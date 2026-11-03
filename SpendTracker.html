@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>Spend Tracker</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--ink:#14211f;--mute:#62716e;--line:#e2e8e6;--pri:#0f766e;--pri2:#ccfbf1;--bad:#c2410c;--good:#15803d;--warn:#b45309}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1514;--card:#162220;--ink:#e8f1ef;--mute:#93a5a1;--line:#243532;--pri:#2dd4bf;--pri2:#123d38;--bad:#fb923c;--good:#4ade80;--warn:#fbbf24}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,sans-serif;padding-bottom:84px}
+header{background:#0f766e;color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:5}
+header h1{margin:0 0 8px;font-size:18px}
+.nav{display:flex;align-items:center;justify-content:space-between}
+.nav button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;width:40px;height:36px;font-size:18px}
+.nav b{font-size:17px}
+main{padding:14px 16px;max-width:640px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
+.big{font-size:32px;font-weight:700;margin:2px 0}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
+.grid div{background:var(--bg);border-radius:12px;padding:8px 4px}
+.grid small{display:block;color:var(--mute);font-size:11px}
+.grid b{font-size:15px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .l{min-width:0}.row .l div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .r{text-align:right;white-space:nowrap}
+button.p{background:var(--pri);color:#062b27;border:0;border-radius:12px;padding:10px 14px;font-weight:600;font-size:15px}
+@media (prefers-color-scheme:light){button.p{color:#fff}}
+button.s{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:6px 10px;font-size:13px}
+button.x{background:none;border:0;color:var(--mute);font-size:18px;padding:4px 8px}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin:4px 0 10px}
+label{font-size:13px;color:var(--mute)}
+.bar{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--pri);border-radius:6px}
+.bar.over i{background:var(--bad)}
+.fab{position:fixed;right:16px;bottom:78px;width:56px;height:56px;border-radius:50%;background:var(--pri);color:#062b27;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
+@media (prefers-color-scheme:light){.fab{color:#fff}}
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+.tabs button{flex:1;background:none;border:0;padding:12px 0;color:var(--mute);font-size:13px}
+.tabs button.on{color:var(--pri);font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:var(--card);width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:18px 16px 24px;max-height:92vh;overflow:auto}
+.sheet h3{margin:0 0 10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 4px;text-align:right;border-top:1px solid var(--line)}th:first-child,td:first-child{text-align:left}
+th{color:var(--mute);font-weight:600;border-top:0}
+tfoot td{font-weight:700}
+.empty{color:var(--mute);text-align:center;padding:14px 0}
+#printArea{display:none}
+.rep{font:13px/1.45 system-ui,sans-serif;color:#111;background:#fff}
+.rep h1{font-size:22px;margin:0 0 2px}.rep h2{font-size:14px;margin:18px 0 6px;border-bottom:2px solid #0f766e;padding-bottom:3px;color:#0f766e}
+.rep table{font-size:12px}.rep th,.rep td{border-top:1px solid #ddd;padding:5px 4px;color:#111}.rep th{color:#555;border-top:0;border-bottom:1px solid #999}
+.rep .kpi{display:flex;gap:10px;margin:10px 0}.rep .kpi div{flex:1;border:1px solid #ccc;border-radius:8px;padding:8px}.rep .kpi small{display:block;color:#555}.rep .kpi b{font-size:16px}
+.rep .sub{color:#555;margin-bottom:8px}
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block}body{background:#fff;padding:0}@page{margin:14mm}}
+</style>
+</head>
+<body>
+<header>
+  <h1>💰 Spend Tracker</h1>
+  <div class="nav"><button id="prev">‹</button><b id="period"></b><button id="next">›</button></div>
+</header>
+<main id="main"></main>
+<button class="fab" id="fab" aria-label="Add">+</button>
+<nav class="tabs" id="tabs"></nav>
+<div id="modalHost"></div>
+<div id="printArea"></div>
+
+<script>
+// ---------- storage ----------
+const KEY='spendtracker.v1';
+const CATS=['Food','Transport','Bills','Shopping','Health','Fun','Other'];
+const ICON={Food:'🍜',Transport:'🚌',Bills:'🧾',Shopping:'🛍️',Health:'💊',Fun:'🎮',Other:'📦'};
+let S;
+function defaults(){return{currency:'RM',defaultIncome:0,incomes:{},spendings:[],contribs:[],goals:[{id:uid(),name:'General savings',target:0,autoType:'none',autoValue:0,lastApplied:null}]}}
+function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults()}catch(e){S=defaults()} }
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+window.saveNow=save;
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+// ---------- helpers ----------
+const pad=n=>String(n).padStart(2,'0');
+const monthKey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1);
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const curMonth=()=>monthKey(new Date());
+const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function addMonths(k,n){let[y,m]=k.split('-').map(Number);m+=n-1;y+=Math.floor(m/12);m=((m%12)+12)%12;return y+'-'+pad(m+1)}
+const monthLabel=k=>{const[y,m]=k.split('-');return MN[m-1]+' '+y};
+const money=n=>(n<0?'-':'')+S.currency+' '+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const $=id=>document.getElementById(id);
+
+// ---------- calculations ----------
+function incomeOf(m){return S.incomes[m]!=null?S.incomes[m]:(m>curMonth()?S.defaultIncome:0)}
+function spentOf(m){return S.spendings.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+x.amount,0)}
+function savedOf(m){return S.contribs.filter(x=>x.month===m).reduce((a,x)=>a+x.amount,0)}
+function goalSaved(g){return S.contribs.filter(x=>x.goalId===g.id).reduce((a,x)=>a+x.amount,0)}
+function leftOf(m){return incomeOf(m)-spentOf(m)-savedOf(m)}
+
+// Ensure every month up to now has an income entry, and apply auto-savings once per month
+function rollForward(){
+  const cm=curMonth();
+  S.goals.forEach(g=>{
+    if(g.autoType==='none')return;
+    let m=g.lastApplied?addMonths(g.lastApplied,1):cm;
+    while(m<=cm){
+      if(S.incomes[m]==null)S.incomes[m]=S.defaultIncome;
+      const amt=g.autoType==='percent'?S.incomes[m]*g.autoValue/100:g.autoValue;
+      if(amt>0)S.contribs.push({id:uid(),goalId:g.id,date:m+'-01',month:m,amount:round(amt),auto:true});
+      g.lastApplied=m;m=addMonths(m,1);
+    }
+  });
+  if(S.incomes[cm]==null)S.incomes[cm]=S.defaultIncome;
+  save();
+}
+const round=n=>Math.round(n*100)/100;
+function setMonthIncome(m,v){
+  S.incomes[m]=v;
+  // keep %-based auto allocations in step with the edited income
+  S.contribs.filter(c=>c.auto&&c.month===m).forEach(c=>{
+    const g=S.goals.find(x=>x.id===c.goalId);if(g&&g.autoType==='percent')c.amount=round(v*g.autoValue/100);
+  });
+  save();
+}
+
+// ---------- state ----------
+let tab='home',month=curMonth(),year=new Date().getFullYear();
+
+// ---------- views ----------
+function render(){
+  const mode=tab==='year'?'year':'month';
+  $('period').textContent=mode==='year'?year:monthLabel(month);
+  $('prev').style.visibility=$('next').style.visibility=(tab==='goals'||tab==='settings')?'hidden':'visible';
+  $('fab').style.display=(tab==='settings')?'none':'block';
+  $('tabs').innerHTML=[['home','🏠','Month'],['goals','🎯','Savings'],['year','📊','Year'],['settings','⚙️','Settings']]
+    .map(([k,i,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${i}<br>${l}</button>`).join('');
+  $('main').innerHTML=({home:viewHome,goals:viewGoals,year:viewYear,settings:viewSettings})[tab]();
+}
+
+function viewHome(){
+  const m=month,inc=incomeOf(m),sp=spentOf(m),sv=savedOf(m),left=inc-sp-sv;
+  const list=S.spendings.filter(x=>x.date.startsWith(m)).sort((a,b)=>b.date.localeCompare(a.date));
+  const by={};list.forEach(x=>by[x.category]=(by[x.category]||0)+x.amount);
+  const cats=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  const pct=inc>0?Math.min(100,(sp+sv)/inc*100):0;
+  return `
+  <div class="card">
+    <h2>Left this month <button class="s" onclick="incomeModal()">Edit income</button></h2>
+    <div class="big ${left<0?'bad':'good'}">${money(left)}</div>
+    <div class="bar ${left<0?'over':''}"><i style="width:${pct}%"></i></div>
+    <div class="grid" style="margin-top:12px">
+      <div><small>Income</small><b>${money(inc)}</b></div>
+      <div><small>Spent</small><b>${money(sp)}</b></div>
+      <div><small>Saved</small><b>${money(sv)}</b></div>
+    </div>
+  </div>
+  ${cats.length?`<div class="card"><h2>By category</h2>${cats.map(([c,v])=>`
+    <div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between"><span>${ICON[c]||'📦'} ${esc(c)}</span><span>${money(v)}</span></div>
+    <div class="bar"><i style="width:${v/sp*100}%"></i></div></div>`).join('')}</div>`:''}
+  <div class="card"><h2>Spendings (${list.length})</h2>
+  ${list.length?list.map(x=>`<div class="row"><div class="l"><div>${ICON[x.category]||'📦'} ${esc(x.note||x.category)}</div><small class="mute">${x.date.slice(8)} ${MN[+x.date.slice(5,7)-1].slice(0,3)} · ${esc(x.category)}</small></div>
+    <div class="r"><b class="bad">-${money(x.amount)}</b><button class="x" onclick="spendModal('${x.id}')">✎</button></div></div>`).join(''):'<div class="empty">No spendings yet.<br>Tap + to add one.</div>'}
+  </div>
+  ${S.contribs.some(c=>c.month===m)?`<div class="card"><h2>Savings this month</h2>${S.contribs.filter(c=>c.month===m).map(c=>{const g=S.goals.find(x=>x.id===c.goalId);return`<div class="row"><div class="l"><div>🎯 ${esc(g?g.name:'?')}</div><small class="mute">${c.auto?'Auto-allocated':'Manual'}</small></div><div class="r"><b>${c.amount<0?'+':'-'}${money(Math.abs(c.amount))}</b><button class="x" onclick="delContrib('${c.id}')">🗑</button></div></div>`}).join('')}</div>`:''}
+  <button class="p" style="width:100%" onclick="printReport('month')">📄 Save ${monthLabel(m)} report as PDF</button>`;
+}
+
+function viewGoals(){
+  const total=S.goals.reduce((a,g)=>a+goalSaved(g),0);
+  return `<div class="card"><h2>Total saved</h2><div class="big good">${money(total)}</div></div>
+  ${S.goals.map(g=>{const s=goalSaved(g),p=g.target>0?Math.min(100,s/g.target*100):0;
+    const auto=g.autoType==='fixed'?`Auto: ${money(g.autoValue)}/month`:g.autoType==='percent'?`Auto: ${g.autoValue}% of income/month`:'Manual only';
+    return `<div class="card"><h2>${esc(g.name)} <button class="s" onclick="goalModal('${g.id}')">Edit</button></h2>
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:22px">${money(s)}</b><span class="mute">${g.target>0?'of '+money(g.target):''}</span></div>
+    ${g.target>0?`<div class="bar"><i style="width:${p}%"></i></div><small class="mute">${p.toFixed(0)}% reached${s<g.target?' · '+money(g.target-s)+' to go':' 🎉'}</small><br>`:''}
+    <small class="mute">${auto}</small>
+    <div style="margin-top:10px"><button class="p" onclick="contribModal('${g.id}')">+ Add / withdraw</button></div></div>`}).join('')}
+  <button class="p" style="width:100%" onclick="goalModal()">+ New savings goal</button>`;
+}
+
+function viewYear(){
+  let ti=0,ts=0,tv=0;const rows=[];
+  for(let i=1;i<=12;i++){const m=year+'-'+pad(i),inc=incomeOf(m),sp=spentOf(m),sv=savedOf(m);ti+=inc;ts+=sp;tv+=sv;rows.push({i,m,inc,sp,sv})}
+  const max=Math.max(1,...rows.map(r=>Math.max(r.inc,r.sp+r.sv)));
+  const W=300,H=110,bw=W/12;
+  const chart=rows.map((r,k)=>{const x=k*bw+3,h1=r.inc/max*H,h2=r.sp/max*H,h3=r.sv/max*H;
+    return `<rect x="${x}" y="${H-h1}" width="${bw-6}" height="${h1}" fill="var(--line)" rx="2"/>
+    <rect x="${x}" y="${H-h2}" width="${bw-6}" height="${h2}" fill="var(--bad)" rx="2"/>
+    <rect x="${x}" y="${H-h2-h3}" width="${bw-6}" height="${h3}" fill="var(--pri)" rx="2"/>
+    <text x="${x+(bw-6)/2}" y="${H+12}" font-size="8" text-anchor="middle" fill="var(--mute)">${MN[k][0]}</text>`}).join('');
+  return `<div class="card"><h2>${year} summary</h2>
+  <div class="grid"><div><small>Income</small><b>${money(ti)}</b></div><div><small>Spent</small><b>${money(ts)}</b></div><div><small>Saved</small><b>${money(tv)}</b></div></div>
+  <div style="text-align:center;margin-top:10px" class="${ti-ts-tv<0?'bad':'good'}"><small class="mute">Left over</small><div class="big" style="font-size:24px">${money(ti-ts-tv)}</div></div></div>
+  <div class="card"><h2>By month</h2><svg viewBox="0 0 ${W} ${H+16}" width="100%"><g>${chart}</g></svg>
+  <small class="mute">▇ income &nbsp;<span class="bad">▇ spent</span> &nbsp;<span style="color:var(--pri)">▇ saved</span></small></div>
+  <div class="card" style="overflow-x:auto"><table><thead><tr><th>Month</th><th>Income</th><th>Spent</th><th>Saved</th><th>Left</th></tr></thead><tbody>
+  ${rows.map(r=>`<tr onclick="month='${r.m}';tab='home';render()"><td>${MN[r.i-1].slice(0,3)}</td><td>${r.inc.toFixed(0)}</td><td>${r.sp.toFixed(0)}</td><td>${r.sv.toFixed(0)}</td><td class="${r.inc-r.sp-r.sv<0?'bad':''}">${(r.inc-r.sp-r.sv).toFixed(0)}</td></tr>`).join('')}
+  </tbody><tfoot><tr><td>Total</td><td>${ti.toFixed(0)}</td><td>${ts.toFixed(0)}</td><td>${tv.toFixed(0)}</td><td>${(ti-ts-tv).toFixed(0)}</td></tr></tfoot></table></div>
+  <button class="p" style="width:100%" onclick="printReport('year')">📄 Save ${year} report as PDF</button>`;
+}
+
+function viewSettings(){
+  return `<div class="card"><h2>Income & currency</h2>
+  <label>Default monthly income (used for each new month)</label><input id="sInc" type="number" inputmode="decimal" value="${S.defaultIncome}">
+  <label>Currency symbol</label><input id="sCur" value="${esc(S.currency)}" maxlength="5">
+  <button class="p" onclick="saveSettings()">Save</button>
+  <p class="mute" style="font-size:13px">Changing the default affects future months. To change a month that already exists, open it and tap “Edit income”.</p></div>
+  <div class="card"><h2>Save &amp; transfer data</h2>
+  <p class="mute" style="font-size:13px;margin-top:0">Your data is saved automatically in this browser. Use these to keep a copy or move it to another phone or computer.</p>
+  <div class="two"><button class="p" onclick="exportData()">⬇ Download backup</button><button class="s" onclick="shareData()">📤 Share backup</button></div><br>
+  <label>Load a backup file (.json)</label><input type="file" id="impFile" accept=".json,application/json" onchange="importFile(this)">
+  <button class="s" onclick="exportCSV()">Export spendings as CSV (Excel)</button></div>
+  <div class="card"><h2>Danger zone</h2><button class="s" onclick="if(confirm('Delete ALL data?')){S=defaults();save();rollForward();render()}">Erase everything</button></div>`;
+}
+
+// ---------- modals ----------
+function modal(html){$('modalHost').innerHTML=`<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet">${html}</div></div>`}
+function closeModal(){$('modalHost').innerHTML=''}
+window.handleBack=()=>{if($('modalHost').innerHTML){closeModal();return true}if(tab!=='home'){tab='home';render();return true}return false};
+
+function spendModal(id){
+  const x=id?S.spendings.find(s=>s.id===id):{amount:'',category:'Food',note:'',date:month===curMonth()?todayStr():month+'-01'};
+  modal(`<h3>${id?'Edit':'Add'} spending</h3>
+  <label>Amount</label><input id="f_a" type="number" inputmode="decimal" value="${x.amount}" autofocus>
+  <label>Category</label><select id="f_c">${CATS.map(c=>`<option ${c===x.category?'selected':''}>${c}</option>`).join('')}</select>
+  <label>Note</label><input id="f_n" value="${esc(x.note)}" placeholder="e.g. Lunch">
+  <label>Date</label><input id="f_d" type="date" value="${x.date}">
+  <div class="two"><button class="p" onclick="saveSpend('${id||''}')">Save</button>${id?`<button class="s" onclick="delSpend('${id}')">Delete</button>`:`<button class="s" onclick="closeModal()">Cancel</button>`}</div>`);
+}
+function saveSpend(id){
+  const a=num($('f_a').value);if(a<=0){alert('Enter an amount');return}
+  const o={amount:a,category:$('f_c').value,note:$('f_n').value.trim(),date:$('f_d').value||todayStr()};
+  if(id)Object.assign(S.spendings.find(s=>s.id===id),o);else S.spendings.push({id:uid(),...o});
+  month=o.date.slice(0,7);ensureIncome(month);save();closeModal();render();
+}
+function ensureIncome(m){if(S.incomes[m]==null&&m<=curMonth())S.incomes[m]=S.defaultIncome}
+function delSpend(id){S.spendings=S.spendings.filter(s=>s.id!==id);save();closeModal();render()}
+function incomeModal(){
+  modal(`<h3>Income for ${monthLabel(month)}</h3>
+  <label>Total income this month</label><input id="f_i" type="number" inputmode="decimal" value="${incomeOf(month)}">
+  <label><input type="checkbox" id="f_def" style="width:auto;margin:0 6px 0 0"> Also use as default for future months</label><br><br>
+  <p class="mute" style="font-size:13px">Spendings and savings are deducted from this automatically.</p>
+  <div class="two"><button class="p" onclick="saveIncome()">Save</button><button class="s" onclick="closeModal()">Cancel</button></div>`);
+}
+function saveIncome(){const v=num($('f_i').value);setMonthIncome(month,v);if($('f_def').checked)S.defaultIncome=v;save();closeModal();render()}
+function contribModal(gid){
+  modal(`<h3>Add to savings</h3>
+  <label>Goal</label><select id="f_g">${S.goals.map(g=>`<option value="${g.id}" ${g.id===gid?'selected':''}>${esc(g.name)}</option>`).join('')}</select>
+  <label>Amount (use a minus to withdraw back into income)</label><input id="f_a" type="number" inputmode="decimal">
+  <p class="mute" style="font-size:13px">Counted against ${monthLabel(month===curMonth()||tab==='home'?month:curMonth())}'s income.</p>
+  <div class="two"><button class="p" onclick="saveContrib()">Save</button><button class="s" onclick="closeModal()">Cancel</button></div>`);
+}
+function saveContrib(){
+  const a=num($('f_a').value);if(!a){alert('Enter an amount');return}
+  const m=tab==='home'?month:curMonth();ensureIncome(m);
+  S.contribs.push({id:uid(),goalId:$('f_g').value,date:m+'-01',month:m,amount:a,auto:false});
+  save();closeModal();render();
+}
+function delContrib(id){if(confirm('Remove this savings entry? It returns to income.')){S.contribs=S.contribs.filter(c=>c.id!==id);save();render()}}
+function goalModal(id){
+  const g=id?S.goals.find(x=>x.id===id):{name:'',target:'',autoType:'none',autoValue:''};
+  modal(`<h3>${id?'Edit':'New'} savings goal</h3>
+  <label>Name</label><input id="g_n" value="${esc(g.name)}" placeholder="e.g. Emergency fund">
+  <label>Target (optional)</label><input id="g_t" type="number" inputmode="decimal" value="${g.target||''}">
+  <label>Auto-allocate every month</label>
+  <select id="g_k" onchange="document.getElementById('g_v').style.display=this.value==='none'?'none':'block'">
+    <option value="none" ${g.autoType==='none'?'selected':''}>Off (manual only)</option>
+    <option value="fixed" ${g.autoType==='fixed'?'selected':''}>Fixed amount</option>
+    <option value="percent" ${g.autoType==='percent'?'selected':''}>% of income</option></select>
+  <input id="g_v" type="number" inputmode="decimal" placeholder="Amount or %" value="${g.autoValue||''}" style="display:${g.autoType==='none'?'none':'block'}">
+  <div class="two"><button class="p" onclick="saveGoal('${id||''}')">Save</button>${id&&S.goals.length>1?`<button class="s" onclick="delGoal('${id}')">Delete</button>`:`<button class="s" onclick="closeModal()">Cancel</button>`}</div>`);
+}
+function saveGoal(id){
+  const n=$('g_n').value.trim();if(!n){alert('Enter a name');return}
+  const o={name:n,target:num($('g_t').value),autoType:$('g_k').value,autoValue:num($('g_v').value)};
+  if(o.autoType!=='none'&&o.autoValue<=0)o.autoType='none';
+  if(id){const g=S.goals.find(x=>x.id===id);const turnedOn=g.autoType==='none'&&o.autoType!=='none';Object.assign(g,o);if(turnedOn)g.lastApplied=addMonths(curMonth(),-1);}
+  else S.goals.push({id:uid(),...o,lastApplied:o.autoType!=='none'?addMonths(curMonth(),-1):null});
+  rollForward();closeModal();render();
+}
+function delGoal(id){if(confirm('Delete this goal? Its savings return to your income.')){S.goals=S.goals.filter(g=>g.id!==id);S.contribs=S.contribs.filter(c=>c.goalId!==id);save();closeModal();render()}}
+
+// ---------- settings ----------
+function saveSettings(){S.defaultIncome=num($('sInc').value);S.currency=$('sCur').value.trim()||'RM';ensureIncome(curMonth());save();render();alert('Saved')}
+function download(name,text,type){const bl=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+const backupName=()=>'spendtracker-backup-'+todayStr()+'.json';
+function exportData(){download(backupName(),JSON.stringify(S,null,2),'application/json')}
+async function shareData(){
+  const f=new File([JSON.stringify(S,null,2)],backupName(),{type:'application/json'});
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Spend Tracker backup'});return}}catch(e){if(e.name==='AbortError')return}
+  exportData();
+}
+function exportCSV(){
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const rows=[['Date','Category','Note','Amount']].concat(S.spendings.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>[x.date,x.category,x.note,x.amount]));
+  download('spendings-'+todayStr()+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv');
+}
+let pending=null;
+function importFile(inp){
+  const f=inp.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.spendings)||!Array.isArray(d.goals)||!d.incomes)throw 0;pending=d;
+    modal(`<h3>Load backup</h3><p>The file has <b>${d.spendings.length}</b> spendings, <b>${d.goals.length}</b> savings goals and <b>${Object.keys(d.incomes).length}</b> months of income.</p>
+    <p class="mute" style="font-size:13px"><b>Replace</b> erases what's on this device first. <b>Merge</b> keeps what's here and adds anything new from the file.</p>
+    <div class="two"><button class="p" onclick="applyImport('replace')">Replace</button><button class="s" onclick="applyImport('merge')">Merge</button></div><br><button class="s" style="width:100%" onclick="closeModal()">Cancel</button>`)}
+    catch(e){alert('That is not a valid Spend Tracker backup file.')}inp.value=''};
+  r.readAsText(f);
+}
+function applyImport(mode){
+  const d=pending;if(!d)return;
+  if(mode==='replace')S=Object.assign(defaults(),d);
+  else{const has=(arr,id)=>arr.some(x=>x.id===id);
+    d.spendings.forEach(x=>{if(!has(S.spendings,x.id))S.spendings.push(x)});
+    d.goals.forEach(x=>{if(!has(S.goals,x.id))S.goals.push(x)});
+    d.contribs.forEach(x=>{if(!has(S.contribs,x.id))S.contribs.push(x)});
+    Object.keys(d.incomes).forEach(k=>{if(S.incomes[k]==null)S.incomes[k]=d.incomes[k]});}
+  pending=null;save();rollForward();closeModal();render();alert('Backup loaded');
+}
+
+// ---------- PDF reports (uses the browser's Print > Save as PDF) ----------
+function repHead(title,sub){return`<h1>💰 ${title}</h1><div class="sub">${sub} · generated ${todayStr()}</div>`}
+function kpis(inc,sp,sv){return`<div class="kpi"><div><small>Income</small><b>${money(inc)}</b></div><div><small>Spent</small><b>${money(sp)}</b></div><div><small>Saved</small><b>${money(sv)}</b></div><div><small>Left over</small><b>${money(inc-sp-sv)}</b></div></div>`}
+function catTable(list){const by={};list.forEach(x=>by[x.category]=(by[x.category]||0)+x.amount);const t=list.reduce((a,x)=>a+x.amount,0);
+  const e=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  return e.length?`<table><thead><tr><th>Category</th><th>Amount</th><th>Share</th></tr></thead><tbody>${e.map(([c,v])=>`<tr><td>${esc(c)}</td><td>${money(v)}</td><td>${(v/t*100).toFixed(0)}%</td></tr>`).join('')}</tbody></table>`:'<div class="sub">No spendings.</div>'}
+function goalsTable(){return`<table><thead><tr><th>Goal</th><th>Saved so far</th><th>Target</th><th>Progress</th></tr></thead><tbody>${S.goals.map(g=>{const s=goalSaved(g);return`<tr><td>${esc(g.name)}</td><td>${money(s)}</td><td>${g.target>0?money(g.target):'—'}</td><td>${g.target>0?Math.min(100,s/g.target*100).toFixed(0)+'%':'—'}</td></tr>`}).join('')}</tbody></table>`}
+function monthReportHtml(m){
+  const list=S.spendings.filter(x=>x.date.startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date));
+  const cs=S.contribs.filter(c=>c.month===m);
+  return`<div class="rep">${repHead('Monthly report','<b>'+monthLabel(m)+'</b>')}${kpis(incomeOf(m),spentOf(m),savedOf(m))}
+  <h2>Spending by category</h2>${catTable(list)}
+  <h2>All spendings (${list.length})</h2>${list.length?`<table><thead><tr><th>Date</th><th>Category</th><th>Note</th><th>Amount</th></tr></thead><tbody>${list.map(x=>`<tr><td>${x.date}</td><td>${esc(x.category)}</td><td style="text-align:left">${esc(x.note||'')}</td><td>${money(x.amount)}</td></tr>`).join('')}</tbody></table>`:'<div class="sub">None.</div>'}
+  <h2>Savings this month</h2>${cs.length?`<table><thead><tr><th>Goal</th><th>Type</th><th>Amount</th></tr></thead><tbody>${cs.map(c=>{const g=S.goals.find(x=>x.id===c.goalId);return`<tr><td>${esc(g?g.name:'?')}</td><td style="text-align:right">${c.auto?'Auto':'Manual'}</td><td>${money(c.amount)}</td></tr>`}).join('')}</tbody></table>`:'<div class="sub">None.</div>'}
+  <h2>Savings goals (all time)</h2>${goalsTable()}</div>`}
+function yearReportHtml(y){
+  let ti=0,ts=0,tv=0;const rows=[];
+  for(let i=1;i<=12;i++){const m=y+'-'+pad(i),inc=incomeOf(m),sp=spentOf(m),sv=savedOf(m);ti+=inc;ts+=sp;tv+=sv;rows.push(`<tr><td>${MN[i-1]}</td><td>${money(inc)}</td><td>${money(sp)}</td><td>${money(sv)}</td><td>${money(inc-sp-sv)}</td></tr>`)}
+  const list=S.spendings.filter(x=>x.date.startsWith(y+'-'));
+  return`<div class="rep">${repHead('Yearly report','<b>'+y+'</b>')}${kpis(ti,ts,tv)}
+  <h2>Month by month</h2><table><thead><tr><th>Month</th><th>Income</th><th>Spent</th><th>Saved</th><th>Left</th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td>Total</td><td>${money(ti)}</td><td>${money(ts)}</td><td>${money(tv)}</td><td>${money(ti-ts-tv)}</td></tr></tfoot></table>
+  <h2>Spending by category</h2>${catTable(list)}
+  <h2>Savings goals (all time)</h2>${goalsTable()}</div>`}
+function printReport(kind){
+  const old=document.title;
+  if(kind==='month'){$('printArea').innerHTML=monthReportHtml(month);document.title='SpendReport-'+month}
+  else{$('printArea').innerHTML=yearReportHtml(year);document.title='SpendReport-'+year}
+  window.onafterprint=()=>{document.title=old;$('printArea').innerHTML='';window.onafterprint=null};
+  setTimeout(()=>window.print(),80);
+}
+
+// ---------- wiring ----------
+$('prev').onclick=()=>{if(tab==='year')year--;else month=addMonths(month,-1);render()};
+$('next').onclick=()=>{if(tab==='year')year++;else month=addMonths(month,1);render()};
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b){tab=b.dataset.t;render();scrollTo(0,0)}};
+$('fab').onclick=()=>tab==='goals'?contribModal():spendModal();
+load();rollForward();render();
+</script>
+</body>
+</html>

@@ -4,15 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CalGencha</title>
+<meta name="theme-color" content="#2347C8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a short heading, then one card per tool in a responsive grid. Each card carries the accent of the tool it opens. */
+/* Layout: a short heading, one card per tool in a responsive grid, then a "Your data" panel for backup and restore. Each card carries the accent of the tool it opens. */
 :root {
   color-scheme: light dark;
   --bg: #EEF1F4;
   --surface: #FFFFFF;
+  --surface-2: #F5F7FA;
   --ink: #141B24;
   --muted: #586474;
   --line: #D6DCE4;
@@ -21,6 +26,8 @@
   --blue-soft: #E3E9FB;
   --teal: #0F766E;
   --teal-soft: #D8F1EE;
+  --accent: #2347C8;
+  --on-accent: #FFFFFF;
   --over: #C2410C;
   --today: #D93025;
   --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
@@ -31,6 +38,7 @@
   :root {
     --bg: #0E1319;
     --surface: #161D26;
+    --surface-2: #1C2530;
     --ink: #E8EDF3;
     --muted: #94A1B1;
     --line: #2B3644;
@@ -39,20 +47,19 @@
     --blue-soft: #1B2745;
     --teal: #2DD4BF;
     --teal-soft: #123D38;
+    --accent: #8AA4FF;
+    --on-accent: #0B1226;
     --over: #FB923C;
     --today: #FF6F61;
   }
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font: 16px/1.5 var(--font-body);
-}
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font-body); }
 h1, h2, p, ul { margin: 0; padding: 0; }
 ul { list-style: none; }
+[hidden] { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .wrap {
   max-width: 920px;
@@ -64,31 +71,30 @@ ul { list-style: none; }
   flex-direction: column;
   gap: 32px;
 }
-.head { display: flex; flex-direction: column; gap: 8px; }
-h1 {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-stretch: 125%;
-  font-size: clamp(34px, 7vw, 52px);
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
+.head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.head > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+h1 { font-family: var(--font-display); font-weight: 800; font-stretch: 125%; font-size: clamp(34px, 7vw, 52px); line-height: 1; letter-spacing: -0.02em; }
 .head p { color: var(--muted); max-width: 46ch; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 38px; padding: 7px 14px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); color: var(--ink);
+  font: 600 14px/1.2 var(--font-body); cursor: pointer;
+}
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn:focus-within, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn svg { width: 16px; height: 16px; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
 .card {
-  --a: var(--blue);
-  --soft: var(--blue-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%;
-  padding: 12px 12px 16px;
-  color: inherit;
-  text-decoration: none;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  --a: var(--blue); --soft: var(--blue-soft);
+  display: flex; flex-direction: column; gap: 16px; height: 100%;
+  padding: 12px 12px 16px; color: inherit; text-decoration: none;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
   transition: border-color 0.15s, transform 0.15s;
 }
 .card.teal { --a: var(--teal); --soft: var(--teal-soft); }
@@ -105,9 +111,6 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
 .card:hover .open svg { transform: translateX(4px); }
 .file { font: 500 12px var(--font-mono); color: var(--muted); }
 
-.note { color: var(--muted); font-size: 13.5px; max-width: 60ch; }
-
-/* art */
 .art .t { font: 500 10px var(--font-mono); fill: var(--ink); }
 .art .m { font: 500 10px var(--font-mono); fill: var(--muted); }
 .art .gl { stroke: var(--grid); stroke-width: 1; }
@@ -117,20 +120,49 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
 .art .trk { fill: var(--surface); }
 .art .ov { fill: var(--over); }
 
+/* Your data */
+.data { display: flex; flex-direction: column; gap: 14px; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.data h2 { font-size: 18px; }
+.data p { color: var(--muted); max-width: 62ch; }
+.pill { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 3px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--ink); background: var(--surface-2); }
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.pill.ok::before { background: var(--teal); }
+.pill.warn { border-color: var(--over); }
+.pill.warn::before { background: var(--over); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.restore { display: flex; flex-direction: column; gap: 12px; padding: 14px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; }
+.restore h3 { margin: 0; font-size: 15px; }
+.restore ul { display: flex; flex-direction: column; gap: 8px; }
+.restore label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.restore input { margin-top: 4px; accent-color: var(--accent); width: 16px; height: 16px; }
+.restore small { display: block; color: var(--muted); }
+.msg { min-height: 1.5em; font-weight: 500; color: var(--ink) !important; }
+.msg.err { color: var(--over) !important; }
+.ios { color: var(--muted); font-size: 13.5px; }
+
+.sitefoot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+
 @media (prefers-reduced-motion: reduce) { .card, .open svg { transition: none; } .card:hover { transform: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="head">
-    <h1>CalGencha</h1>
-    <p>Small tools that run in your browser. Pick one to start.</p>
+    <div>
+      <h1>CalGencha</h1>
+      <p>Small tools that run in your browser. Once opened, they also work offline.</p>
+      <p class="ios" id="iosHint" hidden>On iPhone or iPad: tap Share, then Add to Home Screen.</p>
+    </div>
+    <button type="button" class="btn primary" id="installBtn" hidden>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v8M4.8 7.5L8 10.7l3.2-3.2M3 13h10"/></svg>
+      Install app
+    </button>
   </header>
 
   <nav aria-label="Tools">
     <ul class="grid">
 
-      <!-- To add a tool, copy one <li> block, change the href, text and the "teal" class (or remove it for blue), and replace the picture. -->
+      <!-- To add a tool, copy one <li> block, change the href, text and the "teal" class (or remove it for blue), replace the picture, and add the tool's storage key to TOOLS in the script below so backups include it. -->
 
       <li>
         <a class="card" href="gancha.html">
@@ -146,7 +178,7 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
           </div>
           <div class="body">
             <h2>Gantt Chart</h2>
-            <p>Plan jobs on a timeline, assign one or more people to each, and save the chart as PDF or JSON.</p>
+            <p>Plan jobs on a timeline or a To do, Doing, Done board. Assign people and save as PDF or JSON.</p>
           </div>
           <div class="foot">
             <span class="open">Open
@@ -185,7 +217,141 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
     </ul>
   </nav>
 
-  <p class="note">Your data stays on this device. Each tool keeps its own copy in this browser, so use its save or backup button before clearing browser data or switching devices.</p>
+  <section class="data" aria-labelledby="dataHead">
+    <h2 id="dataHead">Your data</h2>
+    <p>Everything you make is stored in this browser only, never on a server. Download a backup to keep a copy, or to move to another phone or computer.</p>
+    <p class="pill" id="backupStatus" role="status"></p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="backupBtn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v8M4.8 7.5L8 10.7l3.2-3.2M3 13h10"/></svg>
+        Download backup
+      </button>
+      <label class="btn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 10.5v-8M4.8 5.5L8 2.3l3.2 3.2M3 13h10"/></svg>
+        <span>Restore from file</span>
+        <input class="sr" type="file" id="restoreFile" accept=".json,application/json">
+      </label>
+    </div>
+    <div class="restore" id="restorePanel" hidden>
+      <h3>Choose what to restore</h3>
+      <ul id="restoreList"></ul>
+      <p>Restoring replaces the current data for each tool you tick.</p>
+      <div class="actions">
+        <button type="button" class="btn primary" id="restoreGo">Restore selected</button>
+        <button type="button" class="btn" id="restoreCancel">Cancel</button>
+      </div>
+    </div>
+    <p class="msg" id="msg" role="status"></p>
+  </section>
+
+  <footer class="sitefoot">
+    <span>&copy; 2026 rgchaos. All rights reserved.</span>
+    <span>CalGencha</span>
+  </footer>
 </div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  /* Every tool that keeps data in this browser is listed here, so backups know what to include. */
+  var TOOLS = [
+    { key: 'barline.draft.v1', name: 'Gantt Chart',
+      valid: function (d) { return d && typeof d === 'object' && Array.isArray(d.tasks); },
+      has: function (d) { return d.example !== true; },
+      sum: function (d) { return (d.title || 'Untitled project') + ', ' + plural(d.tasks.length, 'item'); } },
+    { key: 'spendtracker.v1', name: 'Spend Tracker',
+      valid: function (d) { return d && typeof d === 'object' && Array.isArray(d.spendings) && Array.isArray(d.goals) && d.incomes && typeof d.incomes === 'object'; },
+      has: function () { return true; },
+      sum: function (d) { return plural(d.spendings.length, 'spending') + ', ' + plural(d.goals.length, 'savings goal'); } }
+  ];
+  var LAST = 'calgencha.lastBackup';
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+  function read(tool) { var raw = lsGet(tool.key); if (!raw) return null; try { var d = JSON.parse(raw); return tool.valid(d) ? d : null; } catch (e) { return null; } }
+  function today() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function dayNum(s) { var p = String(s).split('-').map(Number); return Math.round(Date.UTC(p[0], p[1] - 1, p[2]) / 86400000); }
+
+  function say(text, err) { var m = $('#msg'); m.textContent = text; m.classList.toggle('err', !!err); }
+
+  function status() {
+    var el = $('#backupStatus'), have = TOOLS.some(function (t) { var d = read(t); return d && t.has(d); });
+    var last = lsGet(LAST), ago = last && /^\d{4}-\d{2}-\d{2}$/.test(last) ? dayNum(today()) - dayNum(last) : null;
+    el.className = 'pill';
+    if (!have) { el.textContent = 'No saved data on this device yet'; return; }
+    if (ago == null) { el.textContent = 'No backup yet. Download one soon.'; el.classList.add('warn'); return; }
+    var when = ago === 0 ? 'today' : ago === 1 ? 'yesterday' : ago + ' days ago';
+    if (ago > 30) { el.textContent = 'Last backup ' + when + '. Time for a new one.'; el.classList.add('warn'); }
+    else { el.textContent = 'Last backup ' + when; el.classList.add('ok'); }
+  }
+
+  $('#backupBtn').addEventListener('click', function () {
+    var data = {}, names = [];
+    TOOLS.forEach(function (t) { var d = read(t); if (d && t.has(d)) { data[t.key] = d; names.push(t.name); } });
+    if (!names.length) { say('Nothing to back up yet. Open a tool and add something first.', true); return; }
+    var file = { app: 'calgencha', type: 'backup', version: 1, created: new Date().toISOString(), data: data };
+    var a = document.createElement('a'), name = 'calgencha-backup-' + today() + '.json';
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' })); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    lsSet(LAST, today()); status();
+    say('Saved ' + name + ' with ' + names.join(' and ') + '.');
+  });
+
+  var pending = null;
+  $('#restoreFile').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    $('#restorePanel').hidden = true; pending = null;
+    if (f.size > 20 * 1024 * 1024) { say('That file is too large to be a CalGencha backup.', true); return; }
+    var r = new FileReader();
+    r.onerror = function () { say('Could not read that file.', true); };
+    r.onload = function () {
+      var o; try { o = JSON.parse(String(r.result)); } catch (err) { say('That file is not valid JSON.', true); return; }
+      if (!o || o.app !== 'calgencha' || o.type !== 'backup' || !o.data || typeof o.data !== 'object') { say('That is not a CalGencha backup file. Tool files, such as a saved chart, are loaded inside the tool itself.', true); return; }
+      var found = TOOLS.filter(function (t) { return t.valid(o.data[t.key]); });
+      if (!found.length) { say('That backup has nothing this site can restore.', true); return; }
+      pending = { o: o, found: found };
+      $('#restoreList').innerHTML = found.map(function (t, i) {
+        return '<li><label><input type="checkbox" checked data-i="' + i + '"><span><b>' + esc(t.name) + '</b><small>' + esc(t.sum(o.data[t.key])) + '</small></span></label></li>';
+      }).join('');
+      $('#restorePanel').hidden = false; say('');
+    };
+    r.readAsText(f);
+  });
+  $('#restoreCancel').addEventListener('click', function () { $('#restorePanel').hidden = true; pending = null; say(''); });
+  $('#restoreGo').addEventListener('click', function () {
+    if (!pending) return;
+    var done = [], failed = false;
+    document.querySelectorAll('#restoreList input:checked').forEach(function (c) {
+      var t = pending.found[+c.dataset.i];
+      if (lsSet(t.key, JSON.stringify(pending.o.data[t.key]))) done.push(t.name); else failed = true;
+    });
+    $('#restorePanel').hidden = true; pending = null; status();
+    if (failed) say('This browser would not let the site save that data. Check that storage is allowed.', true);
+    else if (!done.length) say('Nothing was selected.', true);
+    else say('Restored ' + done.join(' and ') + '. Open the tool to see it.');
+  });
+
+  /* install and offline */
+  var deferred = null, btn = $('#installBtn');
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; btn.hidden = false; });
+  btn.addEventListener('click', function () {
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.then(function () { deferred = null; btn.hidden = true; });
+  });
+  window.addEventListener('appinstalled', function () { btn.hidden = true; });
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.navigator.standalone;
+  if (ios) $('#iosHint').hidden = false;
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+
+  status();
+})();
+</script>
 </body>
 </html>

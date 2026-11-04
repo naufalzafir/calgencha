@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Spend Tracker</title>
 <style>
 :root{--bg:#f4f6f5;--card:#fff;--ink:#14211f;--mute:#62716e;--line:#e2e8e6;--pri:#0f766e;--pri2:#ccfbf1;--bad:#c2410c;--good:#15803d;--warn:#b45309}
@@ -59,14 +62,22 @@ tfoot td{font-weight:700}
 .rep .kpi{display:flex;gap:10px;margin:10px 0}.rep .kpi div{flex:1;border:1px solid #ccc;border-radius:8px;padding:8px}.rep .kpi small{display:block;color:#555}.rep .kpi b{font-size:16px}
 .rep .sub{color:#555;margin-bottom:8px}
 @media print{body>*:not(#printArea){display:none!important}#printArea{display:block}body{background:#fff;padding:0}@page{margin:14mm}}
+.sitebar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px))}
+.sitebar a{display:inline-flex;align-items:center;gap:8px;color:var(--mute);text-decoration:none;font-weight:600;font-size:13px}
+.sitebar a:hover{color:var(--ink)}
+.sitebar svg{width:20px;height:20px;color:var(--pri)}
+.sitefoot{max-width:640px;margin:0 auto;padding:14px 16px 0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--mute);font-size:13px}
+.sitefoot a{color:inherit}
 </style>
 </head>
 <body>
+<div class="sitebar"><a href="index.html" aria-label="Back to the CalGencha menu"><svg viewBox="0 0 34 34" aria-hidden="true" fill="none"><rect x="2" y="5" width="14" height="6" rx="2" fill="currentColor"/><rect x="9" y="14" width="18" height="6" rx="2" fill="currentColor" opacity="0.65"/><rect x="16" y="23" width="16" height="6" rx="2" fill="currentColor" opacity="0.35"/></svg><span>&larr; CalGencha</span></a></div>
 <header>
   <h1>💰 Spend Tracker</h1>
   <div class="nav"><button id="prev">‹</button><b id="period"></b><button id="next">›</button></div>
 </header>
 <main id="main"></main>
+<footer class="sitefoot"><span>&copy; 2026 rgchaos. All rights reserved.</span><a href="index.html">CalGencha</a></footer>
 <button class="fab" id="fab" aria-label="Add">+</button>
 <nav class="tabs" id="tabs"></nav>
 <div id="modalHost"></div>
@@ -428,5 +439,6 @@ $('fab').onclick=()=>tab==='goals'?contribModal():spendModal();
 load();rollForward();render();
 let lastDay=todayStr();document.addEventListener('visibilitychange',()=>{if(!document.hidden&&todayStr()!==lastDay){lastDay=todayStr();rollForward();render()}});
 </script>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:')window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 </body>
 </html>

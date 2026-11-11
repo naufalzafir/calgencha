@@ -22,7 +22,7 @@ main{padding:14px 16px;max-width:640px;margin:auto}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
 .card h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
 .big{font-size:32px;font-weight:700;margin:2px 0}
-.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}
+.good{color:var(--good)}.bad{color:var(--bad)}.mute{color:var(--mute)}.warn{color:var(--warn)}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center}
 .grid div{background:var(--bg);border-radius:12px;padding:8px 4px}
 .grid small{display:block;color:var(--mute);font-size:11px}
@@ -43,7 +43,8 @@ label{font-size:13px;color:var(--mute)}
 .fab{position:fixed;right:16px;bottom:78px;width:56px;height:56px;border-radius:50%;background:var(--pri);color:#062b27;border:0;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
 @media (prefers-color-scheme:light){.fab{color:#fff}}
 .tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
-.tabs button{flex:1;background:none;border:0;padding:12px 0;color:var(--mute);font-size:13px}
+.tabs button{flex:1;background:none;border:0;padding:12px 0;color:var(--mute);font-size:13px;position:relative}
+.badge{position:absolute;top:6px;left:calc(50% + 8px);min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:11px;font-weight:700;line-height:18px;padding:0 5px}
 .tabs button.on{color:var(--pri);font-weight:700}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
 .sheet{background:var(--card);width:100%;max-width:640px;border-radius:20px 20px 0 0;padding:18px 16px 24px;max-height:92vh;overflow:auto}
@@ -115,6 +116,46 @@ function savedOf(m){return S.contribs.filter(x=>x.month===m).reduce((a,x)=>a+x.a
 function goalSaved(g){return S.contribs.filter(x=>x.goalId===g.id).reduce((a,x)=>a+x.amount,0)}
 function leftOf(m){return incomeOf(m)-spentOf(m)-savedOf(m)}
 
+// ---------- recurring bills ----------
+const plural=(n,w)=>n+' '+w+(n===1?'':'s');
+const dayLabel=d=>(+d.slice(8))+' '+MN[+d.slice(5,7)-1].slice(0,3);
+const dnum=s=>{const p=s.split('-').map(Number);return Math.round(Date.UTC(p[0],p[1]-1,p[2])/864e5)};
+const monthsDiff=(a,b)=>(+b.slice(0,4)-+a.slice(0,4))*12+(+b.slice(5)-+a.slice(5));
+const MONTH_RE=/^\d{4}-(0[1-9]|1[0-2])$/;
+// Bring older saved bills up to date: frequency, start month, autopay (old bills were always automatic)
+function normRec(r,cm){
+  r.every=[1,2,3,6,12].includes(+r.every)?+r.every:1;
+  r.day=Math.max(1,Math.min(31,Math.round(+r.day)||1));
+  if(r.auto===undefined)r.auto=true;
+  if(!MONTH_RE.test(r.start||'')){
+    const rs=S.spendings.filter(x=>x.rec===r.id).map(x=>x.bm||x.date.slice(0,7)).sort();
+    const la=r.lastApplied?addMonths(r.lastApplied,1):cm;
+    r.start=rs[0]||(la<cm?la:cm);
+  }
+  if(!MONTH_RE.test(r.end||''))r.end='';
+}
+function dueDate(r,m){const[y,mo]=m.split('-').map(Number);return m+'-'+pad(Math.min(r.day,new Date(y,mo,0).getDate()))}
+function dueIn(r,m){return m>=r.start&&(!r.end||m<=r.end)&&monthsDiff(r.start,m)%r.every===0}
+function paidOf(r,m){return S.spendings.find(x=>x.rec===r.id&&(x.bm||x.date.slice(0,7))===m)}
+function billsFor(m){return S.recurring.filter(r=>dueIn(r,m)).map(r=>({r,m,due:dueDate(r,m),paid:paidOf(r,m)})).sort((a,b)=>a.due.localeCompare(b.due)||a.r.name.localeCompare(b.r.name))}
+function billStatus(b){
+  if(b.paid)return{txt:'Paid '+dayLabel(b.paid.date),cls:'good'};
+  const df=dnum(b.due)-dnum(todayStr());
+  if(b.m<curMonth())return{txt:'Unpaid · was due '+dayLabel(b.due),cls:'bad'};
+  if(df<0)return{txt:'Overdue by '+plural(-df,'day')+' · due '+dayLabel(b.due),cls:'bad'};
+  const au=b.r.auto?' · autopay':'';
+  if(df===0)return{txt:'Due today'+au,cls:'warn'};
+  return{txt:(df<=14?'Due in '+plural(df,'day'):'Due '+dayLabel(b.due))+au,cls:df<=3?'warn':'mute'};
+}
+// unpaid bills that are overdue or due within 3 days (this month and last month)
+function alertCount(){
+  const t=dnum(todayStr());let n=0;
+  [addMonths(curMonth(),-1),curMonth()].forEach(m=>billsFor(m).forEach(b=>{if(!b.paid&&dnum(b.due)-t<=3)n++}));
+  return n;
+}
+const badge=k=>{const n=k==='home'?alertCount():0;return n?`<span class="badge" aria-label="${n} bills need attention">${n}</span>`:''};
+function freqLabel(r){return r.every===1?'Monthly':r.every===12?'Yearly in '+MN[+r.start.slice(5)-1]:'Every '+r.every+' months'}
+
 // Ensure every month up to now has an income entry, and apply auto-savings once per month
 function rollForward(){
   const cm=curMonth();
@@ -129,13 +170,16 @@ function rollForward(){
     }
   });
   S.recurring.forEach(r=>{
+    normRec(r,cm);
+    if(!r.auto)return;
     let m=r.lastApplied?addMonths(r.lastApplied,1):cm;
     while(m<=cm){
-      const[y,mo]=m.split('-').map(Number);
-      const d=m+'-'+pad(Math.min(r.day,new Date(y,mo,0).getDate()));
-      if(d>todayStr())break;
-      if(S.incomes[m]==null)S.incomes[m]=S.defaultIncome;
-      S.spendings.push({id:uid(),amount:r.amount,category:r.category,note:r.name,date:d,rec:r.id});
+      if(dueIn(r,m)){
+        const d=dueDate(r,m);
+        if(d>todayStr())break;
+        if(S.incomes[m]==null)S.incomes[m]=S.defaultIncome;
+        if(!paidOf(r,m))S.spendings.push({id:uid(),amount:r.amount,category:r.category,note:r.name,date:d,rec:r.id,bm:m});
+      }
       r.lastApplied=m;m=addMonths(m,1);
     }
   });
@@ -162,7 +206,7 @@ function render(){
   $('prev').style.visibility=$('next').style.visibility=(tab==='goals'||tab==='settings'||tab==='plan')?'hidden':'visible';
   $('fab').style.display=(tab==='settings'||tab==='plan')?'none':'block';
   $('tabs').innerHTML=[['home','🏠','Month'],['goals','🎯','Savings'],['plan','📅','Plan'],['year','📊','Year'],['settings','⚙️','Settings']]
-    .map(([k,i,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${i}<br>${l}</button>`).join('');
+    .map(([k,i,l])=>`<button class="${tab===k?'on':''}" data-t="${k}">${i}<br>${l}${badge(k)}</button>`).join('');
   $('main').innerHTML=({home:viewHome,goals:viewGoals,plan:viewPlan,year:viewYear,settings:viewSettings})[tab]();
 }
 
@@ -182,7 +226,9 @@ function viewHome(){
       <div><small>Spent</small><b>${money(sp)}</b></div>
       <div><small>Saved</small><b>${money(sv)}</b></div>
     </div>
+    ${afterBills(m,left)}
   </div>
+  ${billsCard(m)}
   ${catCard(by,sp)}
   <div class="card"><h2>Spendings (${list.length})</h2>
   ${list.length?list.map(x=>`<div class="row"><div class="l"><div>${x.rec?'🔁':(ICON[x.category]||'📦')} ${esc(x.note||x.category)}</div><small class="mute">${x.date.slice(8)} ${MN[+x.date.slice(5,7)-1].slice(0,3)} · ${esc(x.category)}</small></div>
@@ -190,6 +236,24 @@ function viewHome(){
   </div>
   ${S.contribs.some(c=>c.month===m)?`<div class="card"><h2>Savings this month</h2>${S.contribs.filter(c=>c.month===m).map(c=>{const g=S.goals.find(x=>x.id===c.goalId);return`<div class="row"><div class="l"><div>🎯 ${esc(g?g.name:'?')}</div><small class="mute">${c.auto?'Auto-allocated':'Manual'}</small></div><div class="r"><b>${c.amount<0?'+':'-'}${money(Math.abs(c.amount))}</b><button class="x" onclick="delContrib('${c.id}')">🗑</button></div></div>`}).join('')}</div>`:''}
   <button class="p" style="width:100%" onclick="printReport('month')">📄 Save ${monthLabel(m)} report as PDF</button>`;
+}
+
+function afterBills(m,left){
+  if(m<curMonth())return'';
+  const u=billsFor(m).filter(b=>!b.paid).reduce((a,b)=>a+b.r.amount,0);
+  if(u<=0)return'';
+  return`<div style="text-align:center;margin-top:12px;font-size:13px" class="mute">Unpaid bills ${money(u)} · After bills <b class="${left-u<0?'bad':'good'}">${money(left-u)}</b></div>`;
+}
+function billsCard(m){
+  const bl=billsFor(m);
+  if(!bl.length)return S.recurring.length?'':`<div class="card"><h2>Bills</h2><div class="empty">Add rent, subscriptions or loans to see what is paid and what is due.<br><br><button class="p" onclick="recModal()">+ Add recurring bill</button></div></div>`;
+  const paid=bl.filter(b=>b.paid).length,un=bl.filter(b=>!b.paid),tot=un.reduce((a,b)=>a+b.r.amount,0);
+  const over=un.some(b=>b.m<curMonth()||dnum(b.due)<dnum(todayStr()));
+  return`<div class="card"><h2>Bills <span>${paid} of ${bl.length} paid</span></h2>
+  <div class="bar"><i style="width:${paid/bl.length*100}%"></i></div><div style="height:6px"></div>
+  ${bl.map(b=>{const st=billStatus(b);return`<div class="row"><div class="l" role="button" tabindex="0" style="cursor:pointer" onclick="instModal('${b.r.id}','${m}')" onkeydown="if(event.key==='Enter')this.click()"><div>${b.paid?'✅':'🔁'} ${esc(b.r.name)}</div><small class="${st.cls}">${st.txt}</small></div>
+    <div class="r"><b>${money(b.paid?b.paid.amount:b.r.amount)}</b>${b.paid?'':`<br><button class="s" style="margin-top:4px" onclick="payBill('${b.r.id}','${m}')">Mark paid</button>`}</div></div>`}).join('')}
+  ${un.length?`<div class="row"><span class="mute">Still to pay</span><b class="${over?'bad':''}">${money(tot)}</b></div>`:'<div class="empty" style="padding:8px 0">All bills paid 🎉</div>'}</div>`;
 }
 
 function viewGoals(){
@@ -241,11 +305,11 @@ function catCard(by,sp){
 
 function viewPlan(){
   const bl=CATS.filter(c=>S.budgets[c]>0),bt=bl.reduce((a,c)=>a+S.budgets[c],0);
-  const rt=S.recurring.reduce((a,r)=>a+r.amount,0);
+  const rt=S.recurring.reduce((a,r)=>a+r.amount/r.every,0);
   return`<div class="card"><h2>Monthly budgets <button class="s" onclick="budgetModal()">Edit</button></h2>
   ${bl.length?bl.map(c=>`<div class="row"><div class="l">${ICON[c]} ${esc(c)}</div><div class="r">${money(S.budgets[c])}</div></div>`).join('')+`<div class="row"><b>Total budgeted</b><b>${money(bt)}</b></div>`:'<div class="empty">No budgets yet.<br>Set a limit per category and the Month tab shows how much is left.</div>'}</div>
-  <div class="card"><h2>Recurring bills <span>${money(rt)}/mo</span></h2>
-  ${S.recurring.length?S.recurring.map(r=>`<div class="row"><div class="l"><div>🔁 ${esc(r.name)}</div><small class="mute">${esc(r.category)} · day ${r.day} of each month</small></div><div class="r"><b>${money(r.amount)}</b><button class="x" onclick="recModal('${r.id}')">✎</button></div></div>`).join(''):'<div class="empty">No recurring bills yet.<br>Add rent, subscriptions or loans and they deduct from income by themselves.</div>'}
+  <div class="card"><h2>Recurring bills <span>≈ ${money(rt)}/mo</span></h2>
+  ${S.recurring.length?S.recurring.map(r=>`<div class="row"><div class="l"><div>🔁 ${esc(r.name)}</div><small class="mute">${esc(r.category)} · ${freqLabel(r)} · day ${r.day} · ${r.auto?'Autopay':'Pay manually'}${r.end?' · ends '+monthLabel(r.end):''}</small></div><div class="r"><b>${money(r.amount)}</b><button class="x" aria-label="Edit ${esc(r.name)}" onclick="recModal('${r.id}')">✎</button></div></div>`).join(''):'<div class="empty">No recurring bills yet.<br>Add rent, subscriptions or loans. The Month tab then shows what is due and what you have paid.</div>'}
   <div style="margin-top:10px"><button class="p" onclick="recModal()">+ Add recurring bill</button></div></div>`;
 }
 
@@ -257,24 +321,65 @@ function budgetModal(){
 function saveBudgets(){S.budgets={};CATS.forEach(c=>{const v=num($('b_'+c).value);if(v>0)S.budgets[c]=v});save();closeModal();render()}
 
 function recModal(id){
-  const r=id?S.recurring.find(x=>x.id===id):{name:'',amount:'',category:'Bills',day:1};
+  const r=id?S.recurring.find(x=>x.id===id):{name:'',amount:'',category:'Bills',day:1,every:1,start:curMonth(),end:'',auto:false};
+  const ck='style="width:auto;margin:0 6px 0 0"';
   modal(`<h3>${id?'Edit':'New'} recurring bill</h3>
   <label>Name</label><input id="r_n" value="${esc(r.name)}" placeholder="e.g. Rent, Netflix">
   <label>Amount</label><input id="r_a" type="number" inputmode="decimal" value="${r.amount}">
   <div class="two"><div><label>Category</label><select id="r_c">${CATS.map(c=>`<option ${c===r.category?'selected':''}>${c}</option>`).join('')}</select></div>
-  <div><label>Day of month</label><input id="r_d" type="number" min="1" max="31" value="${r.day}"></div></div>
-  ${id?'<p class="mute" style="font-size:13px">Changes apply to future months. Past spendings stay as they are.</p>':'<label><input type="checkbox" id="r_p" style="width:auto;margin:0 6px 0 0"> Already paid / entered this month</label><br><br>'}
+  <div><label>Due day of month</label><input id="r_d" type="number" min="1" max="31" value="${r.day}"></div></div>
+  <div class="two"><div><label>Repeats</label><select id="r_e">${[[1,'Every month'],[2,'Every 2 months'],[3,'Every 3 months'],[6,'Every 6 months'],[12,'Every year']].map(([v,l])=>`<option value="${v}" ${v===r.every?'selected':''}>${l}</option>`).join('')}</select></div>
+  <div><label>First month</label><input id="r_s" type="month" placeholder="YYYY-MM" value="${r.start}"></div></div>
+  <label>Last month (optional, for loans or instalments)</label><input id="r_x" type="month" placeholder="YYYY-MM" value="${r.end||''}">
+  <label><input type="checkbox" id="r_u" ${ck} ${r.auto?'checked':''}> Autopay: mark as paid automatically on the due day</label><br>
+  ${id?'<p class="mute" style="font-size:13px">Changes apply to unpaid and future months. Payments already made stay as they are.</p>':`<label><input type="checkbox" id="r_p" ${ck}> Already paid this month (adds the payment to your spendings)</label><br><br>`}
   <div class="two"><button class="p" onclick="saveRec('${id||''}')">Save</button>${id?`<button class="s" onclick="delRec('${id}')">Delete</button>`:`<button class="s" onclick="closeModal()">Cancel</button>`}</div>`);
 }
 function saveRec(id){
   const n=$('r_n').value.trim(),a=num($('r_a').value),d=Math.max(1,Math.min(31,Math.round(num($('r_d').value))||1));
   if(!n||a<=0){alert('Enter a name and an amount');return}
-  const o={name:n,amount:a,category:$('r_c').value,day:d};
-  if(id)Object.assign(S.recurring.find(x=>x.id===id),o);
-  else S.recurring.push({id:uid(),...o,lastApplied:$('r_p').checked?curMonth():addMonths(curMonth(),-1)});
+  const start=$('r_s').value||curMonth(),end=$('r_x').value||'';
+  if(!MONTH_RE.test(start)||(end&&!MONTH_RE.test(end))){alert('Enter months like 2026-11');return}
+  if(end&&end<start){alert('The last month cannot be before the first month');return}
+  const o={name:n,amount:a,category:$('r_c').value,day:d,every:+$('r_e').value||1,start,end,auto:$('r_u').checked};
+  if(id){const r=S.recurring.find(x=>x.id===id),turnedOn=o.auto&&!r.auto;Object.assign(r,o);if(turnedOn)r.lastApplied=addMonths(curMonth(),-1)}
+  else{
+    const r={id:uid(),...o,lastApplied:o.auto?addMonths(curMonth(),-1):null};S.recurring.push(r);
+    const cm=curMonth();
+    if($('r_p')&&$('r_p').checked&&dueIn(r,cm)&&!paidOf(r,cm)){ensureIncome(cm);S.spendings.push({id:uid(),amount:r.amount,category:r.category,note:r.name,date:todayStr(),rec:r.id,bm:cm})}
+  }
   rollForward();closeModal();render();
 }
 function delRec(id){if(confirm('Stop this recurring bill? Past spendings are kept.')){S.recurring=S.recurring.filter(r=>r.id!==id);save();closeModal();render()}}
+
+function payBill(id,m){
+  const r=S.recurring.find(x=>x.id===id);if(!r||paidOf(r,m))return;
+  ensureIncome(m);
+  S.spendings.push({id:uid(),amount:r.amount,category:r.category,note:r.name,date:m===curMonth()?todayStr():dueDate(r,m),rec:r.id,bm:m});
+  save();render();toast('✅ '+r.name+' marked as paid');
+}
+function instModal(id,m){
+  const r=S.recurring.find(x=>x.id===id);if(!r)return;
+  const p=paidOf(r,m),st=billStatus({r,m,due:dueDate(r,m),paid:p});
+  modal(`<h3>${esc(r.name)} · ${monthLabel(m)}</h3>
+  <p class="${st.cls}" style="font-size:14px;margin-top:0">${st.txt}</p>
+  <label>Amount paid (change it if this month's bill was different)</label><input id="i_a" type="number" inputmode="decimal" value="${p?p.amount:r.amount}">
+  <label>Date paid</label><input id="i_d" type="date" value="${p?p.date:(m===curMonth()?todayStr():dueDate(r,m))}">
+  <div class="two"><button class="p" onclick="savePay('${id}','${m}')">${p?'Save payment':'Mark paid'}</button>${p?`<button class="s" onclick="unpay('${id}','${m}')">Mark unpaid</button>`:`<button class="s" onclick="closeModal()">Cancel</button>`}</div>
+  <button class="s" style="width:100%;margin-top:10px" onclick="recModal('${id}')">Edit this bill</button>`);
+}
+function savePay(id,m){
+  const r=S.recurring.find(x=>x.id===id);if(!r)return;
+  const a=num($('i_a').value);if(a<=0){alert('Enter the amount paid');return}
+  const d=$('i_d').value||todayStr(),p=paidOf(r,m);
+  if(p){p.amount=a;p.date=d}else{ensureIncome(m);S.spendings.push({id:uid(),amount:a,category:r.category,note:r.name,date:d,rec:r.id,bm:m})}
+  save();closeModal();render();
+}
+function unpay(id,m){
+  const r=S.recurring.find(x=>x.id===id),p=r&&paidOf(r,m);if(!p)return;
+  S.spendings=S.spendings.filter(x=>x!==p);save();closeModal();render();
+  toast('Marked as unpaid. The payment was removed from your spendings.');
+}
 
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),4000)}
 
@@ -411,6 +516,7 @@ function monthReportHtml(m){
   const list=S.spendings.filter(x=>x.date.startsWith(m)).sort((a,b)=>a.date.localeCompare(b.date));
   const cs=S.contribs.filter(c=>c.month===m);
   return`<div class="rep">${repHead('Monthly report','<b>'+monthLabel(m)+'</b>')}${kpis(incomeOf(m),spentOf(m),savedOf(m))}
+  ${billsFor(m).length?`<h2>Recurring bills</h2><table><thead><tr><th>Bill</th><th>Due</th><th>Amount</th><th>Status</th></tr></thead><tbody>${billsFor(m).map(b=>`<tr><td>${esc(b.r.name)}</td><td style="text-align:right">${dayLabel(b.due)}</td><td>${money(b.paid?b.paid.amount:b.r.amount)}</td><td style="text-align:right">${b.paid?'Paid '+dayLabel(b.paid.date):'Unpaid'}</td></tr>`).join('')}</tbody></table>`:''}
   <h2>Spending by category</h2>${catTable(list,true)}
   <h2>All spendings (${list.length})</h2>${list.length?`<table><thead><tr><th>Date</th><th>Category</th><th>Note</th><th>Amount</th></tr></thead><tbody>${list.map(x=>`<tr><td>${x.date}</td><td>${esc(x.category)}</td><td style="text-align:left">${esc(x.note||'')}</td><td>${money(x.amount)}</td></tr>`).join('')}</tbody></table>`:'<div class="sub">None.</div>'}
   <h2>Savings this month</h2>${cs.length?`<table><thead><tr><th>Goal</th><th>Type</th><th>Amount</th></tr></thead><tbody>${cs.map(c=>{const g=S.goals.find(x=>x.id===c.goalId);return`<tr><td>${esc(g?g.name:'?')}</td><td style="text-align:right">${c.auto?'Auto':'Manual'}</td><td>${money(c.amount)}</td></tr>`}).join('')}</tbody></table>`:'<div class="sub">None.</div>'}

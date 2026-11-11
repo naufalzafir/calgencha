@@ -26,6 +26,8 @@
   --blue-soft: #E3E9FB;
   --teal: #0F766E;
   --teal-soft: #D8F1EE;
+  --violet: #6D28D9;
+  --violet-soft: #EFE9FC;
   --accent: #2347C8;
   --on-accent: #FFFFFF;
   --over: #C2410C;
@@ -47,6 +49,8 @@
     --blue-soft: #1B2745;
     --teal: #2DD4BF;
     --teal-soft: #123D38;
+    --violet: #A78BFA;
+    --violet-soft: #2A2347;
     --accent: #8AA4FF;
     --on-accent: #0B1226;
     --over: #FB923C;
@@ -98,6 +102,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-stretch: 125%; fon
   transition: border-color 0.15s, transform 0.15s;
 }
 .card.teal { --a: var(--teal); --soft: var(--teal-soft); }
+.card.violet { --a: var(--violet); --soft: var(--violet-soft); }
 .card:hover { border-color: var(--a); transform: translateY(-2px); }
 .card:focus-visible { outline: 3px solid var(--a); outline-offset: 3px; }
 .art { background: var(--soft); border-radius: 8px; line-height: 0; overflow: hidden; }
@@ -214,6 +219,34 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
         </a>
       </li>
 
+      <li>
+        <a class="card violet" href="HabitTracker.html">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 320 120" focusable="false">
+              <text class="t" x="24" y="26">Read</text>
+              <g class="fl"><rect x="90" y="14" width="18" height="18" rx="4"/><rect x="112" y="14" width="18" height="18" rx="4"/><rect x="134" y="14" width="18" height="18" rx="4"/><rect x="156" y="14" width="18" height="18" rx="4"/><rect x="200" y="14" width="18" height="18" rx="4"/><rect x="222" y="14" width="18" height="18" rx="4"/><rect x="244" y="14" width="18" height="18" rx="4"/></g>
+              <rect class="tr" x="178" y="14" width="18" height="18" rx="4"/>
+              <text class="t" x="24" y="64">Walk</text>
+              <g class="fl"><rect x="90" y="52" width="18" height="18" rx="4"/><rect x="134" y="52" width="18" height="18" rx="4"/><rect x="156" y="52" width="18" height="18" rx="4"/><rect x="178" y="52" width="18" height="18" rx="4"/><rect x="222" y="52" width="18" height="18" rx="4"/><rect x="244" y="52" width="18" height="18" rx="4"/></g>
+              <g class="tr"><rect x="112" y="52" width="18" height="18" rx="4"/><rect x="200" y="52" width="18" height="18" rx="4"/></g>
+              <text class="t" x="24" y="102">Water</text>
+              <g class="fl"><rect x="90" y="90" width="18" height="18" rx="4"/><rect x="112" y="90" width="18" height="18" rx="4"/><rect x="156" y="90" width="18" height="18" rx="4"/><rect x="178" y="90" width="18" height="18" rx="4"/><rect x="200" y="90" width="18" height="18" rx="4"/><rect x="222" y="90" width="18" height="18" rx="4"/></g>
+              <g class="tr"><rect x="134" y="90" width="18" height="18" rx="4"/><rect x="244" y="90" width="18" height="18" rx="4"/></g>
+            </svg>
+          </div>
+          <div class="body">
+            <h2>Habit Tracker</h2>
+            <p>Tick off daily habits, keep your streaks and see how consistent you have been over six months.</p>
+          </div>
+          <div class="foot">
+            <span class="open">Open
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </span>
+            <span class="file">HabitTracker.html</span>
+          </div>
+        </a>
+      </li>
+
     </ul>
   </nav>
 
@@ -266,7 +299,11 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
     { key: 'spendtracker.v1', name: 'Spend Tracker',
       valid: function (d) { return d && typeof d === 'object' && Array.isArray(d.spendings) && Array.isArray(d.goals) && d.incomes && typeof d.incomes === 'object'; },
       has: function () { return true; },
-      sum: function (d) { return plural(d.spendings.length, 'spending') + ', ' + plural(d.goals.length, 'savings goal'); } }
+      sum: function (d) { return plural(d.spendings.length, 'spending') + ', ' + plural(d.goals.length, 'savings goal'); } },
+    { key: 'habittracker.v1', name: 'Habit Tracker',
+      valid: function (d) { return d && typeof d === 'object' && Array.isArray(d.habits) && d.logs && typeof d.logs === 'object' && !Array.isArray(d.logs); },
+      has: function (d) { return d.habits.length > 0; },
+      sum: function (d) { return plural(d.habits.length, 'habit'); } }
   ];
   var LAST = 'calgencha.lastBackup';
 

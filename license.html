@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Licence · CalGencha</title>
+<meta name="theme-color" content="#2347C8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#141b24;--mute:#586474;--line:#d6dce4;--acc:#2347c8}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1319;--card:#161d26;--ink:#e8edf3;--mute:#94a1b1;--line:#2b3644;--acc:#8aa4ff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+.bar{background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px))}
+.bar a{color:var(--mute);text-decoration:none;font-weight:600;font-size:13px}.bar a:hover{color:var(--ink)}
+main{max-width:720px;margin:0 auto;padding:24px 16px 8px}
+article{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+h1{margin:0 0 4px;font-size:28px;line-height:1.15}
+h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:22px 0 6px}
+p,ul{margin:0 0 8px}ul{padding-left:20px}li{margin:4px 0}
+.mute{color:var(--mute)}
+footer{max-width:720px;margin:0 auto;padding:14px 16px 28px;color:var(--mute);font-size:13px}
+a:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="bar"><a href="index.html">&larr; CalGencha</a></div>
+<main>
+<article>
+  <h1>Licence and notice</h1>
+  <p class="mute">Copyright &copy; 2026 rgchaos. All rights reserved.</p>
+
+  <h2>AI-assisted work</h2>
+  <p>CalGencha, including its code, design and text, was created by rgchaos with the assistance of an AI system (Claude, by Anthropic). rgchaos directed, selected, edited and published the work.</p>
+
+  <h2>What you may do</h2>
+  <ul>
+    <li>Open and use the tools on the official CalGencha website for your own personal, non-commercial use.</li>
+    <li>Save your own data, backups and exports from the tools.</li>
+  </ul>
+
+  <h2>What you may not do without written permission</h2>
+  <ul>
+    <li>Copy, fork, clone, mirror or re-host the site or any of its files.</li>
+    <li>Redistribute, sell, rent, sublicense or otherwise market the site, its tools, its code or its design, in original or modified form.</li>
+    <li>Present the site, its tools, its code or its design as your own work.</li>
+    <li>Remove or change the copyright notice or this licence.</li>
+  </ul>
+  <p>Viewing the source code on GitHub does not grant any right to reuse it.</p>
+
+  <h2>Third-party components</h2>
+  <p>Some parts are loaded from other projects under their own licences, for example the jsPDF library (MIT licence) and Google Fonts. They remain the property of their owners and are not covered by this notice.</p>
+
+  <h2>No warranty</h2>
+  <p>The site is provided &ldquo;as is&rdquo;, without warranty of any kind. Your data is stored in your own browser and files, so you are responsible for keeping backups.</p>
+
+  <h2>Permission</h2>
+  <p>To ask for permission, contact rgchaos through the GitHub repository for this site.</p>
+</article>
+</main>
+<footer>&copy; 2026 rgchaos. All rights reserved.</footer>
+<script>if('serviceWorker' in navigator&&location.protocol!=='file:')window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
+</body>
+</html>

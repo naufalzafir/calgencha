@@ -1,0 +1,33 @@
+CalGencha - Licence and notice
+
+Copyright (c) 2026 rgchaos. All rights reserved.
+
+AI-ASSISTED WORK
+CalGencha, including its code, design and text, was created by rgchaos with the
+assistance of an AI system (Claude, by Anthropic). rgchaos directed, selected,
+edited and published the work.
+
+WHAT YOU MAY DO
+- Open and use the tools at the official CalGencha website for your own personal,
+  non-commercial use.
+- Save your own data, backups and exports from the tools.
+
+WHAT YOU MAY NOT DO without written permission from rgchaos
+- Copy, fork, clone, mirror or re-host the site or any of its files.
+- Redistribute, sell, rent, sublicense or otherwise market the site, its tools,
+  its code or its design, whether in original or modified form.
+- Present the site, its tools, its code or its design as your own work.
+- Remove or change the copyright notice or this licence.
+
+Viewing the source code on GitHub does not grant any right to reuse it.
+
+THIRD-PARTY COMPONENTS
+Some parts are loaded from other projects under their own licences, for example
+the jsPDF library (MIT licence) and Google Fonts. These remain the property of
+their respective owners and are not covered by this notice.
+
+NO WARRANTY
+The site is provided "as is", without warranty of any kind. Your data is stored in
+your own browser and files; you are responsible for keeping backups.
+
+To ask for permission, contact rgchaos through the GitHub repository for this site.

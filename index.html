@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="profile.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CalGencha</title>
@@ -147,10 +148,17 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
 
 .sitefoot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
 
+/* Sticky top bar (menu page only; the tools keep a plain bar that scrolls away) */
+.sitebar { position: sticky; top: 0; z-index: 30; padding: 10px max(16px, env(safe-area-inset-left, 0px)); background: var(--surface); border-bottom: 1px solid var(--line); }
+.sitebar .name { display: inline-flex; align-items: center; gap: 8px; font: 700 15px/1 var(--font-display); color: var(--ink); }
+.sitebar .name svg { width: 20px; height: 20px; color: var(--accent); }
+.wrap { padding-block-start: clamp(20px, 5vw, 44px); }
+#profile { scroll-margin-top: 72px; }
 @media (prefers-reduced-motion: reduce) { .card, .open svg { transition: none; } .card:hover { transform: none; } }
 </style>
 </head>
 <body>
+<div class="sitebar"><span class="name"><svg viewBox="0 0 34 34" aria-hidden="true" fill="none"><rect x="2" y="5" width="14" height="6" rx="2" fill="currentColor"/><rect x="9" y="14" width="18" height="6" rx="2" fill="currentColor" opacity="0.65"/><rect x="16" y="23" width="16" height="6" rx="2" fill="currentColor" opacity="0.35"/></svg>CalGencha</span></div>
 <div class="wrap">
   <header class="head">
     <div>
@@ -249,6 +257,11 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
 
     </ul>
   </nav>
+
+  <section class="data" id="profile" aria-labelledby="profileHead">
+    <h2 id="profileHead">Profile</h2>
+    <div id="profilePanel"><p>Loading…</p></div>
+  </section>
 
   <section class="data" aria-labelledby="dataHead">
     <h2 id="dataHead">Your data</h2>

@@ -188,6 +188,18 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 }
 .title-input:hover { border-bottom-color: var(--line); }
 .title-input:focus-visible { outline: none; border-bottom-color: var(--accent); }
+/* logo above the title */
+.titlebox { flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.titlebox .title-input { flex: 0 0 auto; width: 100%; }
+.logo-row { display: flex; align-items: center; gap: 12px; }
+.logo-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; max-width: 220px; padding: 4px 12px;
+  border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.logo-btn:hover { border-color: var(--muted); color: var(--ink); }
+.logo-btn.has { border-style: solid; border-color: transparent; padding: 0; }
+.logo-btn img { display: block; max-height: 56px; max-width: 220px; width: auto; height: auto; }
+.linkbtn { background: none; border: 0; padding: 6px 2px; min-height: 36px; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.linkbtn:hover { color: var(--ink); }
+.logo-btn:focus-visible, .linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
 .seg label { display: block; cursor: pointer; }
@@ -520,8 +532,15 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     <main class="main">
       <section class="panel" aria-label="Gantt chart">
         <div class="panel-head">
-          <label class="sr" for="chartTitle">Chart title</label>
-          <input id="chartTitle" class="title-input" maxlength="80" placeholder="Project name" autocomplete="off">
+          <div class="titlebox">
+            <div class="logo-row">
+              <button type="button" class="logo-btn" id="logoBtn" title="Shown above the title and on the PDF"><span>+ Add logo</span></button>
+              <button type="button" class="linkbtn" id="logoRemove" hidden>Remove logo</button>
+              <input type="file" id="logoFile" class="sr" accept="image/*" tabindex="-1" aria-label="Choose a logo image">
+            </div>
+            <label class="sr" for="chartTitle">Chart title</label>
+            <input id="chartTitle" class="title-input" maxlength="80" placeholder="Project name" autocomplete="off">
+          </div>
           <div class="toolbar">
             <div class="seg" role="radiogroup" aria-label="View">
               <label><input class="sr" type="radio" name="view" value="timeline"><span>Timeline</span></label>
@@ -706,7 +725,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- state ---------- */
   function mkTask() { return { id: uid(), name: '', assignees: [], status: 'todo', start: '', end: '', progress: 0, notes: '' }; }
   function blankState() {
-    return { title: 'Untitled project', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', tasks: [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()], example: false };
+    return { title: 'Untitled project', logo: '', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', tasks: [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()], example: false };
   }
   function exampleState() {
     var B = todayDay(); B -= wd(B) + 7; /* Monday of last week */
@@ -716,7 +735,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       return { id: uid(), name: name, assignees: [].concat(pi).map(function (k) { return people[k].id; }), start: toISO(B + s), end: toISO(B + e), progress: pct, status: pct >= 100 ? 'done' : pct > 0 ? 'doing' : 'todo', notes: notes || '' };
     }
     return {
-      title: 'Website relaunch', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
+      title: 'Website relaunch', logo: '', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
       tasks: [
         T('Kickoff and scope', 0, 0, 2, 100),
         T('User research', 2, 1, 11, 100, 'Eight interviews'),
@@ -772,7 +791,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       };
     });
     return {
-      title: clampStr(o.title, 80) || 'Untitled project', scale: o.scale === 'week' ? 'week' : 'day',
+      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
       fields: fields, persons: cleanPeople(o.persons), tasks: tasks.length ? tasks : [mkTask()]
@@ -780,13 +799,64 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   function exportChart() {
     return {
-      app: 'barline', type: 'chart', version: 1, title: state.title, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      app: 'barline', type: 'chart', version: 1, title: state.title, logo: state.logo || '', scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }),
       tasks: state.tasks.map(function (t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, progress: t.progress, notes: t.notes }; })
     };
   }
   function exportPeople() {
     return { app: 'barline', type: 'people', version: 1, persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }) };
+  }
+
+  /* ---------- logo ---------- */
+  /* The logo is always stored as a small PNG data URL (see logoToPng), so it travels inside the
+     chart JSON and the browser draft. cleanLogo() accepts ONLY that shape, so a hand-edited file
+     cannot smuggle anything else into an <img> or the PDF. */
+  var LOGO_MAX_CHARS = 400000;
+  function cleanLogo(v) {
+    return typeof v === 'string' && v.length <= LOGO_MAX_CHARS && /^data:image\/png;base64,[A-Za-z0-9+\/]+=*$/.test(v) && pngSize(v) ? v : '';
+  }
+  /* Width and height are stored in the first bytes of every PNG file (the IHDR block). */
+  function pngSize(u) {
+    try {
+      var b = atob(u.slice(22, 54)); /* 22 = length of "data:image/png;base64," ; 32 characters = 24 bytes */
+      if (b.slice(1, 4) !== 'PNG') return null;
+      var w = ((b.charCodeAt(16) << 24) | (b.charCodeAt(17) << 16) | (b.charCodeAt(18) << 8) | b.charCodeAt(19)) >>> 0;
+      var h = ((b.charCodeAt(20) << 24) | (b.charCodeAt(21) << 16) | (b.charCodeAt(22) << 8) | b.charCodeAt(23)) >>> 0;
+      return w > 0 && h > 0 && w < 5000 && h < 5000 ? { w: w, h: h } : null;
+    } catch (e) { return null; }
+  }
+  /* Any picture the browser can show (PNG, JPG, WebP, GIF, SVG) is redrawn on a canvas and re-saved as a
+     small PNG. Redrawing also removes anything active inside an SVG. Transparency is kept. */
+  function logoToPng(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !/^image\//.test(file.type)) { reject(new Error('Please choose an image file.')); return; }
+      if (file.size > 8 * 1024 * 1024) { reject(new Error('That image is too large. Choose one under 8 MB.')); return; }
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth || 300, h = img.naturalHeight || 300, out = '';
+        [400, 256, 160].some(function (max) {
+          var k = Math.min(1, max / Math.max(w, h)), c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          out = c.toDataURL('image/png');
+          return out.length <= 300000;
+        });
+        if (cleanLogo(out)) resolve(out); else reject(new Error('That image could not be used. Try a simpler or smaller one.'));
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('That file could not be read as an image.')); };
+      img.src = url;
+    });
+  }
+  function renderLogo() {
+    var b = $('#logoBtn'), has = !!state.logo;
+    b.classList.toggle('has', has);
+    b.textContent = '';
+    if (has) { var im = document.createElement('img'); im.src = state.logo; im.alt = 'Logo'; b.appendChild(im); }
+    else { var sp = document.createElement('span'); sp.textContent = '+ Add logo'; b.appendChild(sp); }
+    b.setAttribute('aria-label', has ? 'Change logo' : 'Add a logo');
+    $('#logoRemove').hidden = !has;
   }
 
   /* ---------- draft kept in this browser only ---------- */
@@ -1133,6 +1203,13 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     r.addEventListener('change', function () { if (r.checked) { state.scale = r.value; changed(); } });
   });
   $('#chartTitle').addEventListener('input', function (e) { state.title = clampStr(e.target.value, 80) || 'Untitled project'; changed(); });
+  $('#logoBtn').addEventListener('click', function () { $('#logoFile').click(); });
+  $('#logoFile').addEventListener('change', function (e) {
+    var file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    logoToPng(file).then(function (png) { withUndo(function () { state.logo = png; return 'Logo added.'; }); },
+      function (err) { toast(err.message, 'error'); });
+  });
+  $('#logoRemove').addEventListener('click', function () { withUndo(function () { state.logo = ''; return 'Logo removed.'; }); });
 
   /* ---------- sort, filter and job details ---------- */
   var sel = null;
@@ -1535,22 +1612,29 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     var lrows = lrow + 1;
 
-    var top1 = M + 17 + lrows * 5 + 3, top2 = M + 9;
+    /* logo: at most 14 mm tall and 50 mm wide, drawn above the title. dy = how far everything below moves down. */
+    var logoDim = null, dy = 0;
+    if (state.logo) {
+      var ps = pngSize(state.logo);
+      if (ps) { var k = Math.min(14 / ps.h, 50 / ps.w); logoDim = { w: ps.w * k, h: ps.h * k }; dy = logoDim.h + 3; }
+    }
+    var top1 = M + dy + 17 + lrows * 5 + 3, top2 = M + 9;
     var n = Math.max(rows.length, 1);
     var perFirst = Math.max(1, Math.floor((H - FOOT - top1 - HEAD) / RH));
     var perRest = Math.max(1, Math.floor((H - FOOT - top2 - HEAD) / RH));
     var pages = n <= perFirst ? 1 : 1 + Math.ceil((n - perFirst) / perRest);
 
     function firstHead() {
+      if (logoDim) doc.addImage(state.logo, 'PNG', M, M, logoDim.w, logoDim.h);
       font('bold', 16); color(INK);
-      doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + 6);
+      doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + dy + 6);
       font('normal', 8.5); color(MUTED);
       var sub = rows.length + (rows.length === 1 ? ' item' : ' items') + (rows.length !== all.length ? ' of ' + all.length : '') +
         (valid.length ? '  |  ' + ymd(min) + ' - ' + ymd(max) : '');
-      doc.text(pdfTxt(sub), M, M + 11.5);
+      doc.text(pdfTxt(sub), M, M + dy + 11.5);
       font('normal', 7);
       legend.forEach(function (it, k) {
-        var p = lpos[k], y = M + 17 + p.row * 5 + 2;
+        var p = lpos[k], y = M + dy + 17 + p.row * 5 + 2;
         if (it.line) { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
         else if (!it.text) { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
         color(INK); doc.text(pdfTxt(it.t), p.x + (it.text ? 0 : 5), y, { baseline: 'middle' });
@@ -1813,6 +1897,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- render all ---------- */
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
+    renderLogo();
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
     $('#banner').hidden = !state.example;
@@ -1892,7 +1977,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; sel = null;
+      state.title = c.title; state.logo = c.logo; state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; sel = null;
       state.tasks = c.tasks.map(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); return t; });
       return 'Loaded “' + c.title + '” with ' + c.tasks.length + (c.tasks.length === 1 ? ' item.' : ' items.');
     });

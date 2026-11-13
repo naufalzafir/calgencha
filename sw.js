@@ -1,6 +1,6 @@
 /* CalGencha service worker: keeps the tools working offline.
    Bump VERSION whenever you publish new files so visitors get them. */
-const VERSION = 'calgencha-v6';
+const VERSION = 'calgencha-v7';
 const SHELL = ['./', 'index.html', 'gancha.html', 'SpendTracker.html', 'HabitTracker.html', 'profile.js', 'license.html', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const CROSS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];

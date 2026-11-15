@@ -195,11 +195,36 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .logo-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; max-width: 220px; padding: 4px 12px;
   border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .logo-btn:hover { border-color: var(--muted); color: var(--ink); }
-.logo-btn.has { border-style: solid; border-color: transparent; padding: 0; }
-.logo-btn img { display: block; max-height: 56px; max-width: 220px; width: auto; height: auto; }
+.logo-btn.has { position: relative; width: 176px; min-height: 124px; max-width: none; align-self: stretch; border-style: solid; border-color: var(--line); padding: 0; }
+.logo-btn img { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); max-width: none; object-fit: contain; }
 .linkbtn { background: none; border: 0; padding: 6px 2px; min-height: 36px; color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
 .linkbtn:hover { color: var(--ink); }
 .logo-btn:focus-visible, .linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* sign-off boxes, to the right of the logo */
+.logo-row { flex-wrap: wrap; }
+.signs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+.sbox { display: grid; gap: 4px; width: 176px; padding: 6px 8px 8px; border: 1px solid var(--line); border-radius: 8px; }
+.sbox .shead { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); }
+.sbox input { width: 100%; min-height: 34px; padding: 2px 8px; font-size: 13px; }
+.sx { min-width: 32px; min-height: 32px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; border-radius: 6px; }
+.sx:hover { color: var(--ink); }
+.sx:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chip { min-height: 36px; padding: 0 12px; border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.chip:hover { border-color: var(--muted); color: var(--ink); }
+/* milestones, above the chart */
+.ms { padding: 12px 0; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.mshead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mstitle { margin: 0; font-size: 14px; font-weight: 700; }
+.mstitle span { color: var(--muted); font-weight: 600; }
+.mslist { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.msrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.msrow .msn { flex: 1 1 200px; min-width: 0; min-height: 36px; }
+.msrow .mss, .msrow .mse { flex: 0 0 150px; min-height: 36px; }
+.msdone { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.dia { flex: none; width: 12px; height: 12px; margin: 0 4px; background: var(--c, #E0A02B); transform: rotate(45deg); border-radius: 2px; }
+.msto { font-size: 13px; color: var(--muted); }
+.msrow .msk { flex: 0 0 104px; min-height: 36px; }
+.msnote { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
 .seg label { display: block; cursor: pointer; }
@@ -286,6 +311,17 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .g-nrow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .bar { cursor: pointer; }
 .bar.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
+/* MILESTONE row at the top of the chart: arrows for date ranges, diamonds for single dates */
+.g-msname { box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-bottom: 1px dashed var(--muted);
+  font: 800 11px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.g-ms { box-sizing: border-box; position: relative; border-bottom: 1px dashed var(--muted);
+  background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px); background-size: var(--cell) 100%; }
+.msarrow { position: absolute; height: 26px; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px 0 8px; z-index: 1;
+  background: var(--c); color: var(--tc); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+  font: 800 11px var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
+.msarrow span { overflow: hidden; text-overflow: ellipsis; }
+.msdi { position: absolute; width: 16px; height: 16px; background: var(--c); transform: rotate(45deg); border-radius: 2px; z-index: 1; }
+.mslab { position: absolute; z-index: 1; font: 800 11px var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
 .detail { scroll-margin-top: 16px; }
 .detail:focus-visible { outline: none; }
 .detail-body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 16px; }
@@ -537,6 +573,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
               <button type="button" class="logo-btn" id="logoBtn" title="Shown above the title and on the PDF"><span>+ Add logo</span></button>
               <button type="button" class="linkbtn" id="logoRemove" hidden>Remove logo</button>
               <input type="file" id="logoFile" class="sr" accept="image/*" tabindex="-1" aria-label="Choose a logo image">
+              <div class="signs" id="signs" title="Optional boxes with space to sign. They print at the top right of the PDF."></div>
             </div>
             <label class="sr" for="chartTitle">Chart title</label>
             <input id="chartTitle" class="title-input" maxlength="80" placeholder="Project name" autocomplete="off">
@@ -565,6 +602,14 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             </label>
           </div>
         </div>
+        <div class="ms" id="milestones">
+          <div class="mshead">
+            <h3 class="mstitle">Milestones <span id="msCount"></span></h3>
+            <button type="button" class="btn" id="msAdd">+ Add milestone</button>
+          </div>
+          <div class="mslist" id="msList"></div>
+          <p class="msnote" id="msNote">Phases and key dates. Give a start and an end to draw an arrow across the chart, or only a start for a diamond. They show in a MILESTONE row above the items and print the same way.</p>
+        </div>
         <div class="viewbar">
           <div class="vfield">
             <label class="lbl" for="sortBy">Sort by</label>
@@ -577,6 +622,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           <div class="vfield">
             <label class="lbl" for="filterBy">Show</label>
             <select id="filterBy"></select>
+          </div>
+          <div class="vfield">
+            <label class="msdone" for="showToday"><input type="checkbox" id="showToday"> Show today line</label>
           </div>
         </div>
         <div class="legend" id="legend"></div>
@@ -725,7 +773,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- state ---------- */
   function mkTask() { return { id: uid(), name: '', assignees: [], status: 'todo', start: '', end: '', progress: 0, notes: '' }; }
   function blankState() {
-    return { title: 'Untitled project', logo: '', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', tasks: [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()], example: false };
+    return { title: 'Untitled project', logo: '', signoffs: defaultSign(), milestones: [], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', tasks: [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()], example: false };
   }
   function exampleState() {
     var B = todayDay(); B -= wd(B) + 7; /* Monday of last week */
@@ -735,7 +783,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       return { id: uid(), name: name, assignees: [].concat(pi).map(function (k) { return people[k].id; }), start: toISO(B + s), end: toISO(B + e), progress: pct, status: pct >= 100 ? 'done' : pct > 0 ? 'doing' : 'todo', notes: notes || '' };
     }
     return {
-      title: 'Website relaunch', logo: '', scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
+      title: 'Website relaunch', logo: '', signoffs: defaultSign(), milestones: [{ id: uid(), name: 'Initiation phase', start: toISO(B), end: toISO(B + 6), color: '#E0A02B' }, { id: uid(), name: 'Preparation phase', start: toISO(B + 7), end: toISO(B + 27), color: '#E0A02B' }, { id: uid(), name: 'Execution phase', start: toISO(B + 28), end: toISO(B + 45), color: '#E0A02B' }, { id: uid(), name: 'Go live', start: toISO(B + 46), end: '', color: '#C2410C' }], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
       tasks: [
         T('Kickoff and scope', 0, 0, 2, 100),
         T('User research', 2, 1, 11, 100, 'Eight interviews'),
@@ -791,7 +839,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       };
     });
     return {
-      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), scale: o.scale === 'week' ? 'week' : 'day',
+      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), signoffs: cleanSign(o.signoffs), milestones: cleanMilestones(o.milestones), showToday: o.showToday !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
       fields: fields, persons: cleanPeople(o.persons), tasks: tasks.length ? tasks : [mkTask()]
@@ -799,7 +847,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   function exportChart() {
     return {
-      app: 'barline', type: 'chart', version: 1, title: state.title, logo: state.logo || '', scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      app: 'barline', type: 'chart', version: 1, title: state.title, logo: state.logo || '', signoffs: state.signoffs, milestones: state.milestones, showToday: state.showToday !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }),
       tasks: state.tasks.map(function (t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, progress: t.progress, notes: t.notes }; })
     };
@@ -858,6 +906,88 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     b.setAttribute('aria-label', has ? 'Change logo' : 'Add a logo');
     $('#logoRemove').hidden = !has;
   }
+
+  /* ---------- sign-off boxes ---------- */
+  /* Each box is optional. state.signoffs = { prepared: {on, name, date}, checked: {...}, approved: {...} }.
+     The PDF prints every box that is ON with blank space above the line for a handwritten signature. */
+  var SIGNS = [['prepared', 'Prepared by'], ['checked', 'Checked by'], ['approved', 'Approved by']];
+  var ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+  function validIso(d) { return typeof d === 'string' && ISO_RE.test(d) && !isNaN(Date.parse(d)) ? d : ''; }
+  function defaultSign() { var o = {}; SIGNS.forEach(function (s) { o[s[0]] = { on: false, name: '', date: '' }; }); return o; }
+  function cleanSign(v) {
+    var o = defaultSign();
+    if (v && typeof v === 'object') SIGNS.forEach(function (s) {
+      var x = v[s[0]];
+      if (x && typeof x === 'object') o[s[0]] = { on: x.on === true, name: clampStr(x.name, 40), date: validIso(x.date) };
+    });
+    return o;
+  }
+  function touch() { if (state.example) { state.example = false; $('#banner').hidden = true; } persist(); }
+  function renderSigns() {
+    var h = '';
+    SIGNS.forEach(function (s) {
+      var x = state.signoffs[s[0]];
+      if (x.on) h += '<div class="sbox"><div class="shead"><span>' + s[1] + '</span><button type="button" class="sx" data-sx="' + s[0] + '" aria-label="Remove the ' + s[1] + ' box">&times;</button></div>' +
+        '<input type="text" class="sname" data-k="' + s[0] + '" maxlength="40" placeholder="Name (printed under the line)" aria-label="' + s[1] + ' name" value="' + esc(x.name) + '">' +
+        '<input type="date" class="sdate" data-k="' + s[0] + '" aria-label="' + s[1] + ' date" value="' + x.date + '"></div>';
+      else h += '<button type="button" class="chip" data-sa="' + s[0] + '">+ ' + s[1] + '</button>';
+    });
+    $('#signs').innerHTML = h;
+  }
+
+  /* ---------- milestones ---------- */
+  /* state.milestones = [{ id, name, start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' or '', color: '#RRGGBB' }].
+     With an end date it is drawn as an arrow across the chart (a phase); with only a start it is a diamond. */
+  var MS_MAX = 40, MS_DEFAULT = '#E0A02B';
+  var MS_COLORS = [['#E0A02B', 'Amber'], ['#2347C8', 'Blue'], ['#0F7B6C', 'Teal'], ['#C2410C', 'Orange'], ['#7C3AED', 'Purple'], ['#586474', 'Slate']];
+  function cleanMilestones(v) {
+    if (!Array.isArray(v)) return [];
+    return v.slice(0, MS_MAX).filter(function (o) { return o && typeof o === 'object'; }).map(function (o) {
+      var st = validIso(o.start || o.date), en = validIso(o.end);
+      if (!st) en = ''; else if (en && en < st) en = st;
+      return { id: typeof o.id === 'string' && o.id ? o.id.slice(0, 40) : uid(), name: clampStr(o.name, 80), start: st, end: en, color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : MS_DEFAULT };
+    }).filter(function (m) { return m.name || m.start; });
+  }
+  function msByDate(a, b) { return a.start === b.start ? 0 : !a.start ? 1 : !b.start ? -1 : a.start < b.start ? -1 : 1; }
+  /* Milestones that have a start date, as day numbers (e is never before s). */
+  function msDays() {
+    return state.milestones.map(function (m) {
+      var s = toDay(m.start); if (s == null) return null;
+      var e = toDay(m.end); if (e == null || e < s) e = s;
+      return { m: m, s: s, e: e, lane: 0 };
+    }).filter(Boolean);
+  }
+  /* Put overlapping items on different lanes. endOf(item) = the last day (or a bit more) the item needs. Returns the lane count. */
+  function packLanes(items, endOf) {
+    var ends = [];
+    items.slice().sort(function (a, b) { return a.s - b.s || a.e - b.e; }).forEach(function (it) {
+      var l = 0; while (l < ends.length && ends[l] >= it.s) l++;
+      it.lane = l; ends[l] = endOf(it);
+    });
+    return ends.length;
+  }
+  function msRange(min, max, hasTasks) {
+    var ms = msDays(); if (!ms.length) return [min, max];
+    var a = Math.min.apply(null, ms.map(function (x) { return x.s; })), b = Math.max.apply(null, ms.map(function (x) { return x.e; }));
+    return hasTasks ? [Math.min(min, a), Math.max(max, b)] : [a, b];
+  }
+  function renderMilestones() {
+    var h = '';
+    state.milestones.forEach(function (m) {
+      var known = MS_COLORS.some(function (c) { return c[0].toLowerCase() === m.color.toLowerCase(); });
+      h += '<div class="msrow" data-id="' + esc(m.id) + '"><span class="dia" style="--c:' + m.color + '" aria-hidden="true"></span>' +
+        '<input type="text" class="msn" maxlength="80" placeholder="Milestone name" aria-label="Milestone name" value="' + esc(m.name) + '">' +
+        '<input type="date" class="mss" aria-label="Start date" value="' + m.start + '"><span class="msto">to</span>' +
+        '<input type="date" class="mse" aria-label="End date (optional)" value="' + m.end + '">' +
+        '<select class="msk" aria-label="Colour">' + MS_COLORS.map(function (c) { return '<option value="' + c[0] + '"' + (c[0].toLowerCase() === m.color.toLowerCase() ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') +
+        (known ? '' : '<option value="' + m.color + '" selected>Custom</option>') + '</select>' +
+        '<button type="button" class="sx" data-msx="1" aria-label="Delete milestone">&times;</button></div>';
+    });
+    $('#msList').innerHTML = h;
+    $('#msCount').textContent = state.milestones.length ? '(' + state.milestones.length + ')' : '';
+    $('#msNote').hidden = state.milestones.length > 0;
+  }
+  function msFind(el) { var row = el.closest('.msrow'); if (!row) return null; var id = row.dataset.id; return { row: row, m: state.milestones.filter(function (x) { return x.id === id; })[0] }; }
 
   /* ---------- draft kept in this browser only ---------- */
   var saveTimer;
@@ -1126,9 +1256,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     var rows = visibleRows(all);
     var valid = all.filter(function (r) { return r.ok; });
-    var today = todayDay(), min, max;
+    var today = todayDay(), min, max, showT = state.showToday !== false;
     if (valid.length) { min = Math.min.apply(null, valid.map(function (r) { return r.s; })); max = Math.max.apply(null, valid.map(function (r) { return r.e; })); }
     else { min = today; max = today + 27; }
+    var xr = msRange(min, max, valid.length > 0); min = xr[0]; max = xr[1];
     var rs = min - 2, re = max + 4;
     rs -= wd(rs); re += 6 - wd(re);
     if (re - rs + 1 < 28) re = rs + 27;
@@ -1153,7 +1284,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     if (scale === 'day') {
       for (var n = rs; n <= re; n++) {
         var k = wd(n);
-        days += '<div class="g-dc' + (k >= 5 ? ' we' : '') + (n === today ? ' now' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + 'MTWTFSS'[k] + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
+        days += '<div class="g-dc' + (k >= 5 ? ' we' : '') + (showT && n === today ? ' now' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + 'MTWTFSS'[k] + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
         if (k >= 5) stripes += '<div class="stripe" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>';
       }
     } else {
@@ -1180,12 +1311,30 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         if (showP && t.progress > 0) bars += '<span class="pct" style="left:' + (left + w + 7) + 'px;top:' + top + 'px">' + t.progress + '%</span>';
       }
     });
-    var line = today >= rs && today <= re ? '<div class="today" style="left:' + ((today - rs + 0.5) * dw - 1) + 'px"></div>' : '';
+    var line = showT && today >= rs && today <= re ? '<div class="today" style="left:' + ((today - rs + 0.5) * dw - 1) + 'px"></div>' : '';
+
+    /* MILESTONE row */
+    var msNames = '', msBand = '', msd = msDays();
+    if (msd.length) {
+      var LANE = 34, lanes = packLanes(msd, function (x) { return x.e > x.s ? x.e : x.e + Math.ceil(((x.m.name || 'Milestone').length * 7 + 30) / dw); });
+      msd.forEach(function (x) {
+        var c = x.m.color, nm = x.m.name || 'Milestone', top = x.lane * LANE + 4;
+        var tip = nm + ': ' + fmtShort(x.s) + (x.e > x.s ? ' to ' + fmtShort(x.e) : '');
+        if (x.e > x.s) {
+          msBand += '<div class="msarrow" title="' + esc(tip) + '" style="left:' + ((x.s - rs) * dw + 1) + 'px;width:' + ((x.e - x.s + 1) * dw - 2) + 'px;top:' + top + 'px;--c:' + c + ';--tc:' + (isLight(c) ? '#141B24' : '#FFFFFF') + '"><span>' + esc(nm) + '</span></div>';
+        } else {
+          var cx = (x.s - rs + 0.5) * dw;
+          msBand += '<div class="msdi" title="' + esc(tip) + '" style="left:' + (cx - 8) + 'px;top:' + (top + 5) + 'px;--c:' + c + '"></div><div class="mslab" style="left:' + (cx + 14) + 'px;top:' + (top + 6) + 'px">' + esc(nm) + '</div>';
+        }
+      });
+      msNames = '<div class="g-msname" style="height:' + lanes * LANE + 'px">Milestone</div>';
+      msBand = '<div class="g-ms" style="height:' + lanes * LANE + 'px">' + stripes + line + msBand + '</div>';
+    }
 
     el.style.setProperty('--dw', dw + 'px'); el.style.setProperty('--cell', cell + 'px');
-    el.innerHTML = '<div class="g-names"><div class="g-corner"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + names + '</div>' +
+    el.innerHTML = '<div class="g-names"><div class="g-corner"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + msNames + names + '</div>' +
       '<div class="g-canvas" style="width:' + total * dw + 'px"><div class="g-head"><div class="g-months">' + months + '</div><div class="g-days">' + days + '</div></div>' +
-      '<div class="g-body" style="height:' + rows.length * RH + 'px">' + stripes + line + bars + '</div></div>';
+      msBand + '<div class="g-body" style="height:' + rows.length * RH + 'px">' + stripes + line + bars + '</div></div>';
     el.scrollLeft = sl; el.scrollTop = stp;
   }
   function renderLegend() {
@@ -1195,7 +1344,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (state.tasks.some(function (t) { return !assigneesOf(t).length; })) h += '<span class="lg"><i class="none"></i>Unassigned</span>';
     }
     if (state.view !== 'board' && f.progress && f.progressShow) h += '<span class="lg">Solid fill shows percent done</span>';
-    if (state.view !== 'board') h += '<span class="lg"><i class="tl"></i>Today</span>';
+    if (state.view !== 'board' && state.showToday !== false) h += '<span class="lg"><i class="tl"></i>Today</span>';
     h += '<span class="lg">Select an item for its details</span>';
     $('#legend').innerHTML = h;
   }
@@ -1210,6 +1359,50 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       function (err) { toast(err.message, 'error'); });
   });
   $('#logoRemove').addEventListener('click', function () { withUndo(function () { state.logo = ''; return 'Logo removed.'; }); });
+
+  $('#signs').addEventListener('click', function (e) {
+    var add = e.target.closest('[data-sa]'), rem = e.target.closest('[data-sx]');
+    if (add) withUndo(function () { state.signoffs[add.dataset.sa].on = true; return 'Sign-off box added.'; });
+    else if (rem) withUndo(function () { state.signoffs[rem.dataset.sx] = { on: false, name: '', date: '' }; return 'Sign-off box removed.'; });
+  });
+  $('#signs').addEventListener('input', function (e) {
+    var k = e.target.dataset.k; if (!k || !state.signoffs[k]) return;
+    if (e.target.classList.contains('sname')) state.signoffs[k].name = clampStr(e.target.value, 40);
+    else if (e.target.classList.contains('sdate')) state.signoffs[k].date = validIso(e.target.value);
+    touch();
+  });
+
+  $('#msAdd').addEventListener('click', function () {
+    if (state.milestones.length >= MS_MAX) { toast('You can have up to ' + MS_MAX + ' milestones.', 'error'); return; }
+    withUndo(function () { state.milestones.push({ id: uid(), name: '', start: '', end: '', color: MS_DEFAULT }); return 'Milestone added.'; });
+    var rows = $('#msList').querySelectorAll('.msn'); if (rows.length) rows[rows.length - 1].focus();
+  });
+  $('#msList').addEventListener('input', function (e) {
+    var r = msFind(e.target); if (!r || !r.m) return;
+    if (e.target.classList.contains('msn')) { r.m.name = clampStr(e.target.value, 80); changed(); }
+  });
+  $('#msList').addEventListener('change', function (e) {
+    var r = msFind(e.target); if (!r || !r.m) return;
+    var cls = e.target.classList, m = r.m, keep = null;
+    if (cls.contains('msk')) { m.color = e.target.value; r.row.querySelector('.dia').style.setProperty('--c', m.color); changed(); return; }
+    if (cls.contains('mss')) {
+      m.start = validIso(e.target.value);
+      if (!m.start) m.end = ''; else if (m.end && m.end < m.start) m.end = m.start;
+      keep = '.mss';
+    } else if (cls.contains('mse')) {
+      var en = validIso(e.target.value);
+      if (en && m.start && en < m.start) { toast('The end date is before the start date, so it was set to the start date.', 'error'); en = m.start; }
+      m.end = en; keep = '.mse';
+    } else return;
+    state.milestones.sort(msByDate); changed(); renderMilestones();
+    var again = $('#msList').querySelector('[data-id="' + m.id + '"] ' + keep); if (again) again.focus();
+  });
+  $('#msList').addEventListener('click', function (e) {
+    var x = e.target.closest('[data-msx]'); if (!x) return;
+    var r = msFind(x); if (!r || !r.m) return;
+    withUndo(function () { state.milestones = state.milestones.filter(function (m) { return m !== r.m; }); return 'Milestone deleted.'; });
+  });
+  $('#showToday').addEventListener('change', function (e) { state.showToday = e.target.checked; changed(); });
 
   /* ---------- sort, filter and job details ---------- */
   var sel = null;
@@ -1557,7 +1750,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
 
   function buildPdf(JsPDF) {
-    var f = state.fields, showP = f.progress && f.progressShow, today = todayDay();
+    var f = state.fields, showP = f.progress && f.progressShow, today = todayDay(), showT = state.showToday !== false;
     var all = state.tasks.map(function (t, i) {
       var s = toDay(t.start), e = toDay(t.end);
       return { t: t, i: i, s: s, e: e, ok: s != null && e != null && e >= s };
@@ -1567,6 +1760,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var min, max;
     if (valid.length) { min = Math.min.apply(null, valid.map(function (r) { return r.s; })); max = Math.max.apply(null, valid.map(function (r) { return r.e; })); }
     else { min = today; max = today + 27; }
+    var xr = msRange(min, max, valid.length > 0); min = xr[0]; max = xr[1];
     var rs = min - 2, re = max + 4;
     rs -= wd(rs); re += 6 - wd(re);
     if (re - rs + 1 < 28) re = rs + 27;
@@ -1601,7 +1795,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       used.forEach(function (p) { legend.push({ t: p.name, c: rgb(p.color) }); });
       if (hasNone) legend.push({ t: 'Unassigned', c: rgb('#7C8998') });
     }
-    legend.push({ t: 'Today', c: RED, line: true });
+    if (showT) legend.push({ t: 'Today', c: RED, line: true });
     if (showP) legend.push({ t: 'Solid fill shows percent done', text: true });
     font('normal', 7);
     var lx = M, lrow = 0;
@@ -1614,21 +1808,35 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
     /* logo: at most 14 mm tall and 50 mm wide, drawn above the title. dy = how far everything below moves down. */
     var logoDim = null, dy = 0;
+    /* sign-off boxes: top right of page 1, 46 mm x 22 mm each (label, ~11 mm to sign, line, name and date). */
+    var SIGN_W = 46, SIGN_H = 22, SIGN_GAP = 4;
+    var signs = SIGNS.filter(function (sg) { return state.signoffs && state.signoffs[sg[0]] && state.signoffs[sg[0]].on; });
     if (state.logo) {
       var ps = pngSize(state.logo);
-      if (ps) { var k = Math.min(14 / ps.h, 50 / ps.w); logoDim = { w: ps.w * k, h: ps.h * k }; dy = logoDim.h + 3; }
+      if (ps) { var k = Math.min(SIGN_H / ps.h, SIGN_W / ps.w); logoDim = { w: ps.w * k, h: ps.h * k }; }
     }
+    dy = Math.max(logoDim ? logoDim.h : 0, signs.length ? SIGN_H : 0);
+    if (dy) dy += 3;
     /* pages 2+: the same logo, smaller (max 8 mm tall, 30 mm wide). dy2 = how far their content moves down. */
     var logoDim2 = null, dy2 = 0;
     if (logoDim) { var k2 = Math.min(1, 8 / logoDim.h, 30 / logoDim.w); logoDim2 = { w: logoDim.w * k2, h: logoDim.h * k2 }; dy2 = logoDim2.h + 2; }
+    /* milestones: a MILESTONE row above the items on page 1. Arrows for date ranges, diamonds for single dates.
+       msBand = its height in mm. It is taken off the space for item rows on page 1. */
+    var MS_LANE = 7, msBand = 0, msItems = msDays();
+    if (msItems.length) {
+      font('bold', 5.5);
+      var lanesN = packLanes(msItems, function (x) { return x.e > x.s ? x.e : x.e + Math.ceil(doc.getTextWidth(pdfTxt((x.m.name || 'Milestone').toUpperCase())) / DW) + 3; });
+      msBand = lanesN * MS_LANE + 1;
+    }
     var top1 = M + dy + 17 + lrows * 5 + 3, top2 = M + 9 + dy2;
     var n = Math.max(rows.length, 1);
-    var perFirst = Math.max(1, Math.floor((H - FOOT - top1 - HEAD) / RH));
+    var perFirst = Math.max(1, Math.floor((H - FOOT - top1 - HEAD - msBand) / RH));
     var perRest = Math.max(1, Math.floor((H - FOOT - top2 - HEAD) / RH));
     var pages = n <= perFirst ? 1 : 1 + Math.ceil((n - perFirst) / perRest);
 
     function firstHead() {
       if (logoDim) doc.addImage(state.logo, 'PNG', M, M, logoDim.w, logoDim.h);
+      drawSigns();
       font('bold', 16); color(INK);
       doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + dy + 6);
       font('normal', 8.5); color(MUTED);
@@ -1641,6 +1849,37 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         if (it.line) { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
         else if (!it.text) { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
         color(INK); doc.text(pdfTxt(it.t), p.x + (it.text ? 0 : 5), y, { baseline: 'middle' });
+      });
+    }
+    function dayNum(iso) { return Math.round(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / DAY); }
+    function drawSigns() {
+      signs.forEach(function (sg, i) {
+        var o = state.signoffs[sg[0]], x = W - M - (signs.length - i) * SIGN_W - (signs.length - 1 - i) * SIGN_GAP, y = M;
+        stroke(LINE, 0.3); doc.rect(x, y, SIGN_W, SIGN_H);
+        font('bold', 6.5); color(MUTED); doc.text(pdfTxt(sg[1]).toUpperCase(), x + 2, y + 4);
+        stroke(MUTED, 0.25); doc.line(x + 2, y + 16, x + SIGN_W - 2, y + 16);
+        font('normal', 7.5); color(INK);
+        if (o.name) doc.text(fit(o.name, SIGN_W - 4 - 19), x + 2, y + 19.5);
+        font('normal', 6.5); color(MUTED);
+        if (o.date) doc.text(ymd(dayNum(o.date)), x + SIGN_W - 2, y + 19.5, { align: 'right' });
+        else { doc.text('Date:', x + SIGN_W - 18, y + 19.5); stroke(LINE, 0.3); doc.line(x + SIGN_W - 12, y + 19.8, x + SIGN_W - 2, y + 19.8); }
+      });
+    }
+    function drawMilestoneBand(yTop, bandH) {
+      stroke(LINE, 0.15); doc.line(M, yTop, GX + GRID, yTop);
+      stroke(MUTED, 0.2); doc.setLineDashPattern([1, 0.8], 0); doc.line(M, yTop + bandH, GX + GRID, yTop + bandH); doc.setLineDashPattern([], 0);
+      font('bold', 6); color(INK); doc.text('MILESTONE', M + NAMEW / 2, yTop + bandH / 2, { align: 'center', baseline: 'middle' });
+      msItems.forEach(function (x) {
+        var c = rgb(x.m.color), y = yTop + 0.5 + x.lane * MS_LANE + 0.6, h = 5.4, nm = pdfTxt((x.m.name || 'Milestone').toUpperCase());
+        if (x.e > x.s) {
+          var xl = GX + (x.s - rs) * DW + 0.2, w = (x.e - x.s + 1) * DW - 0.4, hd = Math.min(2.2, w / 2);
+          fill(c); stroke(c, 0.1); doc.lines([[w - hd, 0], [hd, h / 2], [-hd, h / 2], [-(w - hd), 0]], xl, y, [1, 1], 'F', true);
+          if (w > 9) { font('bold', 5.5); color(isLight(x.m.color) ? [20, 27, 36] : [255, 255, 255]); doc.text(fit(nm, w - hd - 2.4), xl + 1.6, y + h / 2, { baseline: 'middle' }); }
+        } else {
+          var cx = GX + (x.s - rs + 0.5) * DW, r = 2;
+          fill(c); stroke(c, 0.1); doc.lines([[r, r], [-r, r], [-r, -r]], cx, y + h / 2 - r, [1, 1], 'F', true);
+          font('bold', 5.5); color(INK); doc.text(fit(nm, GX + GRID - cx - r - 3), cx + r + 1.2, y + h / 2, { baseline: 'middle' });
+        }
       });
     }
     function footer(pg) {
@@ -1658,14 +1897,15 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       for (var i = 0; i < k; i++) { fill(soft ? tint(cols[i], 0.24) : rgb(cols[i])); doc.rect(x, y + i * bh, w, bh, 'F'); }
     }
 
-    function drawGrid(top, chunk) {
-      var y0 = top + HEAD, bodyH = Math.max(chunk.length, 1) * RH, yEnd = y0 + bodyH, d, dt, k, d2;
+    function drawGrid(top, chunk, msH) {
+      msH = msH || 0;
+      var yS = top + HEAD, y0 = yS + msH, bodyH = Math.max(chunk.length, 1) * RH, yEnd = y0 + bodyH, d, dt, k, d2;
       fill([243, 245, 248]); doc.rect(M, top, NAMEW + GRID, HEAD, 'F');
       font('bold', 6); color(MUTED); doc.text('ITEM', M + 2, top + HEAD - 2.2);
 
       if (DW >= 1) {
         fill([244, 245, 247]);
-        for (d = rs; d <= re; d++) if (wd(d) >= 5) doc.rect(GX + (d - rs) * DW, y0, DW, bodyH, 'F');
+        for (d = rs; d <= re; d++) if (wd(d) >= 5) doc.rect(GX + (d - rs) * DW, yS, DW, bodyH + msH, 'F');
       }
       /* months */
       d = rs;
@@ -1683,7 +1923,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (DW >= 3.2) {
         for (d = rs; d <= re; d++) {
           k = wd(d);
-          var cx = GX + (d - rs) * DW + DW / 2, isT = d === today, num = String(new Date(d * DAY).getUTCDate());
+          var cx = GX + (d - rs) * DW + DW / 2, isT = showT && d === today, num = String(new Date(d * DAY).getUTCDate());
           color(isT ? RED : (k >= 5 ? MUTED : INK));
           if (DW >= 4.8) {
             font('normal', 5.2); doc.text('MTWTFSS'.charAt(k), cx, top + 7.4, { align: 'center' });
@@ -1700,13 +1940,14 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       }
       /* vertical grid */
       stroke(GRIDC, 0.1);
-      if (DW >= 3.2) { for (d = rs; d <= re + 1; d++) doc.line(GX + (d - rs) * DW, y0, GX + (d - rs) * DW, yEnd); }
-      else if (7 * DW >= 4) { for (d2 = rs; d2 <= re + 1; d2 += 7) doc.line(GX + (d2 - rs) * DW, y0, GX + (d2 - rs) * DW, yEnd); }
+      if (DW >= 3.2) { for (d = rs; d <= re + 1; d++) doc.line(GX + (d - rs) * DW, yS, GX + (d - rs) * DW, yEnd); }
+      else if (7 * DW >= 4) { for (d2 = rs; d2 <= re + 1; d2 += 7) doc.line(GX + (d2 - rs) * DW, yS, GX + (d2 - rs) * DW, yEnd); }
       /* horizontal lines */
       stroke(LINE, 0.15);
       for (var q = 0; q <= Math.max(chunk.length, 1); q++) doc.line(M, y0 + q * RH, GX + GRID, y0 + q * RH);
       stroke(LINE, 0.25); doc.line(GX, top, GX, yEnd);
-      if (today >= rs && today <= re) { var tx0 = GX + (today - rs + 0.5) * DW; stroke(RED, 0.4); doc.line(tx0, y0, tx0, yEnd); }
+      if (msH) drawMilestoneBand(yS, msH);
+      if (showT && today >= rs && today <= re) { var tx0 = GX + (today - rs + 0.5) * DW; stroke(RED, 0.4); doc.line(tx0, yS, tx0, yEnd); }
 
       if (!chunk.length) { font('normal', 8); color(MUTED); doc.text('No items to show.', M + 2, y0 + RH / 2, { baseline: 'middle' }); return; }
 
@@ -1763,7 +2004,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (pg === 1) { firstHead(); top = top1; take = perFirst; }
       else { if (logoDim2) doc.addImage(state.logo, 'PNG', M, M, logoDim2.w, logoDim2.h); font('bold', 8); color(MUTED); doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + dy2 + 4); top = top2; take = perRest; }
       var chunk = rows.slice(idx, idx + take); idx += take;
-      drawGrid(top, chunk);
+      drawGrid(top, chunk, pg === 1 ? msBand : 0);
       footer(pg);
     }
     return doc;
@@ -1900,7 +2141,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- render all ---------- */
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
-    renderLogo();
+    renderLogo(); renderSigns(); renderMilestones();
+    $('#showToday').checked = state.showToday !== false;
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
     $('#banner').hidden = !state.example;
@@ -1980,7 +2222,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; sel = null;
+      state.title = c.title; state.logo = c.logo; state.signoffs = c.signoffs; state.milestones = c.milestones; state.showToday = c.showToday; state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; sel = null;
       state.tasks = c.tasks.map(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); return t; });
       return 'Loaded “' + c.title + '” with ' + c.tasks.length + (c.tasks.length === 1 ? ' item.' : ' items.');
     });

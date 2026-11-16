@@ -98,7 +98,8 @@
     var people = {};
     (Array.isArray(g.persons) ? g.persons : []).forEach(function (p) { if (p && p.id) people[p.id] = String(p.name || '').split(' ')[0]; });
     var tn = dnum(t), items = [];
-    g.tasks.forEach(function (x) {
+    var allTasks = Array.isArray(g.sheets) ? [].concat.apply([], g.sheets.map(function (sh) { return sh && Array.isArray(sh.tasks) ? sh.tasks : []; })) : g.tasks;
+    allTasks.forEach(function (x) {
       if (!x || typeof x !== 'object') return;
       var s = DATE_RE.test(x.start || '') ? x.start : '', e = DATE_RE.test(x.end || '') ? x.end : '';
       if (!s && !e) return;

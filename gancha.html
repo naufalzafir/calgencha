@@ -29,6 +29,8 @@
   --none: #7C8998;
   --bad: #C62828;
   --weekend: rgba(20, 27, 36, 0.05);
+  --sat: #DFF3E4; --sun: #FBE0DD; --sat-ink: #0F7B3A; --sun-ink: #C0281C;
+  --ok: #2563EB; --early: #1F9D55; --late: #D93025;
   --shadow: 0 1px 2px rgba(20, 27, 36, 0.06);
   --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
   --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -49,6 +51,8 @@
     --none: #8795A6;
     --bad: #FF8A80;
     --weekend: rgba(255, 255, 255, 0.035);
+    --sat: rgba(52, 168, 83, 0.2); --sun: rgba(217, 48, 37, 0.24); --sat-ink: #6FD99A; --sun-ink: #FF8F85;
+    --ok: #5B8CFF; --early: #3DBE74; --late: #FF6F61;
     --shadow: none;
     color-scheme: dark;
   }
@@ -192,7 +196,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .titlebox { flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .titlebox .title-input { flex: 0 0 auto; width: 100%; }
 .logo-row { display: flex; align-items: center; gap: 12px; }
-.logo-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; max-width: 220px; padding: 4px 12px;
+.logo-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 124px; min-width: 176px; align-self: stretch; max-width: 220px; padding: 4px 12px;
   border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .logo-btn:hover { border-color: var(--muted); color: var(--ink); }
 .logo-btn.has { position: relative; width: 176px; min-height: 124px; max-width: none; align-self: stretch; border-style: solid; border-color: var(--line); padding: 0; }
@@ -202,7 +206,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .logo-btn:focus-visible, .linkbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* sign-off boxes, to the right of the logo */
 .logo-row { flex-wrap: wrap; }
-.signs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+.signs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-left: auto; }
 .sbox { display: grid; gap: 4px; width: 176px; padding: 6px 8px 8px; border: 1px solid var(--line); border-radius: 8px; }
 .sbox .shead { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); }
 .sbox input { width: 100%; min-height: 34px; padding: 2px 8px; font-size: 13px; }
@@ -211,6 +215,32 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .sx:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chip { min-height: 36px; padding: 0 12px; border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .chip:hover { border-color: var(--muted); color: var(--ink); }
+/* address box next to the logo; sign-off names wrap and the box grows downwards */
+.addr { width: 240px; min-height: 124px; align-self: stretch; resize: vertical; padding: 8px 10px; line-height: 1.4; font-size: 13px; border: 1.5px dashed var(--line); background: transparent; border-radius: 8px; }
+.addr:hover { border-color: var(--muted); }
+.sbox textarea { width: 100%; min-height: 34px; padding: 6px 8px; font-size: 13px; line-height: 1.3; resize: none; overflow: hidden; }
+.updated { text-align: right; font: 500 12px var(--font-mono); color: var(--muted); margin-top: 6px; }
+/* sheets */
+.sheets { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px; padding: 0 16px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.shtab { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--surface-2); color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shtab:hover { color: var(--ink); }
+.shtab.on { background: var(--surface); color: var(--ink); padding: 0 4px; margin-bottom: -1px; border-bottom: 1px solid var(--surface); }
+.shname { min-width: 90px; width: auto; border: 0; background: transparent; font-weight: 700; padding: 0 10px; min-height: 36px; }
+.shtools { margin-left: auto; display: flex; gap: 6px; padding-bottom: 6px; }
+.shtools .btn { min-height: 32px; padding: 0 10px; font-size: 12px; }
+.lgc { flex: 0 0 44px; width: 44px; min-height: 36px; padding: 2px; }
+.lg i.sq { border-radius: 3px; }
+.lg i.bar2 { width: 16px; height: 6px; border-radius: 3px; }
+.stripe.sat { background: var(--sat); } .stripe.sun { background: var(--sun); }
+.g-dc.sat { background: var(--sat); color: var(--sat-ink); } .g-dc.sun { background: var(--sun); color: var(--sun-ink); }
+.g-dc.sat b { color: var(--sat-ink); } .g-dc.sun b { color: var(--sun-ink); }
+.bar.sm { height: 16px; }
+.abar { position: absolute; height: 10px; z-index: 1; border-radius: 4px; cursor: pointer; background: var(--ok); }
+.abar.early { background: var(--early); } .abar.late { background: var(--late); }
+.abar.open { opacity: 0.55; }
+.pdfpop label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 6px; }
+.pdfpop label:hover { background: var(--surface-2); }
+.pdfpop .pbtns { display: flex; gap: 6px; padding: 6px 4px 2px; }
 /* milestones, above the chart */
 .ms { padding: 12px 0; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
 .mshead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -246,10 +276,10 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
   background: var(--surface);
 }
 .gantt:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.g-names { flex: none; width: var(--namew); position: sticky; left: 0; z-index: 3; background: var(--surface); border-right: 1px solid var(--line); }
+.g-names { flex: none; width: calc(var(--namew) + var(--nx, 0px)); position: sticky; left: 0; z-index: 3; background: var(--surface); border-right: 1px solid var(--line); }
 .g-corner {
   height: 56px; display: flex; align-items: flex-end; justify-content: space-between;
-  padding: 0 12px 8px; border-bottom: 1px solid var(--line);
+  padding: 0; border-bottom: 1px solid var(--line);
   font: 600 11px var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
 }
 .g-nrow { height: var(--rh); display: flex; align-items: center; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--line); min-width: 0; }
@@ -305,7 +335,17 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding: 0 16px 12px; }
 .vfield { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .vfield select { width: auto; min-width: 150px; max-width: 100%; }
-.g-nrow { cursor: pointer; }
+.g-nrow { cursor: pointer; position: relative; }
+.g-nrow .pa { position: absolute; left: 3px; height: 16px; min-width: 16px; padding: 0 3px; display: grid; place-items: center; font: 800 10px var(--font-mono); color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; }
+.g-nrow.x { padding-right: 0; }
+.g-corner .cl { flex: 1; min-width: 0; display: flex; justify-content: space-between; padding: 0 12px 8px; }
+.g-wfh, .g-pah { flex: none; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; border-left: 1px solid var(--line); }
+.g-wfh { width: 72px; font-size: 10px; letter-spacing: 0.04em; }
+.g-pah { width: 24px; }
+.g-wfc { flex: none; width: 72px; align-self: stretch; display: grid; place-items: center; border-left: 1px solid var(--line); }
+.g-pa { flex: none; width: 24px; align-self: stretch; position: relative; border-left: 1px solid var(--line); }
+.g-nrow .wf { min-width: 28px; height: 22px; padding: 0 5px; display: grid; place-items: center; font: 700 12px var(--font-mono); color: var(--ink); background: var(--surface); border: 1.5px solid var(--ink); border-radius: 5px; }
+.g-nrow .pa:nth-of-type(2) { height: 10px; line-height: 1; font-size: 8px; }
 .g-nrow:hover { background: var(--surface-2); }
 .g-nrow.sel { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
 .g-nrow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -573,8 +613,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
               <button type="button" class="logo-btn" id="logoBtn" title="Shown above the title and on the PDF"><span>+ Add logo</span></button>
               <button type="button" class="linkbtn" id="logoRemove" hidden>Remove logo</button>
               <input type="file" id="logoFile" class="sr" accept="image/*" tabindex="-1" aria-label="Choose a logo image">
+              <textarea class="addr" id="address" maxlength="260" rows="5" placeholder="Company address (optional). Prints next to the logo." aria-label="Company address"></textarea>
               <div class="signs" id="signs" title="Optional boxes with space to sign. They print at the top right of the PDF."></div>
             </div>
+            <div class="updated" id="updated"></div>
             <label class="sr" for="chartTitle">Chart title</label>
             <input id="chartTitle" class="title-input" maxlength="80" placeholder="Project name" autocomplete="off">
           </div>
@@ -589,7 +631,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             </div>
             <button type="button" class="btn primary" id="saveChart">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5v8M4.8 7.5L8 10.7l3.2-3.2M3 13h10"/></svg>
-              Save JSON
+              Save data
             </button>
             <button type="button" class="btn" id="savePdf">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.8h5.2L12.5 5v9.2H4z"/><path d="M9 1.8V5.2h3.5M6 9h4.5M6 11.5h4.5"/></svg>
@@ -597,11 +639,17 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             </button>
             <label class="btn">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.5v-8M4.8 5.5L8 2.3l3.2 3.2M3 13h10"/></svg>
-              <span>Upload JSON</span>
+              <span>Upload data</span>
               <input class="sr" type="file" id="upChart" accept=".json,application/json">
+            </label>
+            <button type="button" class="btn" id="saveTemplate" title="Saves only the logo, address, sign-off boxes, people and legend">Save template</button>
+            <label class="btn" title="Loads the logo, address, sign-off boxes, people and legend from a template file">
+              <span>Load template</span>
+              <input class="sr" type="file" id="upTemplate" accept=".json,application/json">
             </label>
           </div>
         </div>
+        <div class="sheets" id="sheets" role="tablist" aria-label="Sheets"></div>
         <div class="ms" id="milestones">
           <div class="mshead">
             <h3 class="mstitle">Milestones <span id="msCount"></span></h3>
@@ -609,6 +657,14 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           </div>
           <div class="mslist" id="msList"></div>
           <p class="msnote" id="msNote">Phases and key dates. Give a start and an end to draw an arrow across the chart, or only a start for a diamond. They show in a MILESTONE row above the items and print the same way.</p>
+        </div>
+        <div class="ms" id="lgbox">
+          <div class="mshead">
+            <h3 class="mstitle">Legend entries <span id="lgCount"></span></h3>
+            <button type="button" class="btn" id="lgAdd">+ Add legend entry</button>
+          </div>
+          <div class="mslist" id="lgList"></div>
+          <p class="msnote">Your own colour and label. People, Plan, Actual, Saturday and Sunday entries are added for you.</p>
         </div>
         <div class="viewbar">
           <div class="vfield">
@@ -624,7 +680,17 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <select id="filterBy"></select>
           </div>
           <div class="vfield">
+            <label class="lbl" for="filterWf">Workforce</label>
+            <select id="filterWf"></select>
+          </div>
+          <div class="vfield">
             <label class="msdone" for="showToday"><input type="checkbox" id="showToday"> Show today line</label>
+          </div>
+          <div class="vfield">
+            <label class="msdone" for="showWeekend"><input type="checkbox" id="showWeekend"> Show weekends</label>
+          </div>
+          <div class="vfield">
+            <label class="msdone" for="showActual"><input type="checkbox" id="showActual"> Show Actual</label>
           </div>
         </div>
         <div class="legend" id="legend"></div>
@@ -704,6 +770,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <legend class="lbl">Fields on each item</legend>
             <p class="fixed">Always included: task, start, end.</p>
             <label class="chk"><input type="checkbox" data-field="assignee"><span>Assignees (one or more people)</span></label>
+            <label class="chk"><input type="checkbox" data-field="workforce"><span>Workforce (number of people needed)</span></label>
             <label class="chk"><input type="checkbox" data-field="duration"><span>Duration in days</span></label>
             <label class="chk"><input type="checkbox" data-field="progress"><span>Progress percent (Done %)</span></label>
             <label class="chk sub"><input type="checkbox" data-field="progressShow"><span>Show progress on the chart and PDF</span></label>
@@ -725,6 +792,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 </div>
 
 <div class="assign-pop color-pop" id="colorPop" role="dialog" aria-label="Choose a color" tabindex="-1" hidden></div>
+<div class="assign-pop pdfpop" id="pdfPop" role="dialog" aria-label="Choose sheets to save as PDF" tabindex="-1" hidden></div>
 <div class="assign-pop" id="assignPop" role="dialog" aria-label="Choose assignees" tabindex="-1" hidden></div>
 
 <script>
@@ -737,8 +805,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   var customOn = false, customColor = '#3563E9';
   function isLight(hex) { var n = parseInt(String(hex).slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 170; }
   function avc(hex) { return '--c:' + hex + ';--ac:' + (isLight(hex) ? '#111' : '#fff'); }
-  var FIELD_KEYS = ['assignee', 'duration', 'progress', 'progressShow', 'status', 'notes'];
-  var DEFAULT_FIELDS = { assignee: true, duration: true, progress: false, progressShow: true, status: true, notes: false };
+  var FIELD_KEYS = ['assignee', 'workforce', 'duration', 'progress', 'progressShow', 'status', 'notes'];
+  var DEFAULT_FIELDS = { assignee: true, workforce: true, duration: true, progress: false, progressShow: true, status: true, notes: false };
   var LS_KEY = 'barline.draft.v1';
   var X_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>';
 
@@ -771,9 +839,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function fmtShort(n) { return new Date(n * DAY).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }); }
 
   /* ---------- state ---------- */
-  function mkTask() { return { id: uid(), name: '', assignees: [], status: 'todo', start: '', end: '', progress: 0, notes: '' }; }
+  function mkTask() { return { id: uid(), name: '', assignees: [], status: 'todo', start: '', end: '', as: '', ae: '', wf: '', progress: 0, notes: '' }; }
+  var MAX_SHEETS = 12, MAX_LEGEND = 20, OPENED = new Date();
+  function mkSheet(name, tasks, ms) { return { id: uid(), name: name, tasks: tasks, milestones: ms || [] }; }
+  /* state.tasks and state.milestones always point at the ACTIVE sheet's lists. syncSheet() writes them back, bindSheet() reads them. */
+  function syncSheet() { var sh = state && state.sheets && state.sheets[state.sheet]; if (sh) { sh.tasks = state.tasks; sh.milestones = state.milestones; } }
+  function bindSheet(st) { if (!(st.sheet >= 0 && st.sheet < st.sheets.length)) st.sheet = 0; var sh = st.sheets[st.sheet]; st.tasks = sh.tasks; st.milestones = sh.milestones; return st; }
+  function fmtStamp(d) { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   function blankState() {
-    return { title: 'Untitled project', logo: '', signoffs: defaultSign(), milestones: [], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', tasks: [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()], example: false };
+    var tk = [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()];
+    return bindSheet({ title: 'Untitled project', logo: '', address: '', legend: [], signoffs: defaultSign(), showToday: true, showWeekend: true, showActual: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', sheets: [mkSheet('Sheet 1', tk, [])], sheet: 0, example: false });
   }
   function exampleState() {
     var B = todayDay(); B -= wd(B) + 7; /* Monday of last week */
@@ -782,8 +857,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     function T(name, pi, s, e, pct, notes) {
       return { id: uid(), name: name, assignees: [].concat(pi).map(function (k) { return people[k].id; }), start: toISO(B + s), end: toISO(B + e), progress: pct, status: pct >= 100 ? 'done' : pct > 0 ? 'doing' : 'todo', notes: notes || '' };
     }
-    return {
-      title: 'Website relaunch', logo: '', signoffs: defaultSign(), milestones: [{ id: uid(), name: 'Initiation phase', start: toISO(B), end: toISO(B + 6), color: '#E0A02B' }, { id: uid(), name: 'Preparation phase', start: toISO(B + 7), end: toISO(B + 27), color: '#E0A02B' }, { id: uid(), name: 'Execution phase', start: toISO(B + 28), end: toISO(B + 45), color: '#E0A02B' }, { id: uid(), name: 'Go live', start: toISO(B + 46), end: '', color: '#C2410C' }], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
+    var ex = {
+      title: 'Website relaunch', logo: '', address: '', legend: [], showWeekend: true, showActual: true, signoffs: defaultSign(), milestones: [{ id: uid(), name: 'Initiation phase', start: toISO(B), end: toISO(B + 6), color: '#E0A02B' }, { id: uid(), name: 'Preparation phase', start: toISO(B + 7), end: toISO(B + 27), color: '#E0A02B' }, { id: uid(), name: 'Execution phase', start: toISO(B + 28), end: toISO(B + 45), color: '#E0A02B' }, { id: uid(), name: 'Go live', start: toISO(B + 46), end: '', color: '#C2410C' }], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
       tasks: [
         T('Kickoff and scope', 0, 0, 2, 100),
         T('User research', 2, 1, 11, 100, 'Eight interviews'),
@@ -795,6 +870,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         T('Launch', 0, 46, 46, 0)
       ]
     };
+    ex.tasks[0].as = toISO(B); ex.tasks[0].ae = toISO(B + 2);
+    ex.tasks[1].as = toISO(B + 1); ex.tasks[1].ae = toISO(B + 9);
+    ex.tasks[2].as = toISO(B + 9);
+    [3, 2, 4, 2, 6, 3, 2, 1].forEach(function (n, i) { if (ex.tasks[i]) ex.tasks[i].wf = n; });
+    ex.sheets = [mkSheet('Sheet 1', ex.tasks, ex.milestones)]; ex.sheet = 0;
+    return bindSheet(ex);
   }
   var state;
 
@@ -826,31 +907,62 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     return out;
   }
-  function cleanChart(o) {
-    if (!o || typeof o !== 'object' || !Array.isArray(o.tasks)) throw new Error('That file does not look like a saved chart.');
-    var fields = {};
-    FIELD_KEYS.forEach(function (k) { fields[k] = o.fields && typeof o.fields[k] === 'boolean' ? o.fields[k] : DEFAULT_FIELDS[k]; });
-    var tasks = o.tasks.slice(0, MAX_ROWS).map(function (t) {
+  function cleanAddr(v) {
+    if (typeof v !== 'string') return '';
+    return v.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ').split('\n').slice(0, 5).map(function (l) { return l.trim().slice(0, 60); }).join('\n').trim();
+  }
+  function cleanLegend(v) {
+    if (!Array.isArray(v)) return [];
+    return v.slice(0, MAX_LEGEND).filter(function (o) { return o && typeof o === 'object'; }).map(function (o) {
+      return { id: typeof o.id === 'string' && o.id ? o.id.slice(0, 40) : uid(), name: clampStr(o.name, 40), color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#7C3AED' };
+    });
+  }
+  /* Workforce = how many people an item needs: a whole number 0 to 9999, or '' when not set. */
+  function cleanWf(v) { if (v === '' || v == null) return ''; var n = Math.round(Number(v)); return isFinite(n) && n >= 0 ? Math.min(n, 9999) : ''; }
+  function cleanTasks(arr) {
+    return (Array.isArray(arr) ? arr : []).slice(0, MAX_ROWS).map(function (t) {
       t = t && typeof t === 'object' ? t : {};
       return {
         id: uid(), name: clampStr(t.name, 120), assignees: cleanIds(t),
         start: toDay(t.start) != null ? t.start : '', end: toDay(t.end) != null ? t.end : '',
+        as: toDay(t.as) != null ? t.as : '', ae: toDay(t.ae) != null ? t.ae : '', wf: cleanWf(t.wf),
         progress: clampNum(t.progress), status: validStatus(t.status, clampNum(t.progress)), notes: clampStr(t.notes, 300)
       };
     });
-    return {
-      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), signoffs: cleanSign(o.signoffs), milestones: cleanMilestones(o.milestones), showToday: o.showToday !== false, scale: o.scale === 'week' ? 'week' : 'day',
+  }
+  function cleanChart(o) {
+    if (!o || typeof o !== 'object' || (!Array.isArray(o.tasks) && !(Array.isArray(o.sheets) && o.sheets.length))) throw new Error('That file does not look like a saved chart.');
+    var fields = {};
+    FIELD_KEYS.forEach(function (k) { fields[k] = o.fields && typeof o.fields[k] === 'boolean' ? o.fields[k] : DEFAULT_FIELDS[k]; });
+    var src = Array.isArray(o.sheets) && o.sheets.length ? o.sheets : [{ name: 'Sheet 1', tasks: o.tasks, milestones: o.milestones }];
+    var sheets = src.slice(0, MAX_SHEETS).map(function (sh, i) {
+      sh = sh && typeof sh === 'object' ? sh : {};
+      var tk = cleanTasks(sh.tasks);
+      return mkSheet(clampStr(sh.name, 30) || 'Sheet ' + (i + 1), tk.length ? tk : [mkTask()], cleanMilestones(sh.milestones));
+    });
+    var act = Math.round(Number(o.sheet)); if (!(act >= 0 && act < sheets.length)) act = 0;
+    return bindSheet({
+      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), address: cleanAddr(o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
+      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
-      fields: fields, persons: cleanPeople(o.persons), tasks: tasks.length ? tasks : [mkTask()]
+      fields: fields, persons: cleanPeople(o.persons), sheets: sheets, sheet: act
+    });
+  }
+  function exportTask(t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, as: t.as || '', ae: t.ae || '', wf: t.wf === 0 || t.wf ? t.wf : '', progress: t.progress, notes: t.notes }; }
+  function exportPersons() { return state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }); }
+  function exportChart() {
+    syncSheet();
+    return {
+      app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', address: state.address || '', legend: state.legend || [], signoffs: state.signoffs,
+      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      persons: exportPersons(), sheet: state.sheet,
+      sheets: state.sheets.map(function (sh) { return { name: sh.name, tasks: sh.tasks.map(exportTask), milestones: sh.milestones }; }),
+      tasks: state.tasks.map(exportTask), milestones: state.milestones
     };
   }
-  function exportChart() {
-    return {
-      app: 'barline', type: 'chart', version: 1, title: state.title, logo: state.logo || '', signoffs: state.signoffs, milestones: state.milestones, showToday: state.showToday !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
-      persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }),
-      tasks: state.tasks.map(function (t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, progress: t.progress, notes: t.notes }; })
-    };
+  function exportTemplate() {
+    return { app: 'barline', type: 'template', version: 1, logo: state.logo || '', address: state.address || '', signoffs: state.signoffs, legend: state.legend || [], persons: exportPersons() };
   }
   function exportPeople() {
     return { app: 'barline', type: 'people', version: 1, persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }) };
@@ -918,7 +1030,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var o = defaultSign();
     if (v && typeof v === 'object') SIGNS.forEach(function (s) {
       var x = v[s[0]];
-      if (x && typeof x === 'object') o[s[0]] = { on: x.on === true, name: clampStr(x.name, 40), date: validIso(x.date) };
+      if (x && typeof x === 'object') o[s[0]] = { on: x.on === true, name: clampStr(x.name, 60), date: validIso(x.date) };
     });
     return o;
   }
@@ -928,12 +1040,14 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     SIGNS.forEach(function (s) {
       var x = state.signoffs[s[0]];
       if (x.on) h += '<div class="sbox"><div class="shead"><span>' + s[1] + '</span><button type="button" class="sx" data-sx="' + s[0] + '" aria-label="Remove the ' + s[1] + ' box">&times;</button></div>' +
-        '<input type="text" class="sname" data-k="' + s[0] + '" maxlength="40" placeholder="Name (printed under the line)" aria-label="' + s[1] + ' name" value="' + esc(x.name) + '">' +
+        '<textarea class="sname" rows="1" data-k="' + s[0] + '" maxlength="60" placeholder="Name (printed under the line)" aria-label="' + s[1] + ' name">' + esc(x.name) + '</textarea>' +
         '<input type="date" class="sdate" data-k="' + s[0] + '" aria-label="' + s[1] + ' date" value="' + x.date + '"></div>';
       else h += '<button type="button" class="chip" data-sa="' + s[0] + '">+ ' + s[1] + '</button>';
     });
     $('#signs').innerHTML = h;
+    $('#signs').querySelectorAll('.sname').forEach(growBox);
   }
+  function growBox(el) { el.style.height = 'auto'; el.style.height = Math.max(34, el.scrollHeight + 2) + 'px'; }
 
   /* ---------- milestones ---------- */
   /* state.milestones = [{ id, name, start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' or '', color: '#RRGGBB' }].
@@ -1018,11 +1132,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   $('#toastUndo').addEventListener('click', function () { var f = undoFn; $('#toast').hidden = true; if (f) f(); });
 
   function withUndo(mutate) {
+    syncSheet();
     var snap = JSON.stringify(state);
     var msg = mutate();
     state.example = false;
     renderAll(); persist();
-    toast(msg || 'Done.', '', function () { state = JSON.parse(snap); renderAll(); persist(); toast('Undone.'); });
+    toast(msg || 'Done.', '', function () { state = bindSheet(JSON.parse(snap)); sel = null; renderAll(); persist(); toast('Undone.'); });
   }
   function changed() {
     if (state.example) { state.example = false; $('#banner').hidden = true; }
@@ -1167,8 +1282,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- item editor ---------- */
   function columns() {
     var f = state.fields, c = [[34, 0], [170, 2.4]];
+    if (f.workforce) c.push([84, 0]);
     if (f.assignee) c.push([176, 1.2]);
     c.push([136, 1], [136, 1]);
+    if (state.showActual !== false) c.push([136, 1], [136, 1]);
     if (f.duration) c.push([56, 0]);
     if (f.progress) c.push([84, 0]);
     if (f.status) c.push([104, 0]);
@@ -1182,26 +1299,30 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     return '<div class="irow' + (rowBad(t) ? ' bad' : '') + '" data-i="' + i + '">' +
       '<span class="idx">' + n + '</span>' +
       '<label class="cell c-name"><span class="lbl">Task</span><input data-f="name" value="' + esc(t.name) + '" maxlength="120" placeholder="Task name" aria-label="Task name, item ' + n + '"></label>' +
+      (f.workforce ? '<label class="cell"><span class="lbl">Workforce</span><input type="number" min="0" max="9999" step="1" inputmode="numeric" data-f="wf" value="' + esc(t.wf === 0 || t.wf ? t.wf : '') + '" placeholder="0" aria-label="Workforce, item ' + n + '"></label>' : '') +
       (f.assignee ? '<div class="cell"><span class="lbl">Assignees</span><button type="button" class="assign-btn" data-act="assign" aria-haspopup="dialog" aria-expanded="false">' + assignInner(t, n) + '</button></div>' : '') +
-      '<label class="cell"><span class="lbl">Start</span><input type="date" data-f="start" value="' + esc(t.start) + '" min="1990-01-01" max="2100-12-31" aria-label="Start date, item ' + n + '"></label>' +
-      '<label class="cell"><span class="lbl">End</span><input type="date" data-f="end" value="' + esc(t.end) + '" min="1990-01-01" max="2100-12-31" aria-label="End date, item ' + n + '"></label>' +
+      '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan start' : 'Start') + '</span><input type="date" data-f="start" value="' + esc(t.start) + '" min="1990-01-01" max="2100-12-31" aria-label="Start date, item ' + n + '"></label>' +
+      '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan end' : 'End') + '</span><input type="date" data-f="end" value="' + esc(t.end) + '" min="1990-01-01" max="2100-12-31" aria-label="End date, item ' + n + '"></label>' +
+      (state.showActual !== false ? '<label class="cell"><span class="lbl">Actual start</span><input type="date" data-f="as" value="' + esc(t.as || '') + '" min="1990-01-01" max="2100-12-31" aria-label="Actual start date, item ' + n + '"></label>' +
+        '<label class="cell"><span class="lbl">Actual end</span><input type="date" data-f="ae" value="' + esc(t.ae || '') + '" min="1990-01-01" max="2100-12-31" aria-label="Actual end date, item ' + n + '"></label>' : '') +
       (f.duration ? '<div class="cell"><span class="lbl">Days</span><output class="dur">' + durText(t) + '</output></div>' : '') +
       (f.progress ? '<label class="cell"><span class="lbl">Done %</span><input type="number" min="0" max="100" step="5" inputmode="numeric" data-f="progress" value="' + t.progress + '" aria-label="Percent done, item ' + n + '"></label>' : '') +
       (f.status ? '<label class="cell"><span class="lbl">Status</span><select data-f="status" aria-label="Status, item ' + n + '">' + statusOptions(t.status) + '</select></label>' : '') +
       (f.notes ? '<label class="cell c-notes"><span class="lbl">Notes</span><input data-f="notes" value="' + esc(t.notes) + '" maxlength="300" placeholder="Notes" aria-label="Notes, item ' + n + '"></label>' : '') +
       '<button type="button" class="icon-btn del" data-act="del" aria-label="Remove item ' + n + '">' + X_ICON + '</button>' +
-      '<span class="err"' + (rowBad(t) ? '' : ' hidden') + '>The end date is before the start date.</span>' +
+      '<span class="err"' + (rowBad(t) ? '' : ' hidden') + '>An end date is before its start date.</span>' +
       '</div>';
   }
-  function rowBad(t) { var s = toDay(t.start), e = toDay(t.end); return s != null && e != null && e < s; }
+  function rowBad(t) { var s = toDay(t.start), e = toDay(t.end), as = toDay(t.as), ae = toDay(t.ae); return (s != null && e != null && e < s) || (as != null && ae != null && ae < as); }
   function renderItems() {
     closeAssign(false);
     var f = state.fields, cols = columns();
     var tpl = cols.map(function (c) { return c[1] ? 'minmax(' + c[0] + 'px,' + c[1] + 'fr)' : c[0] + 'px'; }).join(' ');
     var minW = cols.reduce(function (a, c) { return a + c[0]; }, 0) + (cols.length - 1) * 8 + 16;
     var heads = ['', 'Task'];
+    if (f.workforce) heads.push('Workforce');
     if (f.assignee) heads.push('Assignees');
-    heads.push('Start', 'End');
+    if (state.showActual !== false) heads.push('Plan start', 'Plan end', 'Actual start', 'Actual end'); else heads.push('Start', 'End');
     if (f.duration) heads.push('Days');
     if (f.progress) heads.push('Done %');
     if (f.status) heads.push('Status');
@@ -1227,7 +1348,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       setStatus(t, el.value);
       var pin = $('#items .irow[data-i="' + i + '"] input[data-f="progress"]'); if (pin) pin.value = t.progress;
     } else {
-      t[k] = k === 'progress' ? clampNum(el.value) : (k === 'start' || k === 'end') ? el.value : el.value.slice(0, k === 'notes' ? 300 : 120);
+      t[k] = k === 'progress' ? clampNum(el.value) : k === 'wf' ? cleanWf(el.value) : (k === 'start' || k === 'end' || k === 'as' || k === 'ae') ? el.value : el.value.slice(0, k === 'notes' ? 300 : 120);
       if (k === 'progress') {
         syncStatus(t);
         var sSel = $('#items .irow[data-i="' + i + '"] select[data-f="status"]'); if (sSel) sSel.value = t.status;
@@ -1243,6 +1364,32 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     withUndo(function () { state.tasks.splice(i, 1); if (!state.tasks.length) state.tasks.push(mkTask()); return 'Item ' + (i + 1) + ' removed.'; });
   });
 
+  /* ---------- plan and actual ---------- */
+  /* actualOf(task, today): null when there is no usable actual start. Otherwise { s, e, open, cls }.
+     cls = 'late' when it started or finished after the plan (or is still open past the planned end),
+     'early' when it started or finished before the plan, else 'ok' (on time). Late wins over early. */
+  var ACT_LBL = { ok: 'on time', early: 'earlier than plan', late: 'later than plan' };
+  function actualOf(t, today) {
+    var ps = toDay(t.start), pe = toDay(t.end), s = toDay(t.as), e = toDay(t.ae);
+    if (s == null) return null;
+    if (e != null && e < s) return null;
+    var open = e == null, cls = 'ok';
+    if (ps != null && pe != null && pe >= ps) {
+      var late = s > ps || (!open && e > pe) || (open && today > pe), early = s < ps || (!open && e < pe);
+      cls = late ? 'late' : early ? 'early' : 'ok';
+    }
+    return { s: s, e: open ? Math.max(s, today) : e, open: open, cls: cls };
+  }
+  function actualSpan(min, max, has) {
+    if (state.showActual === false) return [min, max, has];
+    var today = todayDay();
+    state.tasks.forEach(function (t) {
+      var a = actualOf(t, today); if (!a) return;
+      if (!has) { min = a.s; max = a.e; has = true; } else { min = Math.min(min, a.s); max = Math.max(max, a.e); }
+    });
+    return [min, max, has];
+  }
+
   /* ---------- chart ---------- */
   function renderChart() {
     var el = $('#gantt'), f = state.fields, showP = f.progress && f.progressShow;
@@ -1256,10 +1403,11 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     var rows = visibleRows(all);
     var valid = all.filter(function (r) { return r.ok; });
-    var today = todayDay(), min, max, showT = state.showToday !== false;
+    var today = todayDay(), min, max, showT = state.showToday !== false, showW = state.showWeekend !== false, showA = state.showActual !== false;
     if (valid.length) { min = Math.min.apply(null, valid.map(function (r) { return r.s; })); max = Math.max.apply(null, valid.map(function (r) { return r.e; })); }
     else { min = today; max = today + 27; }
-    var xr = msRange(min, max, valid.length > 0); min = xr[0]; max = xr[1];
+    var ar = actualSpan(min, max, valid.length > 0); min = ar[0]; max = ar[1];
+    var xr = msRange(min, max, ar[2]); min = xr[0]; max = xr[1];
     var rs = min - 2, re = max + 4;
     rs -= wd(rs); re += 6 - wd(re);
     if (re - rs + 1 < 28) re = rs + 27;
@@ -1284,8 +1432,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     if (scale === 'day') {
       for (var n = rs; n <= re; n++) {
         var k = wd(n);
-        days += '<div class="g-dc' + (k >= 5 ? ' we' : '') + (showT && n === today ? ' now' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + 'MTWTFSS'[k] + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
-        if (k >= 5) stripes += '<div class="stripe" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>';
+        days += '<div class="g-dc' + (showW && k >= 5 ? (k === 5 ? ' sat we' : ' sun we') : '') + (showT && n === today ? ' now' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + 'MTWTFSS'[k] + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
+        if (showW && k >= 5) stripes += '<div class="stripe ' + (k === 5 ? 'sat' : 'sun') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>';
       }
     } else {
       for (var m = rs; m <= re; m += 7) {
@@ -1301,14 +1449,23 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (r.ok) meta = fmtShort(r.s) + ' – ' + fmtShort(r.e) + (f.duration ? ' · ' + (r.e - r.s + 1) + 'd' : '');
       else if (r.s != null && r.e != null) { meta = 'End is before start'; bad = true; }
       else meta = 'No dates yet';
-      names += '<div class="g-nrow' + (t.id === sel ? ' sel' : '') + '" data-id="' + esc(t.id) + '" role="button" tabindex="0" aria-label="Show details for ' + esc(t.name || 'item ' + (r.i + 1)) + '"' + (f.notes && t.notes ? ' title="' + esc(t.notes) + '"' : '') + '>' + av +
-        '<div class="g-nm"><div class="g-t' + (t.name ? '' : ' ph') + '">' + esc(t.name || 'Item ' + (r.i + 1)) + '</div><div class="g-ds' + (bad ? ' bad' : '') + '">' + meta + '</div></div></div>';
+      var act = showA ? actualOf(t, today) : null, wfv = f.workforce ? wfOf(t) : null, xcol = f.workforce || showA;
+      names += '<div class="g-nrow' + (t.id === sel ? ' sel' : '') + (xcol ? ' x' : '') + '" data-id="' + esc(t.id) + '" role="button" tabindex="0" aria-label="Show details for ' + esc(t.name || 'item ' + (r.i + 1)) + '"' + (f.notes && t.notes ? ' title="' + esc(t.notes) + '"' : '') + '>' + av +
+        '<div class="g-nm"><div class="g-t' + (t.name ? '' : ' ph') + '">' + esc(t.name || 'Item ' + (r.i + 1)) + '</div><div class="g-ds' + (bad ? ' bad' : '') + '">' + meta + '</div></div>' +
+        (f.workforce ? '<div class="g-wfc">' + (wfv != null ? '<span class="wf" title="Workforce: ' + wfv + (wfv === 1 ? ' person' : ' people') + '">' + wfv + '</span>' : '') + '</div>' : '') +
+        (showA ? '<div class="g-pa">' + (act ? (r.ok ? '<span class="pa" style="top:6px" title="Plan">P</span>' : '') + '<span class="pa" style="top:' + (r.ok ? 26 : (RH - 10) / 2) + 'px" title="Actual">A</span>' : '') + '</div>' : '') + '</div>';
+      var pTop = act ? 6 : (RH - 22) / 2, nm0 = t.name || 'Item ' + (r.i + 1);
       if (r.ok) {
-        var left = (r.s - rs) * dw + 1, w = Math.max((r.e - r.s + 1) * dw - 2, 6), top = pos * RH + (RH - 22) / 2;
-        var tip = (t.name || 'Item ' + (r.i + 1)) + ': ' + fmtShort(r.s) + ' to ' + fmtShort(r.e) + ' (' + (r.e - r.s + 1) + ' days)' +
+        var left = (r.s - rs) * dw + 1, w = Math.max((r.e - r.s + 1) * dw - 2, 6), top = pos * RH + pTop;
+        var tip = nm0 + ': ' + fmtShort(r.s) + ' to ' + fmtShort(r.e) + ' (' + (r.e - r.s + 1) + ' days)' +
           (ppl.length ? ', ' + ppl.map(function (q) { return q.name; }).join(' & ') : '') + (showP ? ', ' + t.progress + '% done' : '') + (f.notes && t.notes ? '. ' + t.notes : '');
-        bars += '<div class="bar' + (t.id === sel ? ' sel' : '') + '" data-id="' + esc(t.id) + '" style="--c:' + (ppl.length ? ppl[0].color : 'var(--none)') + trackBg(ppl) + ';left:' + left + 'px;top:' + top + 'px;width:' + w + 'px" title="' + esc(tip) + '"><i style="width:' + (showP ? t.progress : 100) + '%' + fillBg(ppl) + '"></i></div>';
-        if (showP && t.progress > 0) bars += '<span class="pct" style="left:' + (left + w + 7) + 'px;top:' + top + 'px">' + t.progress + '%</span>';
+        bars += '<div class="bar' + (act ? ' sm' : '') + (t.id === sel ? ' sel' : '') + '" data-id="' + esc(t.id) + '" style="--c:' + (ppl.length ? ppl[0].color : 'var(--none)') + trackBg(ppl) + ';left:' + left + 'px;top:' + top + 'px;width:' + w + 'px" title="' + esc(tip) + '"><i style="width:' + (showP ? t.progress : 100) + '%' + fillBg(ppl) + '"></i></div>';
+        if (showP && t.progress > 0) bars += '<span class="pct" style="left:' + (left + w + 7) + 'px;top:' + top + 'px;height:' + (act ? 16 : 22) + 'px">' + t.progress + '%</span>';
+      }
+      if (act) {
+        var al = (act.s - rs) * dw + 1, aw = Math.max((act.e - act.s + 1) * dw - 2, 6), atop = pos * RH + (r.ok ? pTop + 20 : (RH - 10) / 2);
+        var atip = nm0 + ' actual: ' + fmtShort(act.s) + (act.open ? ' (not finished yet)' : ' to ' + fmtShort(act.e)) + ', ' + ACT_LBL[act.cls];
+        bars += '<div class="abar ' + act.cls + (act.open ? ' open' : '') + '" data-id="' + esc(t.id) + '" style="left:' + al + 'px;top:' + atop + 'px;width:' + aw + 'px" title="' + esc(atip) + '"></div>';
       }
     });
     var line = showT && today >= rs && today <= re ? '<div class="today" style="left:' + ((today - rs + 0.5) * dw - 1) + 'px"></div>' : '';
@@ -1331,20 +1488,39 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       msBand = '<div class="g-ms" style="height:' + lanes * LANE + 'px">' + stripes + line + msBand + '</div>';
     }
 
+    el.style.setProperty('--nx', ((f.workforce ? 72 : 0) + (showA ? 24 : 0)) + 'px');
     el.style.setProperty('--dw', dw + 'px'); el.style.setProperty('--cell', cell + 'px');
-    el.innerHTML = '<div class="g-names"><div class="g-corner"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + msNames + names + '</div>' +
+    el.innerHTML = '<div class="g-names"><div class="g-corner"><div class="cl"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + (f.workforce ? '<div class="g-wfh">Workforce</div>' : '') + (showA ? '<div class="g-pah"></div>' : '') + '</div>' + msNames + names + '</div>' +
       '<div class="g-canvas" style="width:' + total * dw + 'px"><div class="g-head"><div class="g-months">' + months + '</div><div class="g-days">' + days + '</div></div>' +
       msBand + '<div class="g-body" style="height:' + rows.length * RH + 'px">' + stripes + line + bars + '</div></div>';
     el.scrollLeft = sl; el.scrollTop = stp;
   }
-  function renderLegend() {
-    var f = state.fields, h = '';
+  function legendItems() {
+    /* One list for the screen and the PDF: [{ t, c, k }] where k is 'dot', 'sq', 'line', 'bar' or 'text'. */
+    var f = state.fields, out = [], tl = state.view !== 'board';
     if (f.assignee) {
-      state.persons.forEach(function (p) { h += '<span class="lg"><i style="--c:' + p.color + '"></i>' + esc(p.name) + '</span>'; });
-      if (state.tasks.some(function (t) { return !assigneesOf(t).length; })) h += '<span class="lg"><i class="none"></i>Unassigned</span>';
+      state.persons.forEach(function (p) { out.push({ t: p.name, c: p.color, k: 'dot' }); });
+      if (state.tasks.some(function (t) { return !assigneesOf(t).length; })) out.push({ t: 'Unassigned', c: '#7C8998', k: 'dot', none: true });
     }
-    if (state.view !== 'board' && f.progress && f.progressShow) h += '<span class="lg">Solid fill shows percent done</span>';
-    if (state.view !== 'board' && state.showToday !== false) h += '<span class="lg"><i class="tl"></i>Today</span>';
+    if (tl && f.progress && f.progressShow) out.push({ t: 'Solid fill shows percent done', k: 'text' });
+    if (tl && state.showActual !== false) {
+      out.push({ t: 'Plan (top bar)', c: '#7C8998', k: 'bar', plan: true });
+      out.push({ t: 'Actual: on time', c: '#2563EB', k: 'bar', v: 'ok' }, { t: 'Actual: earlier', c: '#1F9D55', k: 'bar', v: 'early' }, { t: 'Actual: later', c: '#D93025', k: 'bar', v: 'late' });
+    }
+    if (tl && state.showWeekend !== false) out.push({ t: 'Saturday', c: '#A5D8B5', k: 'sq', v: 'sat' }, { t: 'Sunday', c: '#F2ABA3', k: 'sq', v: 'sun' });
+    if (tl && state.showToday !== false) out.push({ t: 'Today', c: '#D93025', k: 'line' });
+    (state.legend || []).forEach(function (l) { if (l.name) out.push({ t: l.name, c: l.color, k: 'sq', custom: true }); });
+    return out;
+  }
+  function renderLegend() {
+    var h = '';
+    legendItems().forEach(function (it) {
+      if (it.k === 'text') h += '<span class="lg">' + esc(it.t) + '</span>';
+      else if (it.k === 'line') h += '<span class="lg"><i class="tl"></i>' + it.t + '</span>';
+      else if (it.k === 'dot') h += '<span class="lg"><i' + (it.none ? ' class="none"' : ' style="--c:' + it.c + '"') + '></i>' + esc(it.t) + '</span>';
+      else if (it.k === 'bar') h += '<span class="lg"><i class="bar2" style="--c:' + (it.v ? 'var(--' + it.v + ')' : it.c) + '"></i>' + esc(it.t) + '</span>';
+      else h += '<span class="lg"><i class="sq" style="--c:' + (it.v ? 'var(--' + it.v + ')' : it.c) + '"></i>' + esc(it.t) + '</span>';
+    });
     h += '<span class="lg">Select an item for its details</span>';
     $('#legend').innerHTML = h;
   }
@@ -1367,7 +1543,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   });
   $('#signs').addEventListener('input', function (e) {
     var k = e.target.dataset.k; if (!k || !state.signoffs[k]) return;
-    if (e.target.classList.contains('sname')) state.signoffs[k].name = clampStr(e.target.value, 40);
+    if (e.target.classList.contains('sname')) { state.signoffs[k].name = clampStr(e.target.value.replace(/\n/g, ' '), 60); growBox(e.target); }
     else if (e.target.classList.contains('sdate')) state.signoffs[k].date = validIso(e.target.value);
     touch();
   });
@@ -1404,11 +1580,90 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   });
   $('#showToday').addEventListener('change', function (e) { state.showToday = e.target.checked; changed(); });
 
+  /* ---------- address, legend entries, view toggles ---------- */
+  $('#address').addEventListener('input', function (e) {
+    var v = e.target.value.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ').split('\n').slice(0, 5).map(function (l) { return l.slice(0, 60); }).join('\n');
+    state.address = v; touch();
+  });
+  $('#showWeekend').addEventListener('change', function (e) { state.showWeekend = e.target.checked; changed(); });
+  $('#showActual').addEventListener('change', function (e) { state.showActual = e.target.checked; renderItems(); changed(); });
+  function renderLegendEditor() {
+    $('#lgList').innerHTML = (state.legend || []).map(function (l) {
+      return '<div class="msrow" data-id="' + esc(l.id) + '"><input type="color" class="lgc" value="' + l.color + '" aria-label="Legend colour">' +
+        '<input type="text" class="msn lgn" maxlength="40" placeholder="Legend text" aria-label="Legend text" value="' + esc(l.name) + '">' +
+        '<button type="button" class="sx" data-lgx="1" aria-label="Delete legend entry">&times;</button></div>';
+    }).join('');
+    $('#lgCount').textContent = state.legend.length ? '(' + state.legend.length + ')' : '';
+  }
+  function lgFind(el) { var row = el.closest('.msrow'); if (!row) return null; return state.legend.filter(function (x) { return x.id === row.dataset.id; })[0] || null; }
+  $('#lgAdd').addEventListener('click', function () {
+    if (state.legend.length >= MAX_LEGEND) { toast('You can have up to ' + MAX_LEGEND + ' legend entries.', 'error'); return; }
+    withUndo(function () { state.legend.push({ id: uid(), name: '', color: '#7C3AED' }); return 'Legend entry added.'; });
+    var r = $('#lgList').querySelectorAll('.lgn'); if (r.length) r[r.length - 1].focus();
+  });
+  $('#lgList').addEventListener('input', function (e) {
+    var l = lgFind(e.target); if (!l) return;
+    if (e.target.classList.contains('lgn')) l.name = clampStr(e.target.value, 40); else if (e.target.classList.contains('lgc')) l.color = e.target.value; else return;
+    changed();
+  });
+  $('#lgList').addEventListener('click', function (e) {
+    var x = e.target.closest('[data-lgx]'); if (!x) return; var l = lgFind(x); if (!l) return;
+    withUndo(function () { state.legend = state.legend.filter(function (q) { return q !== l; }); return 'Legend entry deleted.'; });
+  });
+
+  /* ---------- sheets ---------- */
+  function renderSheets() {
+    var h = '';
+    state.sheets.forEach(function (sh, i) {
+      if (i === state.sheet) h += '<div class="shtab on" role="tab" aria-selected="true"><input class="shname" maxlength="30" value="' + esc(sh.name) + '" size="' + Math.max(8, sh.name.length + 1) + '" aria-label="Sheet name (type to rename)"></div>';
+      else h += '<button type="button" class="shtab" role="tab" aria-selected="false" data-sh="' + i + '">' + esc(sh.name) + '</button>';
+    });
+    h += '<button type="button" class="shtab" id="shAdd" aria-label="Add a sheet">+ New sheet</button>' +
+      '<div class="shtools"><button type="button" class="btn" id="shDup">Duplicate sheet</button><button type="button" class="btn" id="shDel">Delete sheet</button></div>';
+    $('#sheets').innerHTML = h;
+    $('#shAdd').disabled = state.sheets.length >= MAX_SHEETS;
+  }
+  function switchSheet(i) { syncSheet(); state.sheet = i; bindSheet(state); sel = null; renderAll(); persist(); }
+  $('#sheets').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-sh]');
+    if (b) { switchSheet(+b.dataset.sh); return; }
+    if (e.target.closest('#shAdd')) {
+      if (state.sheets.length >= MAX_SHEETS) { toast('You can have up to ' + MAX_SHEETS + ' sheets.', 'error'); return; }
+      withUndo(function () { syncSheet(); state.sheets.push(mkSheet('Sheet ' + (state.sheets.length + 1), [mkTask(), mkTask(), mkTask()], [])); state.sheet = state.sheets.length - 1; bindSheet(state); sel = null; return 'Sheet added.'; });
+    } else if (e.target.closest('#shDup')) {
+      if (state.sheets.length >= MAX_SHEETS) { toast('You can have up to ' + MAX_SHEETS + ' sheets.', 'error'); return; }
+      withUndo(function () {
+        syncSheet(); var src = state.sheets[state.sheet], cp = JSON.parse(JSON.stringify(src));
+        cp.id = uid(); cp.name = clampStr(src.name + ' copy', 30); cp.tasks.forEach(function (t) { t.id = uid(); }); cp.milestones.forEach(function (m) { m.id = uid(); });
+        state.sheets.splice(state.sheet + 1, 0, cp); state.sheet += 1; bindSheet(state); sel = null; return 'Sheet duplicated.';
+      });
+    } else if (e.target.closest('#shDel')) {
+      if (state.sheets.length < 2) { toast('A chart needs at least one sheet.', 'error'); return; }
+      withUndo(function () { syncSheet(); var nm = state.sheets[state.sheet].name; state.sheets.splice(state.sheet, 1); state.sheet = Math.max(0, state.sheet - 1); bindSheet(state); sel = null; return 'Deleted sheet “' + nm + '”.'; });
+    }
+  });
+  $('#sheets').addEventListener('input', function (e) {
+    if (!e.target.classList.contains('shname')) return;
+    var v = clampStr(e.target.value, 30); state.sheets[state.sheet].name = v || 'Sheet ' + (state.sheet + 1);
+    e.target.size = Math.max(8, e.target.value.length + 1); persist();
+  });
+
   /* ---------- sort, filter and job details ---------- */
   var sel = null;
 
+  var WF_RANGES = {
+    all: { label: 'All workforce' },
+    none: { label: 'Not set', test: function (n) { return n == null; } },
+    '1-2': { label: '1 to 2 people', test: function (n) { return n != null && n >= 1 && n <= 2; } },
+    '3-5': { label: '3 to 5 people', test: function (n) { return n != null && n >= 3 && n <= 5; } },
+    '6-10': { label: '6 to 10 people', test: function (n) { return n != null && n >= 6 && n <= 10; } },
+    '11+': { label: '11 or more', test: function (n) { return n != null && n >= 11; } }
+  };
+  function wfOf(t) { return t.wf === 0 || t.wf ? Number(t.wf) : null; }
   function visibleRows(all) {
     var f = state.fields, rows = all.slice(), flt = f.assignee ? (state.filter || 'all') : 'all';
+    var wfr = WF_RANGES[f.workforce ? (state.wfFilter || 'all') : 'all'];
+    if (wfr && wfr.test) rows = rows.filter(function (r) { return wfr.test(wfOf(r.t)); });
     if (flt === '__none') rows = rows.filter(function (r) { return !assigneesOf(r.t).length; });
     else if (flt !== 'all' && personById(flt)) rows = rows.filter(function (r) { return (r.t.assignees || []).indexOf(flt) >= 0; });
     var mode = state.sort || 'manual';
@@ -1453,9 +1708,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     fltEl.value = f.assignee ? cur : 'all';
     fltEl.disabled = !f.assignee;
     fltEl.title = f.assignee ? '' : 'Turn on the Assignees field to filter by person.';
+    var wfEl = $('#filterWf'), wc = {};
+    Object.keys(WF_RANGES).forEach(function (k) { wc[k] = k === 'all' ? state.tasks.length : state.tasks.filter(function (t) { return WF_RANGES[k].test(wfOf(t)); }).length; });
+    wfEl.innerHTML = Object.keys(WF_RANGES).map(function (k) { return '<option value="' + k + '">' + WF_RANGES[k].label + ' (' + wc[k] + ')</option>'; }).join('');
+    if (!WF_RANGES[state.wfFilter]) state.wfFilter = 'all';
+    wfEl.value = f.workforce ? state.wfFilter : 'all'; wfEl.disabled = !f.workforce;
+    wfEl.title = f.workforce ? '' : 'Turn on the Workforce field to filter by it.';
   }
   $('#sortBy').addEventListener('change', function (e) { state.sort = e.target.value; renderChart(); persist(); });
   $('#filterBy').addEventListener('change', function (e) { state.filter = e.target.value; renderChart(); persist(); });
+  $('#filterWf').addEventListener('change', function (e) { state.wfFilter = e.target.value; renderChart(); persist(); });
 
   function findTask(id) {
     for (var i = 0; i < state.tasks.length; i++) if (state.tasks[i].id === id) return i;
@@ -1487,6 +1749,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       else timing = 'Ends in ' + plural(e - today, 'day');
     } else if (s != null && e != null) { dates = '<span class="muted">The end date is before the start date.</span>'; }
 
+    var actTxt = '<span class="muted">Not set</span>', ac = actualOf(t, today);
+    if (ac) actTxt = (ac.open ? 'Started ' + fmtLong(ac.s) + ' (not finished yet)' : (ac.s === ac.e ? fmtLong(ac.s) : fmtLong(ac.s) + ' to ' + fmtLong(ac.e))) + ' &middot; <b>' + ACT_LBL[ac.cls] + '</b>';
     var who = ppl.length
       ? '<div class="d-people">' + ppl.map(function (p) { return '<div class="d-person"><span class="av" style="' + avc(p.color) + '">' + esc(initials(p.name)) + '</span><div><div class="d-name">' + esc(p.name) + '</div>' + (p.role ? '<div class="d-role">' + esc(p.role) + '</div>' : '') + '</div></div>'; }).join('') + '</div>'
       : '<span class="muted">Unassigned</span>';
@@ -1510,7 +1774,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     $('#detailBody').innerHTML =
       '<div><div class="d-eyebrow">Item ' + (idx + 1) + ' of ' + state.tasks.length + '</div>' +
       '<div class="d-title"><h3>' + esc(t.name || 'Untitled item') + '</h3><span class="status ' + cls + '">' + st + '</span></div></div>' +
-      '<dl class="d-grid">' + ddRow('Assigned to', who) + ddRow('Dates', dates) + ddRow('Length', len) + ddRow('Timing', timing) + ddRow('Board column', STATUS_LABEL[t.status || 'todo']) +
+      '<dl class="d-grid">' + ddRow('Assigned to', who) + ddRow('Dates', dates) + (state.showActual !== false ? ddRow('Actual', actTxt) : '') + (f.workforce && wfOf(t) != null ? ddRow('Workforce', plural(wfOf(t), 'person').replace('persons', 'people')) : '') + ddRow('Length', len) + ddRow('Timing', timing) + ddRow('Board column', STATUS_LABEL[t.status || 'todo']) +
       (showP ? '<div class="wide"><dt class="lbl">Progress</dt><dd>' + prog + '</dd></div>' : '') +
       '<div class="wide"><dt class="lbl">Notes</dt><dd>' + notes + '</dd></div></dl>' + more;
     box.hidden = false;
@@ -1749,7 +2013,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       .replace(/…/g, '...').replace(/[^\x20-\x7E -ÿ]/g, '?');
   }
 
-  function buildPdf(JsPDF) {
+  function pdfSheet(docIn, JsPDF, first, ttl) {
     var f = state.fields, showP = f.progress && f.progressShow, today = todayDay(), showT = state.showToday !== false;
     var all = state.tasks.map(function (t, i) {
       var s = toDay(t.start), e = toDay(t.end);
@@ -1760,19 +2024,21 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var min, max;
     if (valid.length) { min = Math.min.apply(null, valid.map(function (r) { return r.s; })); max = Math.max.apply(null, valid.map(function (r) { return r.e; })); }
     else { min = today; max = today + 27; }
-    var xr = msRange(min, max, valid.length > 0); min = xr[0]; max = xr[1];
+    var arr = actualSpan(min, max, valid.length > 0); min = arr[0]; max = arr[1];
+    var xr = msRange(min, max, arr[2]); min = xr[0]; max = xr[1];
     var rs = min - 2, re = max + 4;
     rs -= wd(rs); re += 6 - wd(re);
     if (re - rs + 1 < 28) re = rs + 27;
     var total = re - rs + 1;
 
     var big = total > 70, W = big ? 420 : 297, H = big ? 297 : 210;
-    var doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] });
-    var M = 10, NAMEW = 66, GX = M + NAMEW, GW = W - M - GX;
+    var doc = first ? new JsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] }) : docIn;
+    var WFW = f.workforce ? 12 : 0, PAW = state.showActual !== false ? 5 : 0;
+    var M = 10, NAMEW = 66 + WFW + PAW, GX = M + NAMEW, GW = W - M - GX;
     var DW = Math.min(8, GW / total), GRID = DW * total;
     var HEAD = 12, RH = f.notes ? 12 : 10, FOOT = 9;
     var INK = [20, 27, 36], MUTED = [88, 100, 116], LINE = [214, 220, 228], GRIDC = [233, 236, 241], RED = [217, 48, 37];
-    doc.setProperties({ title: pdfTxt(state.title) });
+    if (first) doc.setProperties({ title: pdfTxt(state.title) });
 
     function color(c) { doc.setTextColor(c[0], c[1], c[2]); }
     function fill(c) { doc.setFillColor(c[0], c[1], c[2]); }
@@ -1786,36 +2052,42 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     }
     function ymd(n) { return new Date(n * DAY).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); }
 
-    /* legend */
-    var used = [], seen = {};
-    rows.forEach(function (r) { assigneesOf(r.t).forEach(function (p) { if (!seen[p.id]) { seen[p.id] = 1; used.push(p); } }); });
-    var hasNone = rows.some(function (r) { return !assigneesOf(r.t).length; });
-    var legend = [];
-    if (f.assignee) {
-      used.forEach(function (p) { legend.push({ t: p.name, c: rgb(p.color) }); });
-      if (hasNone) legend.push({ t: 'Unassigned', c: rgb('#7C8998') });
-    }
-    if (showT) legend.push({ t: 'Today', c: RED, line: true });
-    if (showP) legend.push({ t: 'Solid fill shows percent done', text: true });
+    /* legend (same list as on screen) */
+    var showW = state.showWeekend !== false, showA = state.showActual !== false;
+    var SATC = [223, 243, 228], SUNC = [251, 224, 221], SATINK = [15, 123, 58], SUNINK = [192, 40, 28];
+    var legend = legendItems().map(function (it) { return { t: it.t, k: it.k, c: it.none ? [124, 137, 152] : it.c ? rgb(it.c) : null }; });
     font('normal', 7);
     var lx = M, lrow = 0;
     var lpos = legend.map(function (it) {
-      var w = (it.text ? 0 : 5) + doc.getTextWidth(pdfTxt(it.t)) + 6;
+      var w = (it.k === 'text' ? 0 : 6) + doc.getTextWidth(pdfTxt(it.t)) + 6;
       if (lx + w > W - M && lx > M) { lx = M; lrow++; }
       var o = { x: lx, row: lrow }; lx += w; return o;
     });
     var lrows = lrow + 1;
 
-    /* logo: at most 14 mm tall and 50 mm wide, drawn above the title. dy = how far everything below moves down. */
+    /* Page 1 top row: logo, address, sign-off boxes. The logo fills the same size as a sign-off box (46 mm wide).
+       A box grows downwards when the name wraps onto more lines; all boxes share the tallest height (boxH). */
     var logoDim = null, dy = 0;
-    /* sign-off boxes: top right of page 1, 46 mm x 22 mm each (label, ~11 mm to sign, line, name and date). */
-    var SIGN_W = 46, SIGN_H = 22, SIGN_GAP = 4;
+    var SIGN_W = 46, SIGN_GAP = 4, SIGN_MIN = 26, boxH = SIGN_MIN, signNames = {};
     var signs = SIGNS.filter(function (sg) { return state.signoffs && state.signoffs[sg[0]] && state.signoffs[sg[0]].on; });
+    font('normal', 7.5);
+    signs.forEach(function (sg) {
+      var nm = pdfTxt(state.signoffs[sg[0]].name), ls = nm ? doc.splitTextToSize(nm, SIGN_W - 4).slice(0, 3) : [];
+      signNames[sg[0]] = ls; boxH = Math.max(boxH, 22.1 + Math.max(ls.length, 1) * 3.2);
+    });
+    var topH = signs.length ? boxH : SIGN_MIN;
     if (state.logo) {
       var ps = pngSize(state.logo);
-      if (ps) { var k = Math.min(SIGN_H / ps.h, SIGN_W / ps.w); logoDim = { w: ps.w * k, h: ps.h * k }; }
+      if (ps) { var k = Math.min(topH / ps.h, SIGN_W / ps.w); logoDim = { w: ps.w * k, h: ps.h * k }; }
     }
-    dy = Math.max(logoDim ? logoDim.h : 0, signs.length ? SIGN_H : 0);
+    var addrX = M + (logoDim ? logoDim.w + 5 : 0), addrLines = [];
+    var addrW = (signs.length ? W - M - signs.length * SIGN_W - (signs.length - 1) * SIGN_GAP : W - M) - addrX - 4;
+    if (state.address && addrW >= 24) {
+      font('normal', 7.5);
+      String(state.address).split('\n').forEach(function (l) { l = pdfTxt(l); if (l) addrLines = addrLines.concat(doc.splitTextToSize(l, addrW)); else addrLines.push(''); });
+      addrLines = addrLines.slice(0, Math.floor(topH / 3.4));
+    }
+    dy = Math.max(logoDim ? logoDim.h : 0, signs.length ? boxH : 0, addrLines.length * 3.4);
     if (dy) dy += 3;
     /* pages 2+: the same logo, smaller (max 8 mm tall, 30 mm wide). dy2 = how far their content moves down. */
     var logoDim2 = null, dy2 = 0;
@@ -1836,33 +2108,38 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
     function firstHead() {
       if (logoDim) doc.addImage(state.logo, 'PNG', M, M, logoDim.w, logoDim.h);
+      if (addrLines.length) { font('normal', 7.5); color(INK); addrLines.forEach(function (l, j) { if (l) doc.text(l, addrX, M + 3 + j * 3.4); }); }
       drawSigns();
       font('bold', 16); color(INK);
-      doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + dy + 6);
+      doc.text(fit(ttl || 'Untitled project', W - 2 * M), M, M + dy + 6);
       font('normal', 8.5); color(MUTED);
       var sub = rows.length + (rows.length === 1 ? ' item' : ' items') + (rows.length !== all.length ? ' of ' + all.length : '') +
         (valid.length ? '  |  ' + ymd(min) + ' - ' + ymd(max) : '');
       doc.text(pdfTxt(sub), M, M + dy + 11.5);
+      doc.text('Last updated: ' + fmtStamp(OPENED), W - M, M + dy + 11.5, { align: 'right' });
       font('normal', 7);
       legend.forEach(function (it, k) {
         var p = lpos[k], y = M + dy + 17 + p.row * 5 + 2;
-        if (it.line) { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
-        else if (!it.text) { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
-        color(INK); doc.text(pdfTxt(it.t), p.x + (it.text ? 0 : 5), y, { baseline: 'middle' });
+        if (it.k === 'line') { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
+        else if (it.k === 'sq') { fill(it.c); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'F'); }
+        else if (it.k === 'bar') { fill(it.c); doc.roundedRect(p.x, y - 0.8, 4.2, 1.6, 0.5, 0.5, 'F'); }
+        else if (it.k === 'dot') { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
+        color(INK); doc.text(pdfTxt(it.t), p.x + (it.k === 'text' ? 0 : 6), y, { baseline: 'middle' });
       });
     }
     function dayNum(iso) { return Math.round(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / DAY); }
     function drawSigns() {
       signs.forEach(function (sg, i) {
-        var o = state.signoffs[sg[0]], x = W - M - (signs.length - i) * SIGN_W - (signs.length - 1 - i) * SIGN_GAP, y = M;
-        stroke(LINE, 0.3); doc.rect(x, y, SIGN_W, SIGN_H);
+        var o = state.signoffs[sg[0]], x = W - M - (signs.length - i) * SIGN_W - (signs.length - 1 - i) * SIGN_GAP, y = M, nl = signNames[sg[0]] || [];
+        stroke(LINE, 0.3); doc.rect(x, y, SIGN_W, boxH);
         font('bold', 6.5); color(MUTED); doc.text(pdfTxt(sg[1]).toUpperCase(), x + 2, y + 4);
         stroke(MUTED, 0.25); doc.line(x + 2, y + 16, x + SIGN_W - 2, y + 16);
         font('normal', 7.5); color(INK);
-        if (o.name) doc.text(fit(o.name, SIGN_W - 4 - 19), x + 2, y + 19.5);
+        nl.forEach(function (l, j) { doc.text(l, x + 2, y + 19.5 + j * 3.2); });
+        var dyy = y + 19.5 + Math.max(nl.length, 1) * 3.2 + 0.2;
         font('normal', 6.5); color(MUTED);
-        if (o.date) doc.text(ymd(dayNum(o.date)), x + SIGN_W - 2, y + 19.5, { align: 'right' });
-        else { doc.text('Date:', x + SIGN_W - 18, y + 19.5); stroke(LINE, 0.3); doc.line(x + SIGN_W - 12, y + 19.8, x + SIGN_W - 2, y + 19.8); }
+        if (o.date) doc.text('Date: ' + ymd(dayNum(o.date)), x + 2, dyy);
+        else { doc.text('Date:', x + 2, dyy); stroke(LINE, 0.3); doc.line(x + 9, dyy + 0.3, x + SIGN_W - 2, dyy + 0.3); }
       });
     }
     function drawMilestoneBand(yTop, bandH) {
@@ -1902,10 +2179,15 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       var yS = top + HEAD, y0 = yS + msH, bodyH = Math.max(chunk.length, 1) * RH, yEnd = y0 + bodyH, d, dt, k, d2;
       fill([243, 245, 248]); doc.rect(M, top, NAMEW + GRID, HEAD, 'F');
       font('bold', 6); color(MUTED); doc.text('ITEM', M + 2, top + HEAD - 2.2);
+      if (WFW) { font('bold', 5); doc.text('WORKFORCE', GX - PAW - WFW / 2, top + HEAD - 2.2, { align: 'center' }); }
 
-      if (DW >= 1) {
-        fill([244, 245, 247]);
-        for (d = rs; d <= re; d++) if (wd(d) >= 5) doc.rect(GX + (d - rs) * DW, yS, DW, bodyH + msH, 'F');
+      if (showW && DW >= 1) {
+        for (d = rs; d <= re; d++) {
+          k = wd(d); if (k < 5) continue;
+          fill(k === 5 ? SATC : SUNC);
+          doc.rect(GX + (d - rs) * DW, yS, DW, bodyH + msH, 'F');
+          if (DW >= 3.2) doc.rect(GX + (d - rs) * DW, top + 5.2, DW, HEAD - 5.2, 'F');
+        }
       }
       /* months */
       d = rs;
@@ -1924,7 +2206,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         for (d = rs; d <= re; d++) {
           k = wd(d);
           var cx = GX + (d - rs) * DW + DW / 2, isT = showT && d === today, num = String(new Date(d * DAY).getUTCDate());
-          color(isT ? RED : (k >= 5 ? MUTED : INK));
+          color(isT ? RED : (showW && k === 5 ? SATINK : showW && k === 6 ? SUNINK : INK));
           if (DW >= 4.8) {
             font('normal', 5.2); doc.text('MTWTFSS'.charAt(k), cx, top + 7.4, { align: 'center' });
             font(isT ? 'bold' : 'normal', 6.3); doc.text(num, cx, top + 10.4, { align: 'center' });
@@ -1946,6 +2228,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       stroke(LINE, 0.15);
       for (var q = 0; q <= Math.max(chunk.length, 1); q++) doc.line(M, y0 + q * RH, GX + GRID, y0 + q * RH);
       stroke(LINE, 0.25); doc.line(GX, top, GX, yEnd);
+      if (WFW) doc.line(GX - PAW - WFW, top, GX - PAW - WFW, yEnd);
+      if (PAW) doc.line(GX - PAW, top, GX - PAW, yEnd);
       if (msH) drawMilestoneBand(yS, msH);
       if (showT && today >= rs && today <= re) { var tx0 = GX + (today - rs + 0.5) * DW; stroke(RED, 0.4); doc.line(tx0, yS, tx0, yEnd); }
 
@@ -1967,13 +2251,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             font('bold', 4.4); color(MUTED); doc.text('+' + extra, ex, cy, { align: 'center', baseline: 'middle' });
             nShown++;
           }
-          if (!ppl.length) {
-            stroke(MUTED, 0.3); doc.setLineDashPattern([0.6, 0.6], 0); doc.circle(M + 5, cy, 2.7, 'S'); doc.setLineDashPattern([], 0);
-            nShown = 1;
-          }
-          tx = M + 5 + (nShown - 1) * 4.2 + 2.9 + 2.5;
+          if (ppl.length) tx = M + 5 + (nShown - 1) * 4.2 + 2.9 + 2.5;
         }
-        var maxW = GX - tx - 2;
+        var a = showA ? actualOf(t, today) : null;
+        var wfv = f.workforce ? wfOf(t) : null;
+        if (wfv != null) {
+          font('bold', 7); var wtx = String(wfv), wbw = Math.min(WFW - 2, Math.max(6.4, doc.getTextWidth(wtx) + 2.4)), wcx = GX - PAW - WFW / 2;
+          stroke(INK, 0.3); fill([255, 255, 255]); doc.roundedRect(wcx - wbw / 2, cy - 2.2, wbw, 4.4, 0.8, 0.8, 'FD');
+          color(INK); doc.text(wtx, wcx, cy, { align: 'center', baseline: 'middle' });
+        }
+        var maxW = GX - PAW - WFW - tx - 2;
         font('bold', 8.5); color(t.name ? INK : MUTED);
         doc.text(fit(t.name || 'Item ' + (r.i + 1), maxW), tx, y + (f.notes ? 3.2 : 3.6), { baseline: 'middle' });
         var meta = r.ok ? fmtShort(r.s) + ' - ' + fmtShort(r.e) + (f.duration ? '  |  ' + (r.e - r.s + 1) + 'd' : '')
@@ -1982,8 +2269,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         doc.text(fit(meta, maxW), tx, y + (f.notes ? 6.9 : 7), { baseline: 'middle' });
         if (f.notes && t.notes) { font('italic', 6); doc.text(fit(t.notes, maxW), tx, y + 10, { baseline: 'middle' }); }
 
+        var bh = a ? 3.4 : 4.6, ah = 2.6, tot = a ? bh + 0.8 + ah : bh, by = y + (RH - tot) / 2;
         if (r.ok) {
-          var bx = GX + (r.s - rs) * DW + 0.3, bw = Math.max((r.e - r.s + 1) * DW - 0.6, 1), bh = 4.6, by = y + (RH - bh) / 2;
+          var bx = GX + (r.s - rs) * DW + 0.3, bw = Math.max((r.e - r.s + 1) * DW - 0.6, 1);
           var cols = ppl.length ? ppl.map(function (p) { return p.color; }) : ['#7C8998'];
           if (showP) {
             band(bx, by, bw, bh, cols, true);
@@ -1994,15 +2282,24 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             band(bx, by, bw, bh, cols, false);
           }
         }
+        if (a) {
+          var base = a.cls === 'late' ? [217, 48, 37] : a.cls === 'early' ? [31, 157, 85] : [37, 99, 235];
+          var ac = a.open ? base.map(function (v) { return Math.round(v * 0.6 + 255 * 0.4); }) : base;
+          var ax = GX + (a.s - rs) * DW + 0.3, aw = Math.max((a.e - a.s + 1) * DW - 0.6, 1), ay = r.ok ? by + bh + 0.8 : y + (RH - ah) / 2;
+          fill(ac); if (aw >= 2) doc.roundedRect(ax, ay, aw, ah, 0.6, 0.6, 'F'); else doc.rect(ax, ay, aw, ah, 'F');
+          font('bold', 5.5); color(MUTED);
+          if (r.ok) doc.text('P', GX - PAW / 2, by + bh / 2, { align: 'center', baseline: 'middle' });
+          doc.text('A', GX - PAW / 2, ay + ah / 2, { align: 'center', baseline: 'middle' });
+        }
       });
     }
 
     var idx = 0;
     for (var pg = 1; pg <= pages; pg++) {
       var top, take;
-      if (pg > 1) doc.addPage([W, H], 'landscape');
+      if (pg > 1 || !first) doc.addPage([W, H], 'landscape');
       if (pg === 1) { firstHead(); top = top1; take = perFirst; }
-      else { if (logoDim2) doc.addImage(state.logo, 'PNG', M, M, logoDim2.w, logoDim2.h); font('bold', 8); color(MUTED); doc.text(fit(state.title || 'Untitled project', W - 2 * M), M, M + dy2 + 4); top = top2; take = perRest; }
+      else { if (logoDim2) doc.addImage(state.logo, 'PNG', M, M, logoDim2.w, logoDim2.h); font('bold', 8); color(MUTED); doc.text(fit(ttl || 'Untitled project', W - 2 * M), M, M + dy2 + 4); top = top2; take = perRest; }
       var chunk = rows.slice(idx, idx + take); idx += take;
       drawGrid(top, chunk, pg === 1 ? msBand : 0);
       footer(pg);
@@ -2010,13 +2307,24 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     return doc;
   }
 
-  async function savePdf() {
+  function buildPdf(JsPDF, idxs) {
+    syncSheet();
+    var keepT = state.tasks, keepM = state.milestones, doc = null, multi = state.sheets.length > 1;
+    try {
+      idxs.forEach(function (i, n) {
+        var sh = state.sheets[i]; state.tasks = sh.tasks; state.milestones = sh.milestones;
+        doc = pdfSheet(doc, JsPDF, n === 0, (state.title || 'Untitled project') + (multi ? ' - ' + sh.name : ''));
+      });
+    } finally { state.tasks = keepT; state.milestones = keepM; }
+    return doc;
+  }
+  async function savePdf(idxs) {
     var cap = await capP, btn = $('#savePdf');
-    if (!cap && !STANDALONE) { toast('Saving files is not available in this view. Use Save JSON instead.', 'error'); return; }
+    if (!cap && !STANDALONE) { toast('Saving files is not available in this view. Use Save data instead.', 'error'); return; }
     btn.disabled = true;
     try {
       var J = await loadJsPdf();
-      var doc = buildPdf(J), pdfName = slug(state.title) + '-gantt.pdf';
+      var doc = buildPdf(J, idxs), pdfName = slug(state.title) + (idxs.length === 1 && state.sheets.length > 1 ? '-' + slug(state.sheets[idxs[0]].name) : '') + '-gantt.pdf';
       if (!cap) { downloadBlob(pdfName, new Blob([doc.output('arraybuffer')], { type: 'application/pdf' })); toast('PDF saved.'); return; }
       var res = await cap.save({ filename: pdfName, data: doc.output('arraybuffer') });
       if (res && res.status === 'saved') toast('PDF saved.');
@@ -2024,11 +2332,31 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       var code = err && err.code;
       if (code === 'declined') { /* viewer said no */ }
       else if (code === 'rate_limited') toast('Wait a moment, then try saving again.', 'error');
-      else if (code) toast('This view cannot save files. Use Save JSON instead.', 'error');
+      else if (code) toast('This view cannot save files. Use Save data instead.', 'error');
       else { toast('Could not create the PDF. Check your connection and try again.', 'error'); if (window.console) console.error(err); }
     } finally { btn.disabled = false; }
   }
-  $('#savePdf').addEventListener('click', savePdf);
+  var pdfBtn = $('#savePdf'), pdfPop = $('#pdfPop');
+  function closePdfPop() { pdfPop.hidden = true; }
+  pdfBtn.addEventListener('click', function () {
+    if (state.sheets.length < 2) { savePdf([0]); return; }
+    if (!pdfPop.hidden) { closePdfPop(); return; }
+    syncSheet();
+    pdfPop.innerHTML = '<div class="lbl" style="padding:4px 8px">Sheets to save</div>' + state.sheets.map(function (sh, i) {
+      return '<label><input type="checkbox" data-i="' + i + '"' + (i === state.sheet ? ' checked' : '') + '> <span>' + esc(sh.name) + '</span></label>';
+    }).join('') + '<div class="pbtns"><button type="button" class="btn primary" id="pdfGo">Save PDF</button><button type="button" class="btn" id="pdfAll">All sheets</button></div>';
+    pdfPop.hidden = false; placeNear(pdfPop, pdfBtn);
+  });
+  pdfPop.addEventListener('click', function (e) {
+    if (e.target.id === 'pdfAll') { closePdfPop(); savePdf(state.sheets.map(function (x, i) { return i; })); }
+    else if (e.target.id === 'pdfGo') {
+      var idx = [].slice.call(pdfPop.querySelectorAll('input:checked')).map(function (c) { return +c.dataset.i; });
+      if (!idx.length) { toast('Choose at least one sheet.', 'error'); return; }
+      closePdfPop(); savePdf(idx);
+    }
+  });
+  document.addEventListener('pointerdown', function (e) { if (!pdfPop.hidden && !pdfPop.contains(e.target) && !pdfBtn.contains(e.target)) closePdfPop(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePdfPop(); });
 
   /* ---------- kanban board ---------- */
   var STATUSES = ['todo', 'doing', 'done'];
@@ -2141,8 +2469,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- render all ---------- */
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
-    renderLogo(); renderSigns(); renderMilestones();
-    $('#showToday').checked = state.showToday !== false;
+    renderLogo(); renderSigns(); renderMilestones(); renderSheets(); renderLegendEditor();
+    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false;
+    $('#address').value = state.address || ''; $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
     $('#banner').hidden = !state.example;
@@ -2184,11 +2513,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       toast('Could not save the file. Try again.', 'error');
     }
   }
-  $('#saveChart').addEventListener('click', function () { saveFile(slug(state.title) + '-gantt.json', exportChart(), 'Chart'); });
+  $('#saveChart').addEventListener('click', function () { saveFile(slug(state.title) + '-gantt.json', exportChart(), 'Data'); });
   $('#savePeople').addEventListener('click', function () {
     if (!state.persons.length) { toast('Add at least one person before saving.', 'error'); return; }
     saveFile('barline-people.json', exportPeople(), 'People');
   });
+  $('#saveTemplate').addEventListener('click', function () { saveFile(slug(state.title) + '-template.json', exportTemplate(), 'Template'); });
   $('#exportClose').addEventListener('click', function () { $('#exportPanel').hidden = true; });
   $('#exportCopy').addEventListener('click', function () {
     var ta = $('#exportText');
@@ -2199,13 +2529,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function handleUpload(e, kind) {
     var file = e.target.files && e.target.files[0]; e.target.value = '';
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { toast('That file is larger than 2 MB.', 'error'); return; }
+    if (file.size > 6 * 1024 * 1024) { toast('That file is larger than 6 MB.', 'error'); return; }
     var r = new FileReader();
     r.onerror = function () { toast('Could not read that file.', 'error'); };
     r.onload = function () {
       var data;
       try { data = JSON.parse(String(r.result)); } catch (err) { toast('That file is not valid JSON.', 'error'); return; }
-      try { if (kind === 'people' || Array.isArray(data) || (data && data.type === 'people')) applyPeople(data); else applyChart(data); }
+      try {
+        if (kind === 'template' || (data && data.type === 'template')) applyTemplate(data);
+        else if (kind === 'people' || Array.isArray(data) || (data && data.type === 'people')) applyPeople(data); else applyChart(data);
+      }
       catch (err) { toast(err.message || 'That file is not a Barline file.', 'error'); }
     };
     r.readAsText(file);
@@ -2218,17 +2551,30 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       return 'Loaded ' + list.length + (list.length === 1 ? ' person' : ' people') + (res.added !== list.length ? ' (' + res.added + ' new)' : '') + '.' + (before === 0 ? '' : '');
     });
   }
+  function applyTemplate(data) {
+    if (!data || data.type !== 'template') throw new Error('That is not a template file. Use Upload data for a saved chart.');
+    var list = cleanPeople(data.persons), logo = cleanLogo(data.logo), addr = cleanAddr(data.address), sg = cleanSign(data.signoffs), lg = cleanLegend(data.legend);
+    withUndo(function () {
+      mergePeople(list);
+      state.logo = logo; state.address = addr; state.signoffs = sg; state.legend = lg;
+      return 'Template loaded: logo, address, boxes, legend and ' + list.length + (list.length === 1 ? ' person.' : ' people.');
+    });
+  }
   function applyChart(data) {
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.signoffs = c.signoffs; state.milestones = c.milestones; state.showToday = c.showToday; state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; sel = null;
-      state.tasks = c.tasks.map(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); return t; });
-      return 'Loaded “' + c.title + '” with ' + c.tasks.length + (c.tasks.length === 1 ? ' item.' : ' items.');
+      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual;
+      state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; state.wfFilter = 'all'; sel = null;
+      c.sheets.forEach(function (sh) { sh.tasks.forEach(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); }); });
+      state.sheets = c.sheets; state.sheet = c.sheet; bindSheet(state);
+      var n = c.sheets.reduce(function (a, sh) { return a + sh.tasks.length; }, 0);
+      return 'Loaded “' + c.title + '” with ' + n + (n === 1 ? ' item' : ' items') + (c.sheets.length > 1 ? ' on ' + c.sheets.length + ' sheets.' : '.');
     });
   }
   $('#upPeople').addEventListener('change', function (e) { handleUpload(e, 'people'); });
   $('#upChart').addEventListener('change', function (e) { handleUpload(e, 'chart'); });
+  $('#upTemplate').addEventListener('change', function (e) { handleUpload(e, 'template'); });
 
   $('#startEmpty').addEventListener('click', function () {
     withUndo(function () { state = blankState(); sel = null; return 'Cleared the example. Add people and items.'; });
@@ -2239,7 +2585,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   state = loadDraft() || exampleState();
   renderAll();
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').then(function (r) { if (r && r.update) r.update(); }).catch(function () {}); });
   }
 })();
 </script>

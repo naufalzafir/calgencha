@@ -27,10 +27,11 @@
   --on-accent: #FFFFFF;
   --today: #D93025;
   --none: #7C8998;
+  --unassigned: #F08C1A; --rowline: #B4BDCA;
   --bad: #C62828;
   --weekend: rgba(20, 27, 36, 0.05);
-  --sat: #DFF3E4; --sun: #FBE0DD; --sat-ink: #0F7B3A; --sun-ink: #C0281C;
-  --ok: #2563EB; --early: #1F9D55; --late: #D93025;
+  --sat: #92D050; --sun: #FFFF00; --sat-ink: #1E4D0A; --sun-ink: #5C5200; --itemline: #1F2933; --cellline: #8E98A6;
+  --ok: #166534; --early: #166534; --late: #166534;
   --shadow: 0 1px 2px rgba(20, 27, 36, 0.06);
   --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
   --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -49,10 +50,12 @@
     --on-accent: #0B1226;
     --today: #FF6F61;
     --none: #8795A6;
+  --unassigned: #F5A04A; --rowline: #4B5666;
+  --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
+  --ok: #3FAE6A; --early: #3FAE6A; --late: #3FAE6A;
     --bad: #FF8A80;
     --weekend: rgba(255, 255, 255, 0.035);
-    --sat: rgba(52, 168, 83, 0.2); --sun: rgba(217, 48, 37, 0.24); --sat-ink: #6FD99A; --sun-ink: #FF8F85;
-    --ok: #5B8CFF; --early: #3DBE74; --late: #FF6F61;
+    --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
     --shadow: none;
     color-scheme: dark;
   }
@@ -69,6 +72,9 @@
   --on-accent: #0B1226;
   --today: #FF6F61;
   --none: #8795A6;
+  --unassigned: #F5A04A; --rowline: #4B5666;
+  --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
+  --ok: #3FAE6A; --early: #3FAE6A; --late: #3FAE6A;
   --bad: #FF8A80;
   --weekend: rgba(255, 255, 255, 0.035);
   --shadow: none;
@@ -232,11 +238,15 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .lg i.sq { border-radius: 3px; }
 .lg i.bar2 { width: 16px; height: 6px; border-radius: 3px; }
 .stripe.sat { background: var(--sat); } .stripe.sun { background: var(--sun); }
+.stripe.sat, .stripe.sun { box-shadow: inset 1px 0 var(--cellline), inset -1px 0 var(--cellline); }
 .g-dc.sat { background: var(--sat); color: var(--sat-ink); } .g-dc.sun { background: var(--sun); color: var(--sun-ink); }
 .g-dc.sat b { color: var(--sat-ink); } .g-dc.sun b { color: var(--sun-ink); }
 .bar.sm { height: 16px; }
 .abar { position: absolute; height: 10px; z-index: 1; border-radius: 4px; cursor: pointer; background: var(--ok); }
-.abar.early { background: var(--early); } .abar.late { background: var(--late); }
+/* On time is solid, early has vertical stripes, late is cross-hatched, so the three still differ in black and white. */
+.abar.early, .lg i.early { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.75) 0 1.5px, transparent 1.5px 4px); }
+.abar.late, .lg i.late { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.75) 0 1.2px, transparent 1.2px 4px), repeating-linear-gradient(-45deg, rgba(255,255,255,.75) 0 1.2px, transparent 1.2px 4px); }
+.g-pa .pdiv { position: absolute; left: 0; right: 0; top: 24px; border-top: 1px solid var(--muted); }
 .abar.open { opacity: 0.55; }
 .pdfpop label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 6px; }
 .pdfpop label:hover { background: var(--surface-2); }
@@ -266,7 +276,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .lg { display: inline-flex; align-items: center; gap: 6px; }
 .lg i { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--none)); }
 .lg i.tl { width: 2px; height: 12px; border-radius: 0; background: var(--today); }
-.lg i.none { background: var(--none); }
+.lg i.none { background: var(--unassigned); }
 
 .gantt {
   --rh: 48px; --namew: 232px; --dw: 28px; --cell: 28px;
@@ -282,7 +292,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
   padding: 0; border-bottom: 1px solid var(--line);
   font: 600 11px var(--font-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
 }
-.g-nrow { height: var(--rh); display: flex; align-items: center; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--line); min-width: 0; }
+.g-nrow { height: var(--rh); display: flex; align-items: center; gap: 10px; padding: 0 12px 0 0; border-bottom: 2px solid var(--itemline); min-width: 0; }
 .av {
   flex: none; width: 26px; height: 26px; border-radius: 50%;
   display: grid; place-items: center;
@@ -315,9 +325,16 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .g-body {
   position: relative;
   background-image:
-    linear-gradient(to right, var(--grid) 1px, transparent 1px),
-    linear-gradient(to bottom, transparent calc(var(--rh) - 1px), var(--line) calc(var(--rh) - 1px));
+    linear-gradient(to right, var(--cellline) 1px, transparent 1px),
+    linear-gradient(to bottom, transparent calc(var(--rh) - 2px), var(--itemline) calc(var(--rh) - 2px));
   background-size: var(--cell) 100%, 100% var(--rh);
+}
+.g-body.pa2 {
+  background-image:
+    linear-gradient(to right, var(--cellline) 1px, transparent 1px),
+    linear-gradient(to bottom, transparent calc(var(--rh) - 2px), var(--itemline) calc(var(--rh) - 2px)),
+    linear-gradient(to bottom, transparent calc(50% - 1px), var(--cellline) calc(50% - 1px), var(--cellline) 50%, transparent 50%);
+  background-size: var(--cell) 100%, 100% var(--rh), 100% var(--rh);
 }
 .stripe { position: absolute; top: 0; bottom: 0; background: var(--weekend); }
 .today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--today); z-index: 2; }
@@ -426,6 +443,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .swgrid .sw span { width: 28px; height: 28px; }
 .swb { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: var(--c); cursor: pointer; }
 .swb[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.swb:disabled, .sw input:disabled + span { opacity: 0.22; cursor: not-allowed; }
 .swb:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .chk.sub { margin-left: 26px; }
 .chk input:disabled + span { color: var(--muted); }
@@ -475,7 +493,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
   position: relative;
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
   padding: 12px 14px 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--rowline);
 }
 .irow:last-of-type { border-bottom: 0; }
 .irow.head { display: none; }
@@ -484,7 +502,16 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .irow.head span { text-align: center; }
 .irow input[type=date], .irow input[type=number] { text-align: center; }
 .g-corner .cl { justify-content: center; gap: 10px; }
-.mline { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid rgba(88, 100, 116, 0.55); z-index: 0; pointer-events: none; }
+.mline { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px dashed #D93025; z-index: 2; pointer-events: none; }
+.bar, .abar { border-radius: 0; }
+.bar, .abar { border: 1px solid #000; }
+.g-no { flex: none; width: 34px; align-self: stretch; display: grid; place-items: center; font: 600 12px var(--font-mono); color: var(--muted); border-right: 1px solid var(--cellline); }
+.g-noh { flex: none; width: 34px; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font-size: 10px; letter-spacing: 0.04em; order: -1; }
+.g-pa { display: flex; flex-direction: column; }
+.g-pa .pc { flex: 1; display: grid; place-items: center; font: 800 11px var(--font-mono); color: var(--ink); }
+.g-pa .pc + .pc { border-top: 1px solid var(--cellline); }
+.g-wfc .wfe { color: var(--muted); font: 600 12px var(--font-mono); }
+.g-nrow .g-nm { padding-left: 2px; }
 .pdfview { position: fixed; inset: 0; z-index: 2000; background: rgba(10, 14, 20, 0.8); display: flex; flex-direction: column; padding: 12px; gap: 8px; }
 .pdfview[hidden] { display: none; }
 .pv-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: #fff; }
@@ -717,6 +744,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           <div class="vfield">
             <label class="msdone" for="showActual"><input type="checkbox" id="showActual"> Show Actual</label>
           </div>
+          <div class="vfield">
+            <label class="msdone" for="showLegend" title="Show the legend on screen and in the PDF. It lists only people who are tagged on the items shown."><input type="checkbox" id="showLegend"> Show legend</label>
+          </div>
         </div>
         <div class="legend" id="legend"></div>
         <div class="gantt" id="gantt" tabindex="0" role="region" aria-label="Gantt chart. Scroll sideways to see the whole timeline."></div>
@@ -829,9 +859,37 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   'use strict';
 
   var DAY = 86400000, RH = 48, MAX_ROWS = 60;
-  var PALETTE = ['#3563E9', '#0B7A6B', '#C2410C', '#7C3AED', '#BE185D', '#4D7C0F', '#A16207', '#64748B',
-    '#D32F2F', '#0E7490', '#15803D', '#A21CAF', '#0369A1', '#8B5E3C', '#B8860B'];
+  var PALETTE = ['#3563E9', '#7C3AED', '#BE185D', '#4D7C0F', '#A16207', '#64748B', '#0E7490', '#A21CAF', '#821717', '#172C82', '#4A044E'];
+  /* Colours the chart itself uses. A person cannot take these or anything close to them. */
+  var RESERVED = [['#F08C1A', 'the Unassigned orange'], ['#166534', 'the Actual green'], ['#92D050', 'the Saturday green'], ['#FFFF00', 'the Sunday yellow'], ['#D93025', 'the Today red']];
+  var NEAR = 62;
+  function cdist(a, b) {
+    var x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+    return Math.sqrt(Math.pow((x >> 16) - (y >> 16), 2) + Math.pow(((x >> 8) & 255) - ((y >> 8) & 255), 2) + Math.pow((x & 255) - (y & 255), 2));
+  }
   var customOn = false, customColor = '#3563E9';
+  function hslHex(h, sat, l) {
+    var a = sat * Math.min(l, 1 - l);
+    function f(n) { var k = (n + h / 30) % 12, v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return ('0' + Math.round(v * 255).toString(16)).slice(-2); }
+    return '#' + f(0) + f(8) + f(4);
+  }
+  function clashes(c, list) {
+    for (var i = 0; i < RESERVED.length; i++) if (cdist(c, RESERVED[i][0]) < NEAR) return true;
+    for (var j = 0; j < list.length; j++) if (cdist(c, list[j]) < NEAR) return true;
+    return false;
+  }
+  function freshColor(usedList) {
+    var i;
+    for (i = 0; i < PALETTE.length; i++) if (!clashes(PALETTE[i], usedList)) return PALETTE[i];
+    for (i = 0; i < 1500; i++) { var c = hslHex((i * 137.5) % 360, 0.55 + (i % 3) * 0.1, 0.26 + (i % 4) * 0.06); if (!clashes(c, usedList)) return c; }
+    return PALETTE[0];
+  }
+  function colorOwner(c, except) {
+    var i;
+    for (i = 0; i < RESERVED.length; i++) if (cdist(c, RESERVED[i][0]) < NEAR) return { name: RESERVED[i][1], reserved: true };
+    for (i = 0; i < state.persons.length; i++) if (state.persons[i] !== except && cdist(c, state.persons[i].color) < NEAR) return state.persons[i];
+    return null;
+  }
   function isLight(hex) { var n = parseInt(String(hex).slice(1), 16); return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) > 170; }
   function avc(hex) { return '--c:' + hex + ';--ac:' + (isLight(hex) ? '#111' : '#fff'); }
   var FIELD_KEYS = ['assignee', 'workforce', 'duration', 'progress', 'progressShow', 'status', 'notes'];
@@ -919,6 +977,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       var name = clampStr(p.name, 40); if (!name) return;
       var key = name.toLowerCase(); if (seen[key]) return; seen[key] = 1;
       var color = typeof p.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(p.color) ? p.color : PALETTE[out.length % PALETTE.length];
+      if (clashes(color, out.map(function (q) { return q.color; }))) color = freshColor(out.map(function (q) { return q.color; }));
       var id = clampStr(String(p.id == null ? name : p.id), 40) || name;
       out.push({ id: id, name: name, role: clampStr(p.role, 40), color: color });
     });
@@ -972,7 +1031,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var act = Math.round(Number(o.sheet)); if (!(act >= 0 && act < sheets.length)) act = 0;
     return bindSheet({
       title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), address: cleanAddr(o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
-      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
+      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
       fields: fields, persons: cleanPeople(o.persons), sheets: sheets, sheet: act
@@ -984,7 +1043,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     syncSheet();
     return {
       app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', address: state.address || '', legend: state.legend || [], signoffs: state.signoffs,
-      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: exportPersons(), sheet: state.sheet,
       sheets: state.sheets.map(function (sh) { return { name: sh.name, tasks: sh.tasks.map(exportTask), milestones: sh.milestones }; }),
       tasks: state.tasks.map(exportTask), milestones: state.milestones
@@ -1185,10 +1244,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var cur = keep ? keep.value : null;
     box.querySelectorAll('.sw').forEach(function (n) { n.remove(); });
     var used = state.persons.map(function (p) { return p.color; });
-    var pick = customOn ? null : cur || PALETTE.filter(function (c) { return used.indexOf(c) < 0; })[0] || PALETTE[state.persons.length % PALETTE.length];
+    var pick = customOn ? null : cur && !colorOwner(cur, null) ? cur : freshColor(used);
     PALETTE.forEach(function (c) {
       var l = document.createElement('label'); l.className = 'sw'; l.style.setProperty('--c', c);
-      l.innerHTML = '<input class="sr" type="radio" name="pColor" value="' + c + '"' + (c === pick ? ' checked' : '') + ' aria-label="Color ' + c + '"><span></span>';
+      l.innerHTML = '<input class="sr" type="radio" name="pColor" value="' + c + '"' + (c === pick ? ' checked' : '') + ' aria-label="Color ' + c + '"' + (colorOwner(c, null) ? ' disabled title="Already used"' : '') + '><span></span>';
       box.appendChild(l);
     });
     var cl = document.createElement('label'); cl.className = 'sw custom' + (customOn ? ' on' : ''); cl.title = 'Custom color';
@@ -1202,7 +1261,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   function nextFreeColor() {
     var used = state.persons.map(function (p) { return p.color; });
-    var c = PALETTE.filter(function (x) { return used.indexOf(x) < 0; })[0] || PALETTE[state.persons.length % PALETTE.length];
+    var c = freshColor(used);
     customOn = false; var cl = $('#swatches .sw.custom'); if (cl) cl.classList.remove('on');
     var r = $('input[name="pColor"][value="' + c + '"]'); if (r) r.checked = true;
   }
@@ -1225,7 +1284,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var name = clampStr($('#pName').value, 40);
     if (!name) { toast('Enter a name first.', 'error'); $('#pName').focus(); return; }
     if (state.persons.some(function (p) { return p.name.toLowerCase() === name.toLowerCase(); })) { toast(name + ' is already in the list.', 'error'); return; }
-    state.persons.push({ id: uid(), name: name, role: clampStr($('#pRole').value, 40), color: currentColor() });
+    var pcol = currentColor(), own = colorOwner(pcol, null);
+    if (own) { toast('That colour is already used by ' + own.name + '. Pick another.', 'error'); return; }
+    state.persons.push({ id: uid(), name: name, role: clampStr($('#pRole').value, 40), color: pcol });
     $('#pName').value = ''; $('#pRole').value = '';
     renderPeople(); renderItems(); renderViewbar(); nextFreeColor(); changed();
     $('#pName').focus();
@@ -1265,8 +1326,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     list.forEach(function (p) {
       var match = null;
       state.persons.forEach(function (x) { if (!match && x.name.toLowerCase() === p.name.toLowerCase()) match = x; });
-      if (match) { if (p.role) match.role = p.role; match.color = p.color; idMap[p.id] = match.id; }
-      else { var np = { id: uid(), name: p.name, role: p.role, color: p.color }; state.persons.push(np); idMap[p.id] = np.id; added++; }
+      if (match) { if (p.role) match.role = p.role; if (!colorOwner(p.color, match)) match.color = p.color; idMap[p.id] = match.id; }
+      else { var np = { id: uid(), name: p.name, role: p.role, color: colorOwner(p.color, null) ? freshColor(state.persons.map(function (q) { return q.color; })) : p.color }; state.persons.push(np); idMap[p.id] = np.id; added++; }
     });
     return { idMap: idMap, added: added };
   }
@@ -1483,22 +1544,22 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       else if (r.s != null && r.e != null) { meta = 'End is before start'; bad = true; }
       else meta = 'No dates yet';
       var act = showA ? actualOf(t, today) : null, wfv = f.workforce ? wfOf(t) : null, xcol = f.workforce || showA;
-      names += '<div class="g-nrow' + (t.id === sel ? ' sel' : '') + (xcol ? ' x' : '') + '" data-id="' + esc(t.id) + '" role="button" tabindex="0" aria-label="Show details for ' + esc(t.name || 'item ' + (r.i + 1)) + '"' + (f.notes && t.notes ? ' title="' + esc(t.notes) + '"' : '') + '>' + av +
+      names += '<div class="g-nrow' + (t.id === sel ? ' sel' : '') + (xcol ? ' x' : '') + '" data-id="' + esc(t.id) + '" role="button" tabindex="0" aria-label="Show details for ' + esc(t.name || 'item ' + (r.i + 1)) + '"' + (f.notes && t.notes ? ' title="' + esc(t.notes) + '"' : '') + '><div class="g-no">' + (r.i + 1) + '</div>' + av +
         '<div class="g-nm"><div class="g-t' + (t.name ? '' : ' ph') + '">' + esc(t.name || 'Item ' + (r.i + 1)) + '</div><div class="g-ds' + (bad ? ' bad' : '') + '">' + meta + '</div></div>' +
-        (f.workforce ? '<div class="g-wfc">' + (wfv != null ? '<span class="wf" title="Workforce: ' + wfv + (wfv === 1 ? ' person' : ' people') + '">' + wfv + '</span>' : '') + '</div>' : '') +
-        (showA ? '<div class="g-pa">' + (act ? (r.ok ? '<span class="pa" style="top:6px" title="Plan">P</span>' : '') + '<span class="pa" style="top:' + (r.ok ? 26 : (RH - 10) / 2) + 'px" title="Actual">A</span>' : '') + '</div>' : '') + '</div>';
-      var pTop = act ? 6 : (RH - 22) / 2, nm0 = t.name || 'Item ' + (r.i + 1);
+        (f.workforce ? '<div class="g-wfc">' + (wfv != null ? '<span class="wf" title="Workforce: ' + wfv + (wfv === 1 ? ' person' : ' people') + '">' + wfv + '</span>' : '<span class="wfe">-</span>') + '</div>' : '') +
+        (showA ? '<div class="g-pa"><span class="pc" title="Plan">P</span><span class="pc" title="Actual">A</span></div>' : '') + '</div>';
+      var pTop = 1, pH = showA ? RH / 2 - 1 : RH - 3, nm0 = t.name || 'Item ' + (r.i + 1);
       if (r.ok) {
-        var left = (r.s - rs) * dw + 1, w = Math.max((r.e - r.s + 1) * dw - 2, 6), top = pos * RH + pTop;
+        var left = (r.s - rs) * dw, w = Math.max((r.e - r.s + 1) * dw, 6), top = pos * RH + pTop;
         var tip = nm0 + ': ' + fmtShort(r.s) + ' to ' + fmtShort(r.e) + ' (' + (r.e - r.s + 1) + ' days)' +
           (ppl.length ? ', ' + ppl.map(function (q) { return q.name; }).join(' & ') : '') + (showP ? ', ' + t.progress + '% done' : '') + (f.notes && t.notes ? '. ' + t.notes : '');
-        bars += '<div class="bar' + (act ? ' sm' : '') + (t.id === sel ? ' sel' : '') + '" data-id="' + esc(t.id) + '" style="--c:' + (ppl.length ? ppl[0].color : 'var(--none)') + trackBg(ppl) + ';left:' + left + 'px;top:' + top + 'px;width:' + w + 'px" title="' + esc(tip) + '"><i style="width:' + (showP ? t.progress : 100) + '%' + fillBg(ppl) + '"></i></div>';
-        if (showP && t.progress > 0) bars += '<span class="pct" style="left:' + (left + w + 7) + 'px;top:' + top + 'px;height:' + (act ? 16 : 22) + 'px">' + t.progress + '%</span>';
+        bars += '<div class="bar' + (t.id === sel ? ' sel' : '') + '" data-id="' + esc(t.id) + '" style="--c:' + (ppl.length ? ppl[0].color : 'var(--unassigned)') + trackBg(ppl) + ';left:' + left + 'px;top:' + top + 'px;height:' + pH + 'px;width:' + w + 'px" title="' + esc(tip) + '"><i style="width:' + (showP ? t.progress : 100) + '%' + fillBg(ppl) + '"></i></div>';
+        if (showP && t.progress > 0) bars += '<span class="pct" style="left:' + (left + w + 7) + 'px;top:' + top + 'px;height:' + pH + 'px">' + t.progress + '%</span>';
       }
       if (act) {
-        var al = (act.s - rs) * dw + 1, aw = Math.max((act.e - act.s + 1) * dw - 2, 6), atop = pos * RH + (r.ok ? pTop + 20 : (RH - 10) / 2);
+        var al = (act.s - rs) * dw, aw = Math.max((act.e - act.s + 1) * dw, 6), atop = pos * RH + RH / 2 + 1, aH = RH / 2 - 3;
         var atip = nm0 + ' actual: ' + fmtShort(act.s) + (act.open ? ' (not finished yet)' : ' to ' + fmtShort(act.e)) + ', ' + ACT_LBL[act.cls];
-        bars += '<div class="abar ' + act.cls + (act.open ? ' open' : '') + '" data-id="' + esc(t.id) + '" style="left:' + al + 'px;top:' + atop + 'px;width:' + aw + 'px" title="' + esc(atip) + '"></div>';
+        bars += '<div class="abar ' + act.cls + (act.open ? ' open' : '') + '" data-id="' + esc(t.id) + '" style="left:' + al + 'px;top:' + atop + 'px;height:' + aH + 'px;width:' + aw + 'px" title="' + esc(atip) + '"></div>';
       }
     });
     var line = showT && today >= rs && today <= re ? '<div class="today" style="left:' + ((today - rs + 0.5) * dw - 1) + 'px"></div>' : '';
@@ -1521,26 +1582,31 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       msBand = '<div class="g-ms" style="height:' + lanes * LANE + 'px">' + stripes + mlines + line + msBand + '</div>';
     }
 
-    el.style.setProperty('--nx', ((f.workforce ? 72 : 0) + (showA ? 24 : 0)) + 'px');
+    el.style.setProperty('--nx', (34 + (f.workforce ? 72 : 0) + (showA ? 24 : 0)) + 'px');
     el.style.setProperty('--dw', dw + 'px'); el.style.setProperty('--cell', cell + 'px');
-    el.innerHTML = '<div class="g-names"><div class="g-corner"><div class="cl"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + (f.workforce ? '<div class="g-wfh">Workforce</div>' : '') + (showA ? '<div class="g-pah"></div>' : '') + '</div>' + msNames + names + '</div>' +
+    el.innerHTML = '<div class="g-names"><div class="g-corner"><div class="g-noh">No.</div><div class="cl"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + (f.workforce ? '<div class="g-wfh">Workforce</div>' : '') + (showA ? '<div class="g-pah"></div>' : '') + '</div>' + msNames + names + '</div>' +
       '<div class="g-canvas" style="width:' + total * dw + 'px"><div class="g-head"><div class="g-months">' + months + '</div><div class="g-days">' + days + '</div></div>' +
-      msBand + '<div class="g-body" style="height:' + rows.length * RH + 'px">' + stripes + mlines + line + bars + '</div></div>';
+      msBand + '<div class="g-body' + (showA ? ' pa2' : '') + '" style="height:' + rows.length * RH + 'px">' + stripes + mlines + line + bars + '</div></div>';
     el.scrollLeft = sl; el.scrollTop = stp;
   }
   function legendItems() {
     /* One list for the screen and the PDF: [{ t, c, k }] where k is 'dot', 'sq', 'line', 'bar' or 'text'. */
-    var f = state.fields, out = [], tl = state.view !== 'board';
+    var f = state.fields, out = [], tl = state.view !== 'board', unas = false;
+    if (state.showLegend === false) return out;
     if (f.assignee) {
-      state.persons.forEach(function (p, i) { out.push({ t: p.name, c: p.color, k: 'dot', pi: i }); });
-      if (state.tasks.some(function (t) { return !assigneesOf(t).length; })) out.push({ t: 'Unassigned', c: '#7C8998', k: 'dot', none: true });
+      var shown = visibleRows(state.tasks.map(function (t, i) { return { t: t, i: i, s: null, e: null, ok: false }; })), tagged = {};
+      shown.forEach(function (r) { (r.t.assignees || []).forEach(function (id) { tagged[id] = 1; }); });
+      state.persons.forEach(function (p, i) { if (tagged[p.id]) out.push({ t: p.name, c: p.color, k: 'dot', pi: i }); });
+      unas = shown.some(function (r) { return !assigneesOf(r.t).length; });
+      if (unas && !(tl && state.showActual !== false)) out.push({ t: 'Unassigned', c: '#F08C1A', k: 'dot', none: true });
     }
     if (tl && f.progress && f.progressShow) out.push({ t: 'Solid fill shows percent done', k: 'text' });
     if (tl && state.showActual !== false) {
-      out.push({ t: 'Plan (top bar)', c: '#7C8998', k: 'bar', plan: true });
-      out.push({ t: 'Actual - on time', c: '#2563EB', k: 'bar', v: 'ok' }, { t: 'Actual - plan', c: '#1F9D55', k: 'bar', v: 'early' }, { t: 'Actual - delays', c: '#D93025', k: 'bar', v: 'late' });
+      if (!f.assignee || unas) out.push({ t: f.assignee ? 'Plan - unassigned' : 'Plan', c: '#F08C1A', k: 'bar', plan: true });
+      else out.push({ t: 'Plan: top row, in each person\'s colour', k: 'text' });
+      out.push({ t: 'Actual - on time', c: '#166534', k: 'bar', v: 'ok' }, { t: 'Actual - plan', c: '#166534', k: 'bar', v: 'early' }, { t: 'Actual - delays', c: '#166534', k: 'bar', v: 'late' });
     }
-    if (tl && state.showWeekend !== false) out.push({ t: 'Saturday', c: '#A5D8B5', k: 'sq', v: 'sat' }, { t: 'Sunday', c: '#F2ABA3', k: 'sq', v: 'sun' });
+    if (tl && state.showWeekend !== false) out.push({ t: 'Saturday', c: '#92D050', k: 'sq', v: 'sat' }, { t: 'Sunday', c: '#FFFF00', k: 'sq', v: 'sun' });
     if (tl && state.showToday !== false) out.push({ t: 'Today', c: '#D93025', k: 'line' });
     (state.legend || []).forEach(function (l) { if (l.name) out.push({ t: l.name, c: l.color, k: 'sq', custom: true }); });
     return out;
@@ -1551,7 +1617,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (it.k === 'text') h += '<span class="lg">' + esc(it.t) + '</span>';
       else if (it.k === 'line') h += '<span class="lg"><i class="tl"></i>' + it.t + '</span>';
       else if (it.k === 'dot') h += '<span class="lg"><i' + (it.none ? ' class="none"' : ' style="--c:' + it.c + '"') + '></i>' + esc(it.t) + '</span>';
-      else if (it.k === 'bar') h += '<span class="lg"><i class="bar2" style="--c:' + (it.v ? 'var(--' + it.v + ')' : it.c) + '"></i>' + esc(it.t) + '</span>';
+      else if (it.k === 'bar') h += '<span class="lg"><i class="bar2 ' + (it.v || '') + '" style="--c:' + (it.v ? 'var(--' + it.v + ')' : it.c) + '"></i>' + esc(it.t) + '</span>';
       else h += '<span class="lg"><i class="sq" style="--c:' + (it.v ? 'var(--' + it.v + ')' : it.c) + '"></i>' + esc(it.t) + '</span>';
     });
     h += '<span class="lg">Select an item for its details</span>';
@@ -1619,6 +1685,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     state.address = v; touch();
   });
   $('#showWeekend').addEventListener('change', function (e) { state.showWeekend = e.target.checked; changed(); });
+  $('#showLegend').addEventListener('change', function (e) { state.showLegend = e.target.checked; changed(); });
   $('#showMonthLines').addEventListener('change', function (e) { state.showMonthLines = e.target.checked; changed(); });
   $('#bwSafe').addEventListener('change', function (e) { state.bwSafe = e.target.checked; touch(); });
   $('#showActual').addEventListener('change', function (e) { state.showActual = e.target.checked; renderItems(); changed(); });
@@ -2064,6 +2131,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   function applyPersonColor(c) {
     if (!colorPerson) return;
+    var own = colorOwner(c, colorPerson);
+    if (own) { toast('That colour is already used by ' + own.name + '.', 'error'); return; }
     colorPerson.color = c;
     if (colorBtn) colorBtn.setAttribute('style', avc(c));
     markColor(c); refreshAssignBtns(); changed();
@@ -2074,7 +2143,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     colorBtn = btn; colorPerson = p;
     var el = $('#colorPop');
     el.innerHTML = '<div class="swgrid">' + PALETTE.map(function (c) {
-      return '<button type="button" class="swb" style="--c:' + c + '" data-c="' + c + '" aria-label="Color ' + c + '" aria-pressed="false"></button>';
+      var ow = colorOwner(c, p);
+      return '<button type="button" class="swb" style="--c:' + c + '" data-c="' + c + '" aria-label="Color ' + c + (ow ? ', used by ' + esc(ow.name) : '') + '" aria-pressed="false"' + (ow ? ' disabled title="Used by ' + esc(ow.name) + '"' : '') + '></button>';
     }).join('') + '<label class="sw custom" title="Custom color"><input class="sr" type="color" id="pPersonColor" value="' + p.color + '" aria-label="Custom color"><span></span></label></div>';
     markColor(p.color);
     el.hidden = false; placeNear(el, btn);
@@ -2083,6 +2153,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   $('#colorPop').addEventListener('click', function (e) {
     var b = e.target.closest('.swb'); if (!b) return;
+    if (b.disabled) return;
     applyPersonColor(b.dataset.c); closeColor(true);
   });
   $('#colorPop').addEventListener('input', function (e) { if (e.target.id === 'pPersonColor') applyPersonColor(e.target.value); });
@@ -2139,7 +2210,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var big = total > 70, W = big ? 420 : 297, H = big ? 297 : 210;
     var doc = first ? new JsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] }) : docIn;
     var WFW = f.workforce ? 12 : 0, PAW = state.showActual !== false ? 5 : 0;
-    var M = 10, NAMEW = 66 + WFW + PAW, GX = M + NAMEW, GW = W - M - GX;
+    var M = 10, NOW = 7, NAMEW = 66 + NOW + WFW + PAW, GX = M + NAMEW, GW = W - M - GX;
     var DW = Math.min(8, GW / total), GRID = DW * total;
     var HEAD = 12, RH = f.notes ? 12 : 10, FOOT = 9;
     var INK = [20, 27, 36], MUTED = [88, 100, 116], LINE = [214, 220, 228], GRIDC = [233, 236, 241], RED = [217, 48, 37];
@@ -2159,8 +2230,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
     /* legend (same list as on screen) */
     var showW = state.showWeekend !== false, showA = state.showActual !== false;
-    var SATC = [223, 243, 228], SUNC = [251, 224, 221], SATINK = [15, 123, 58], SUNINK = [192, 40, 28];
-    var legend = legendItems().map(function (it) { return { t: it.t, k: it.k, v: it.v, pi: it.pi, c: it.none ? [124, 137, 152] : it.c ? rgb(it.c) : null }; });
+    var SATC = [146, 208, 80], SUNC = [255, 255, 0], SATINK = [30, 77, 10], SUNINK = [92, 82, 0];
+    var legend = legendItems().map(function (it) { return { t: it.t, k: it.k, v: it.v, pi: it.pi, c: it.none ? [240, 140, 26] : it.c ? rgb(it.c) : null }; });
     font('normal', 7);
     var lx = M, lrow = 0;
     var lpos = legend.map(function (it) {
@@ -2168,7 +2239,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (lx + w > W - M && lx > M) { lx = M; lrow++; }
       var o = { x: lx, row: lrow }; lx += w; return o;
     });
-    var lrows = lrow + 1;
+    var lrows = legend.length ? lrow + 1 : 0;
 
     /* Page 1 top row: logo, address, sign-off boxes. The logo fills the same size as a sign-off box (46 mm wide).
        A box grows downwards when the name wraps onto more lines; all boxes share the tallest height (boxH). */
@@ -2227,7 +2298,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         var p = lpos[k], y = M + dy + 17 + p.row * 5 + 2;
         if (it.k === 'line') { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
         else if (it.k === 'sq') { fill(it.c); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'F'); }
-        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); hatch(p.x, y - 1.2, 4.6, 2.4, it.v === 'late' ? 5 : it.v === 'early' ? 3 : 0, it.c); }
+        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); }
         else if (it.k === 'dot' && bwSafe && it.pi != null) { fill(it.c); doc.rect(p.x, y - 1.3, 4.6, 2.6, 'F'); hatch(p.x, y - 1.3, 4.6, 2.6, patOf(it.pi), it.c); }
         else if (it.k === 'dot') { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
         color(INK); doc.text(pdfTxt(it.t), p.x + (it.k === 'text' ? 0 : (it.k === 'bar' || (it.k === 'dot' && bwSafe && it.pi != null) ? 7 : 6)), y, { baseline: 'middle' });
@@ -2293,7 +2364,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     function band(x, y, w, h, cols, soft, pats) {
       if (cols.length === 1) {
         var c = soft ? tint(cols[0], 0.24) : rgb(cols[0]); fill(c);
-        if (w >= 2) doc.roundedRect(x, y, w, h, 0.9, 0.9, 'F'); else doc.rect(x, y, w, h, 'F');
+        doc.rect(x, y, w, h, 'F');
         if (!soft && pats) hatch(x + 0.5, y, w - 1, h, pats[0], cols[0]);
         return;
       }
@@ -2305,7 +2376,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       msH = msH || 0;
       var yS = top + HEAD, y0 = yS + msH, bodyH = Math.max(chunk.length, 1) * RH, yEnd = y0 + bodyH, d, dt, k, d2;
       fill([243, 245, 248]); doc.rect(M, top, NAMEW + GRID, HEAD, 'F');
-      font('bold', 6); color(MUTED); doc.text('ITEM', M + (NAMEW - WFW - PAW) / 2, top + HEAD - 2.2, { align: 'center' });
+      font('bold', 6); color(MUTED); font('bold', 5); doc.text('NO.', M + NOW / 2, top + HEAD - 2.2, { align: 'center' }); font('bold', 6); doc.text('ITEM', M + NOW + (NAMEW - NOW - WFW - PAW) / 2, top + HEAD - 2.2, { align: 'center' });
       if (WFW) { font('bold', 5); doc.text('WORKFORCE', GX - PAW - WFW / 2, top + HEAD - 2.2, { align: 'center' }); }
 
       if (showW && DW >= 1) {
@@ -2348,41 +2419,45 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         }
       }
       /* vertical grid */
-      stroke(GRIDC, 0.1);
+      stroke([142, 152, 166], 0.12);
       if (DW >= 3.2) { for (d = rs; d <= re + 1; d++) doc.line(GX + (d - rs) * DW, yS, GX + (d - rs) * DW, yEnd); }
       else if (7 * DW >= 4) { for (d2 = rs; d2 <= re + 1; d2 += 7) doc.line(GX + (d2 - rs) * DW, yS, GX + (d2 - rs) * DW, yEnd); }
       /* horizontal lines */
-      stroke(LINE, 0.15);
+      if (showA) { stroke([142, 152, 166], 0.15); for (var q2 = 0; q2 < Math.max(chunk.length, 1); q2++) doc.line(GX - PAW, y0 + q2 * RH + RH / 2, GX + GRID, y0 + q2 * RH + RH / 2); }
+      stroke([31, 41, 51], 0.45);
       for (var q = 0; q <= Math.max(chunk.length, 1); q++) doc.line(M, y0 + q * RH, GX + GRID, y0 + q * RH);
+      stroke([142, 152, 166], 0.15); doc.line(M + NOW, top, M + NOW, yEnd);
       stroke(LINE, 0.25); doc.line(GX, top, GX, yEnd);
       if (WFW) doc.line(GX - PAW - WFW, top, GX - PAW - WFW, yEnd);
       if (PAW) doc.line(GX - PAW, top, GX - PAW, yEnd);
-      if (showM) for (d = rs + 1; d <= re; d++) if (new Date(d * DAY).getUTCDate() === 1) { stroke(MUTED, 0.35); doc.line(GX + (d - rs) * DW, top, GX + (d - rs) * DW, yEnd); }
+      if (showM) { doc.setLineDashPattern([1.2, 0.9], 0); for (d = rs + 1; d <= re; d++) if (new Date(d * DAY).getUTCDate() === 1) { stroke([217, 48, 37], 0.4); doc.line(GX + (d - rs) * DW, top, GX + (d - rs) * DW, yEnd); } doc.setLineDashPattern([], 0); }
       if (msH) drawMilestoneBand(yS, msH);
       if (showT && today >= rs && today <= re) { var tx0 = GX + (today - rs + 0.5) * DW; stroke(RED, 0.4); doc.line(tx0, yS, tx0, yEnd); }
 
       if (!chunk.length) { font('normal', 8); color(MUTED); doc.text('No items to show.', M + 2, y0 + RH / 2, { baseline: 'middle' }); return; }
 
       chunk.forEach(function (r, j) {
-        var t = r.t, y = y0 + j * RH, cy = y + RH / 2, ppl = f.assignee ? assigneesOf(t) : [], tx = M + 2;
+        var t = r.t, y = y0 + j * RH, cy = y + RH / 2, ppl = f.assignee ? assigneesOf(t) : [], tx = M + NOW + 2;
         if (f.assignee) {
           var show = ppl.length <= 3 ? ppl : ppl.slice(0, 2), extra = ppl.length > 3 ? ppl.length - 2 : 0, nShown = show.length;
           show.forEach(function (p, i) {
-            var cx = M + 5 + i * 4.2;
+            var cx = M + NOW + 5 + i * 4.2;
             fill(rgb(p.color)); stroke([255, 255, 255], 0.4); doc.circle(cx, cy, 2.9, 'FD');
             font('bold', 4.6); color(isLight(p.color) ? [17, 17, 17] : [255, 255, 255]);
             doc.text(pdfTxt(initials(p.name)), cx, cy, { align: 'center', baseline: 'middle' });
           });
           if (extra) {
-            var ex = M + 5 + nShown * 4.2;
+            var ex = M + NOW + 5 + nShown * 4.2;
             fill(GRIDC); stroke([255, 255, 255], 0.4); doc.circle(ex, cy, 2.9, 'FD');
             font('bold', 4.4); color(MUTED); doc.text('+' + extra, ex, cy, { align: 'center', baseline: 'middle' });
             nShown++;
           }
-          if (ppl.length) tx = M + 5 + (nShown - 1) * 4.2 + 2.9 + 2.5;
+          if (ppl.length) tx = M + NOW + 5 + (nShown - 1) * 4.2 + 2.9 + 2.5;
         }
         var a = showA ? actualOf(t, today) : null;
         var wfv = f.workforce ? wfOf(t) : null;
+        font('bold', 7); color(INK); doc.text(String(r.i + 1), M + NOW / 2, cy, { align: 'center', baseline: 'middle' });
+        if (f.workforce && wfv == null) { font('bold', 7); color(MUTED); doc.text('-', GX - PAW - WFW / 2, cy, { align: 'center', baseline: 'middle' }); }
         if (wfv != null) {
           font('bold', 7); var wtx = String(wfv), wbw = Math.min(WFW - 2, Math.max(6.4, doc.getTextWidth(wtx) + 2.4)), wcx = GX - PAW - WFW / 2;
           stroke(INK, 0.3); fill([255, 255, 255]); doc.roundedRect(wcx - wbw / 2, cy - 2.2, wbw, 4.4, 0.8, 0.8, 'FD');
@@ -2397,10 +2472,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         doc.text(fit(meta, maxW), tx, y + (f.notes ? 6.9 : 7), { baseline: 'middle' });
         if (f.notes && t.notes) { font('italic', 6); doc.text(fit(t.notes, maxW), tx, y + 10, { baseline: 'middle' }); }
 
-        var bh = a ? 3.4 : 4.6, ah = 2.6, tot = a ? bh + 0.8 + ah : bh, by = y + (RH - tot) / 2;
+        var bh = showA ? RH / 2 - 0.5 : RH - 0.7, ah = RH / 2 - 0.5, by = y + 0.35;
         if (r.ok) {
-          var bx = GX + (r.s - rs) * DW + 0.3, bw = Math.max((r.e - r.s + 1) * DW - 0.6, 1);
-          var cols = ppl.length ? ppl.map(function (p) { return p.color; }) : ['#7C8998'];
+          var bx = GX + (r.s - rs) * DW, bw = Math.max((r.e - r.s + 1) * DW, 1);
+          var cols = ppl.length ? ppl.map(function (p) { return p.color; }) : ['#F08C1A'];
           var pats = ppl.length ? ppl.map(function (p) { return patOf(state.persons.indexOf(p)); }) : [0];
           if (showP) {
             band(bx, by, bw, bh, cols, true);
@@ -2410,6 +2485,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           } else {
             band(bx, by, bw, bh, cols, false, pats);
           }
+          stroke([0, 0, 0], 0.25); doc.rect(bx, by, bw, bh, 'S');
           if (bwSafe && ppl.length && bh >= 3.2) {
             var ini = ppl.slice(0, 3).map(function (p) { return initials(p.name); }).join(' ');
             font('bold', 5); var itw = doc.getTextWidth(ini);
@@ -2420,14 +2496,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           }
         }
         if (a) {
-          var base = a.cls === 'late' ? [217, 48, 37] : a.cls === 'early' ? [31, 157, 85] : [37, 99, 235];
+          var base = [22, 101, 52];
           var ac = a.open ? base.map(function (v) { return Math.round(v * 0.6 + 255 * 0.4); }) : base;
-          var ax = GX + (a.s - rs) * DW + 0.3, aw = Math.max((a.e - a.s + 1) * DW - 0.6, 1), ay = r.ok ? by + bh + 0.8 : y + (RH - ah) / 2;
-          fill(ac); if (aw >= 2) doc.roundedRect(ax, ay, aw, ah, 0.6, 0.6, 'F'); else doc.rect(ax, ay, aw, ah, 'F');
-          hatch(ax, ay, aw, ah, a.cls === 'late' ? 5 : a.cls === 'early' ? 3 : 0, ac);
+          var ax = GX + (a.s - rs) * DW, aw = Math.max((a.e - a.s + 1) * DW, 1), ay = y + RH / 2 + 0.15;
+          fill(ac); doc.rect(ax, ay, aw, ah, 'F'); stroke([0, 0, 0], 0.25); doc.rect(ax, ay, aw, ah, 'S');
           font('bold', 5.5); color(MUTED);
-          if (r.ok) doc.text('P', GX - PAW / 2, by + bh / 2, { align: 'center', baseline: 'middle' });
-          doc.text('A', GX - PAW / 2, ay + ah / 2, { align: 'center', baseline: 'middle' });
+        }
+        if (showA) {
+          font('bold', 5.5); color(INK);
+          doc.text('P', GX - PAW / 2, y + RH / 4, { align: 'center', baseline: 'middle' });
+          doc.text('A', GX - PAW / 2, y + RH * 0.75, { align: 'center', baseline: 'middle' });
         }
       });
     }
@@ -2624,7 +2702,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
     renderLogo(); renderSigns(); renderMilestones(); renderSheets(); renderLegendEditor();
-    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#bwSafe').checked = state.bwSafe !== false;
+    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#bwSafe').checked = state.bwSafe !== false;
     $('#address').value = state.address || ''; $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
@@ -2718,7 +2796,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.bwSafe = c.bwSafe;
+      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.bwSafe = c.bwSafe;
       state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; state.wfFilter = 'all'; sel = null;
       c.sheets.forEach(function (sh) { sh.tasks.forEach(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); }); });
       state.sheets = c.sheets; state.sheet = c.sheet; bindSheet(state);

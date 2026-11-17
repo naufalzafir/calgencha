@@ -31,7 +31,7 @@
   --bad: #C62828;
   --weekend: rgba(20, 27, 36, 0.05);
   --sat: #92D050; --sun: #FFFF00; --sat-ink: #1E4D0A; --sun-ink: #5C5200; --itemline: #1F2933; --cellline: #8E98A6;
-  --ok: #166534; --early: #166534; --late: #166534;
+  --ok: #166534; --early: #166534; --late: #D93025;
   --shadow: 0 1px 2px rgba(20, 27, 36, 0.06);
   --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
   --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -52,7 +52,7 @@
     --none: #8795A6;
   --unassigned: #F5A04A; --rowline: #4B5666;
   --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
-  --ok: #3FAE6A; --early: #3FAE6A; --late: #3FAE6A;
+  --ok: #3FAE6A; --early: #3FAE6A; --late: #FF6B5E;
     --bad: #FF8A80;
     --weekend: rgba(255, 255, 255, 0.035);
     --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
@@ -74,7 +74,7 @@
   --none: #8795A6;
   --unassigned: #F5A04A; --rowline: #4B5666;
   --sat: rgba(120, 180, 60, 0.7); --sun: rgba(255, 225, 0, 0.92); --sat-ink: #F0FFE0; --sun-ink: #1A1600; --itemline: #AEB8C6; --cellline: #5A6676;
-  --ok: #3FAE6A; --early: #3FAE6A; --late: #3FAE6A;
+  --ok: #3FAE6A; --early: #3FAE6A; --late: #FF6B5E;
   --bad: #FF8A80;
   --weekend: rgba(255, 255, 255, 0.035);
   --shadow: none;
@@ -247,7 +247,11 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .abar.early, .lg i.early { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.75) 0 1.5px, transparent 1.5px 4px); }
 .abar.late, .lg i.late { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.75) 0 1.2px, transparent 1.2px 4px), repeating-linear-gradient(-45deg, rgba(255,255,255,.75) 0 1.2px, transparent 1.2px 4px); }
 .g-pa .pdiv { position: absolute; left: 0; right: 0; top: 24px; border-top: 1px solid var(--muted); }
+.abar.early { background-color: var(--early); }
+.abar.late { background-color: var(--late); }
 .abar.open { opacity: 0.55; }
+.sticky { position: absolute; z-index: 4; display: flex; align-items: center; padding: 0 8px 0 7px; white-space: nowrap; font: 700 10.5px var(--font-mono); color: #7A1020; background: #FFD1DC; border: 1px solid #C97A8E; box-shadow: 2px 3px 5px rgba(0,0,0,.35); transform: rotate(-1.6deg); pointer-events: none; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%); }
+.sticky::before { content: ''; position: absolute; right: 0; bottom: 0; width: 7px; height: 7px; background: #E59BAF; }
 .pdfpop label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 6px; }
 .pdfpop label:hover { background: var(--surface-2); }
 .pdfpop .pbtns { display: flex; gap: 6px; padding: 6px 4px 2px; }
@@ -281,7 +285,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .gantt {
   --rh: 48px; --namew: 232px; --dw: 28px; --cell: 28px;
   display: flex; overflow: auto;
-  border-top: 1px solid var(--line);
+  border: 2px solid var(--itemline);
   border-radius: 0 0 10px 10px;
   background: var(--surface);
 }
@@ -361,7 +365,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .g-pah { width: 24px; }
 .g-wfc { flex: none; width: 72px; align-self: stretch; display: grid; place-items: center; border-left: 1px solid var(--line); }
 .g-pa { flex: none; width: 24px; align-self: stretch; position: relative; border-left: 1px solid var(--line); }
-.g-nrow .wf { min-width: 28px; height: 22px; padding: 0 5px; display: grid; place-items: center; font: 700 12px var(--font-mono); color: var(--ink); background: var(--surface); border: 1.5px solid var(--ink); border-radius: 5px; }
+.g-nrow .wf { min-width: 28px; padding: 0 5px; display: grid; place-items: center; font: 700 12px var(--font-mono); color: var(--ink); }
 .g-nrow .pa:nth-of-type(2) { height: 10px; line-height: 1; font-size: 8px; }
 .g-nrow:hover { background: var(--surface-2); }
 .g-nrow.sel { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
@@ -739,10 +743,15 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <label class="msdone" for="showMonthLines"><input type="checkbox" id="showMonthLines"> Show month lines</label>
           </div>
           <div class="vfield">
-            <label class="msdone" for="bwSafe" title="In the PDF, each person gets a pattern and initials on their bar, so it still works in black and white"><input type="checkbox" id="bwSafe"> Print-friendly PDF</label>
+            <label class="msdone" for="bwSafe" title="In the PDF, each person's bar gets its own pattern (stripes, dots, cross-hatch) and the Actual bars get patterns too, so it still reads in black and white"><input type="checkbox" id="bwSafe"> Print-friendly PDF</label>
           </div>
           <div class="vfield">
             <label class="msdone" for="showActual"><input type="checkbox" id="showActual"> Show Actual</label>
+          </div>
+          <div class="vfield">
+            <label class="msdone" for="padB">Extra days before <input type="number" id="padB" min="0" max="365" step="1" inputmode="numeric" style="width:64px"></label>
+            <label class="msdone" for="padA">after <input type="number" id="padA" min="0" max="365" step="1" inputmode="numeric" style="width:64px"></label>
+            <label class="msdone" for="weekSnap" title="Round the chart out to whole Monday-to-Sunday weeks. Turn off for the tightest fit."><input type="checkbox" id="weekSnap"> Whole weeks</label>
           </div>
           <div class="vfield">
             <label class="msdone" for="showLegend" title="Show the legend on screen and in the PDF. It lists only people who are tagged on the items shown."><input type="checkbox" id="showLegend"> Show legend</label>
@@ -861,7 +870,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   var DAY = 86400000, RH = 48, MAX_ROWS = 60;
   var PALETTE = ['#3563E9', '#7C3AED', '#BE185D', '#4D7C0F', '#A16207', '#64748B', '#0E7490', '#A21CAF', '#821717', '#172C82', '#4A044E'];
   /* Colours the chart itself uses. A person cannot take these or anything close to them. */
-  var RESERVED = [['#F08C1A', 'the Unassigned orange'], ['#166534', 'the Actual green'], ['#92D050', 'the Saturday green'], ['#FFFF00', 'the Sunday yellow'], ['#D93025', 'the Today red']];
+  var RESERVED = [['#F08C1A', 'the Unassigned orange'], ['#166534', 'the Actual green'], ['#92D050', 'the Saturday green'], ['#FFFF00', 'the Sunday yellow'], ['#D93025', 'the Today red'], ['#FFD1DC', 'the delay sticky note']];
   var NEAR = 62;
   function cdist(a, b) {
     var x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
@@ -968,6 +977,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
   /* ---------- sanitising (uploaded files and saved drafts are untrusted) ---------- */
   function clampStr(v, n) { return (typeof v === 'string' ? v : '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n); }
+  function cleanPad(v, d) { var n = Math.round(Number(v)); return v === '' || v == null || !isFinite(n) ? d : Math.min(365, Math.max(0, n)); }
   function clampNum(v) { var n = Math.round(Number(v)); return isFinite(n) ? Math.min(100, Math.max(0, n)) : 0; }
   function cleanPeople(arr) {
     if (!Array.isArray(arr)) return [];
@@ -1014,7 +1024,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         id: uid(), name: clampStr(t.name, 120), assignees: cleanIds(t),
         start: toDay(t.start) != null ? t.start : '', end: toDay(t.end) != null ? t.end : '',
         as: toDay(t.as) != null ? t.as : '', ae: toDay(t.ae) != null ? t.ae : '', wf: cleanWf(t.wf),
-        progress: clampNum(t.progress), status: validStatus(t.status, clampNum(t.progress)), notes: clampStr(t.notes, 300)
+        progress: clampNum(t.progress), status: validStatus(t.status, clampNum(t.progress)), notes: clampStr(t.notes, 300), dn: clampStr(t.dn, 60)
       };
     });
   }
@@ -1031,19 +1041,19 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var act = Math.round(Number(o.sheet)); if (!(act >= 0 && act < sheets.length)) act = 0;
     return bindSheet({
       title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), address: cleanAddr(o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
-      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
+      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, padBefore: cleanPad(o.padBefore, 2), padAfter: cleanPad(o.padAfter, 4), weekSnap: o.weekSnap !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
       fields: fields, persons: cleanPeople(o.persons), sheets: sheets, sheet: act
     });
   }
-  function exportTask(t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, as: t.as || '', ae: t.ae || '', wf: t.wf === 0 || t.wf ? t.wf : '', progress: t.progress, notes: t.notes }; }
+  function exportTask(t) { return { name: t.name, assignees: (t.assignees || []).slice(), status: t.status || 'todo', start: t.start, end: t.end, as: t.as || '', ae: t.ae || '', wf: t.wf === 0 || t.wf ? t.wf : '', progress: t.progress, notes: t.notes, dn: t.dn || '' }; }
   function exportPersons() { return state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }); }
   function exportChart() {
     syncSheet();
     return {
       app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', address: state.address || '', legend: state.legend || [], signoffs: state.signoffs,
-      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, padBefore: padB(), padAfter: padA(), weekSnap: state.weekSnap !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: exportPersons(), sheet: state.sheet,
       sheets: state.sheets.map(function (sh) { return { name: sh.name, tasks: sh.tasks.map(exportTask), milestones: sh.milestones }; }),
       tasks: state.tasks.map(exportTask), milestones: state.milestones
@@ -1375,7 +1385,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     if (f.workforce) c.push([84, 0]);
     if (f.assignee) c.push([176, 1.2]);
     c.push([136, 1], [136, 1]);
-    if (state.showActual !== false) c.push([136, 1], [136, 1]);
+    if (state.showActual !== false) c.push([136, 1], [136, 1], [170, 1.4]);
     if (f.duration) c.push([56, 0]);
     if (f.progress) c.push([84, 0]);
     if (f.status) c.push([104, 0]);
@@ -1394,7 +1404,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan start' : 'Start') + '</span><input type="date" data-f="start" value="' + esc(t.start) + '" min="1990-01-01" max="2100-12-31" aria-label="Start date, item ' + n + '"></label>' +
       '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan end' : 'End') + '</span><input type="date" data-f="end" value="' + esc(t.end) + '" min="1990-01-01" max="2100-12-31" aria-label="End date, item ' + n + '"></label>' +
       (state.showActual !== false ? '<label class="cell"><span class="lbl">Actual start</span><input type="date" data-f="as" value="' + esc(t.as || '') + '" min="1990-01-01" max="2100-12-31" aria-label="Actual start date, item ' + n + '"></label>' +
-        '<label class="cell"><span class="lbl">Actual end</span><input type="date" data-f="ae" value="' + esc(t.ae || '') + '" min="1990-01-01" max="2100-12-31" aria-label="Actual end date, item ' + n + '"></label>' : '') +
+        '<label class="cell"><span class="lbl">Actual end</span><input type="date" data-f="ae" value="' + esc(t.ae || '') + '" min="1990-01-01" max="2100-12-31" aria-label="Actual end date, item ' + n + '"></label>' +
+        '<label class="cell"><span class="lbl">Delay note</span><input data-f="dn" value="' + esc(t.dn || '') + '" maxlength="60" placeholder="Auto" title="Text for the sticky note beside the actual bar. Leave empty to use the automatic delay text." aria-label="Delay note, item ' + n + '"></label>' : '') +
       (f.duration ? '<div class="cell"><span class="lbl">Days</span><output class="dur">' + durText(t) + '</output></div>' : '') +
       (f.progress ? '<label class="cell"><span class="lbl">Done %</span><input type="number" min="0" max="100" step="5" inputmode="numeric" data-f="progress" value="' + t.progress + '" aria-label="Percent done, item ' + n + '"></label>' : '') +
       (f.status ? '<label class="cell"><span class="lbl">Status</span><select data-f="status" aria-label="Status, item ' + n + '">' + statusOptions(t.status) + '</select></label>' : '') +
@@ -1412,7 +1423,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var heads = ['', 'Task'];
     if (f.workforce) heads.push('Workforce');
     if (f.assignee) heads.push('Assignees');
-    if (state.showActual !== false) heads.push('Plan start', 'Plan end', 'Actual start', 'Actual end'); else heads.push('Start', 'End');
+    if (state.showActual !== false) heads.push('Plan start', 'Plan end', 'Actual start', 'Actual end', 'Delay note'); else heads.push('Start', 'End');
     if (f.duration) heads.push('Days');
     if (f.progress) heads.push('Done %');
     if (f.status) heads.push('Status');
@@ -1438,7 +1449,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       setStatus(t, el.value);
       var pin = $('#items .irow[data-i="' + i + '"] input[data-f="progress"]'); if (pin) pin.value = t.progress;
     } else {
-      t[k] = k === 'progress' ? clampNum(el.value) : k === 'wf' ? cleanWf(el.value) : (k === 'start' || k === 'end' || k === 'as' || k === 'ae') ? el.value : el.value.slice(0, k === 'notes' ? 300 : 120);
+      t[k] = k === 'progress' ? clampNum(el.value) : k === 'wf' ? cleanWf(el.value) : (k === 'start' || k === 'end' || k === 'as' || k === 'ae') ? el.value : el.value.slice(0, k === 'notes' ? 300 : k === 'dn' ? 60 : 120);
       if (k === 'progress') {
         syncStatus(t);
         var sSel = $('#items .irow[data-i="' + i + '"] select[data-f="status"]'); if (sSel) sSel.value = t.status;
@@ -1470,6 +1481,24 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     }
     return { s: s, e: open ? Math.max(s, today) : e, open: open, cls: cls };
   }
+  function delayText(t, a, today) {
+    if (!a) return '';
+    if (t.dn) return t.dn;
+    if (a.cls !== 'late') return '';
+    var ps = toDay(t.start), pe = toDay(t.end), s = toDay(t.as), parts = [];
+    if (ps != null && s > ps) parts.push('start +' + (s - ps) + 'd');
+    if (pe != null) { var ed = a.open ? today - pe : a.e - pe; if (ed > 0) parts.push((a.open ? 'overdue +' : 'finish +') + ed + 'd'); }
+    return parts.length ? 'DELAY: ' + parts.join(', ') : 'DELAY';
+  }
+  function padB() { var v = state.padBefore; return v == null ? 2 : v; }
+  function padA() { var v = state.padAfter; return v == null ? 4 : v; }
+  function chartRange(min, max) {
+    var rs = min - padB(), re = max + padA(), snap = state.weekSnap !== false;
+    if (snap) { rs -= wd(rs); re += 6 - wd(re); }
+    var need = snap ? 28 : 7;
+    if (re - rs + 1 < need) re = rs + need - 1;
+    return [rs, re];
+  }
   function actualSpan(min, max, has) {
     if (state.showActual === false) return [min, max, has];
     var today = todayDay();
@@ -1498,9 +1527,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     else { min = today; max = today + 27; }
     var ar = actualSpan(min, max, valid.length > 0); min = ar[0]; max = ar[1];
     var xr = msRange(min, max, ar[2]); min = xr[0]; max = xr[1];
-    var rs = min - 2, re = max + 4;
-    rs -= wd(rs); re += 6 - wd(re);
-    if (re - rs + 1 < 28) re = rs + 27;
+    var rr = chartRange(min, max), rs = rr[0], re = rr[1];
     var total = re - rs + 1;
     renderLegend();
     if (!rows.length) { el.innerHTML = '<p class="g-msg">No items for this person.</p>'; return; }
@@ -1560,6 +1587,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         var al = (act.s - rs) * dw, aw = Math.max((act.e - act.s + 1) * dw, 6), atop = pos * RH + RH / 2 + 1, aH = RH / 2 - 3;
         var atip = nm0 + ' actual: ' + fmtShort(act.s) + (act.open ? ' (not finished yet)' : ' to ' + fmtShort(act.e)) + ', ' + ACT_LBL[act.cls];
         bars += '<div class="abar ' + act.cls + (act.open ? ' open' : '') + '" data-id="' + esc(t.id) + '" style="left:' + al + 'px;top:' + atop + 'px;height:' + aH + 'px;width:' + aw + 'px" title="' + esc(atip) + '"></div>';
+        var dn = delayText(t, act, today);
+        if (dn) {
+          var stw = dn.length * 6.6 + 18, stl = al + aw + 8;
+          if (stl + stw > total * dw) stl = Math.max(2, al - stw - 8);
+          bars += '<div class="sticky" style="left:' + stl + 'px;top:' + (atop - 1) + 'px;height:' + (aH + 2) + 'px">' + esc(dn) + '</div>';
+        }
       }
     });
     var line = showT && today >= rs && today <= re ? '<div class="today" style="left:' + ((today - rs + 0.5) * dw - 1) + 'px"></div>' : '';
@@ -1604,8 +1637,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     if (tl && state.showActual !== false) {
       if (!f.assignee || unas) out.push({ t: f.assignee ? 'Plan - unassigned' : 'Plan', c: '#F08C1A', k: 'bar', plan: true });
       else out.push({ t: 'Plan: top row, in each person\'s colour', k: 'text' });
-      out.push({ t: 'Actual - on time', c: '#166534', k: 'bar', v: 'ok' }, { t: 'Actual - plan', c: '#166534', k: 'bar', v: 'early' }, { t: 'Actual - delays', c: '#166534', k: 'bar', v: 'late' });
+      out.push({ t: 'Actual - on time', c: '#166534', k: 'bar', v: 'ok' }, { t: 'Actual - plan', c: '#166534', k: 'bar', v: 'early' }, { t: 'Actual - delays', c: '#D93025', k: 'bar', v: 'late' });
     }
+    if (tl && state.showActual !== false && state.tasks.some(function (t) { return !!delayText(t, actualOf(t, todayDay()), todayDay()); })) out.push({ t: 'Sticky note = delay', c: '#FFD1DC', k: 'sq' });
     if (tl && state.showWeekend !== false) out.push({ t: 'Saturday', c: '#92D050', k: 'sq', v: 'sat' }, { t: 'Sunday', c: '#FFFF00', k: 'sq', v: 'sun' });
     if (tl && state.showToday !== false) out.push({ t: 'Today', c: '#D93025', k: 'line' });
     (state.legend || []).forEach(function (l) { if (l.name) out.push({ t: l.name, c: l.color, k: 'sq', custom: true }); });
@@ -1685,6 +1719,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     state.address = v; touch();
   });
   $('#showWeekend').addEventListener('change', function (e) { state.showWeekend = e.target.checked; changed(); });
+  $('#padB').addEventListener('change', function (e) { state.padBefore = cleanPad(e.target.value, 2); e.target.value = state.padBefore; changed(); });
+  $('#padA').addEventListener('change', function (e) { state.padAfter = cleanPad(e.target.value, 4); e.target.value = state.padAfter; changed(); });
+  $('#weekSnap').addEventListener('change', function (e) { state.weekSnap = e.target.checked; changed(); });
   $('#showLegend').addEventListener('change', function (e) { state.showLegend = e.target.checked; changed(); });
   $('#showMonthLines').addEventListener('change', function (e) { state.showMonthLines = e.target.checked; changed(); });
   $('#bwSafe').addEventListener('change', function (e) { state.bwSafe = e.target.checked; touch(); });
@@ -2202,16 +2239,14 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     else { min = today; max = today + 27; }
     var arr = actualSpan(min, max, valid.length > 0); min = arr[0]; max = arr[1];
     var xr = msRange(min, max, arr[2]); min = xr[0]; max = xr[1];
-    var rs = min - 2, re = max + 4;
-    rs -= wd(rs); re += 6 - wd(re);
-    if (re - rs + 1 < 28) re = rs + 27;
+    var rr = chartRange(min, max), rs = rr[0], re = rr[1];
     var total = re - rs + 1;
 
     var big = total > 70, W = big ? 420 : 297, H = big ? 297 : 210;
     var doc = first ? new JsPDF({ orientation: 'landscape', unit: 'mm', format: [W, H] }) : docIn;
     var WFW = f.workforce ? 12 : 0, PAW = state.showActual !== false ? 5 : 0;
     var M = 10, NOW = 7, NAMEW = 66 + NOW + WFW + PAW, GX = M + NAMEW, GW = W - M - GX;
-    var DW = Math.min(8, GW / total), GRID = DW * total;
+    var DW = Math.min(16, GW / total), GRID = DW * total;
     var HEAD = 12, RH = f.notes ? 12 : 10, FOOT = 9;
     var INK = [20, 27, 36], MUTED = [88, 100, 116], LINE = [214, 220, 228], GRIDC = [233, 236, 241], RED = [217, 48, 37];
     if (first) doc.setProperties({ title: pdfTxt(state.title) });
@@ -2281,6 +2316,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var perFirst = Math.max(1, Math.floor((H - FOOT - top1 - HEAD - msBand) / RH));
     var perRest = Math.max(1, Math.floor((H - FOOT - top2 - HEAD) / RH));
     var pages = n <= perFirst ? 1 : 1 + Math.ceil((n - perFirst) / perRest);
+    var RH0 = RH;
+    if (pages === 1 && n > 0) RH = Math.min(18, Math.max(RH0, Math.floor((H - FOOT - top1 - HEAD - msBand - 3) / n * 10) / 10));
+    var yo = (RH - RH0) / 2;
 
     function firstHead() {
       if (logoDim) doc.addImage(state.logo, 'PNG', M, M, logoDim.w, logoDim.h);
@@ -2298,7 +2336,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         var p = lpos[k], y = M + dy + 17 + p.row * 5 + 2;
         if (it.k === 'line') { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
         else if (it.k === 'sq') { fill(it.c); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'F'); }
-        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); }
+        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); if (it.v === 'early') hatch(p.x, y - 1.2, 4.6, 2.4, 3, it.c); else if (it.v === 'late') hatch(p.x, y - 1.2, 4.6, 2.4, 5, it.c); }
         else if (it.k === 'dot' && bwSafe && it.pi != null) { fill(it.c); doc.rect(p.x, y - 1.3, 4.6, 2.6, 'F'); hatch(p.x, y - 1.3, 4.6, 2.6, patOf(it.pi), it.c); }
         else if (it.k === 'dot') { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
         color(INK); doc.text(pdfTxt(it.t), p.x + (it.k === 'text' ? 0 : (it.k === 'bar' || (it.k === 'dot' && bwSafe && it.pi != null) ? 7 : 6)), y, { baseline: 'middle' });
@@ -2309,13 +2347,13 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       signs.forEach(function (sg, i) {
         var o = state.signoffs[sg[0]], x = W - M - (signs.length - i) * SIGN_W - (signs.length - 1 - i) * SIGN_GAP, y = M, nl = signNames[sg[0]] || [];
         stroke(LINE, 0.3); doc.rect(x, y, SIGN_W, boxH);
-        font('bold', 6.5); color(MUTED); doc.text(pdfTxt(sg[1]).toUpperCase(), x + 2, y + 4);
+        font('bold', 6.5); color(MUTED); doc.text(pdfTxt(sg[1]).toUpperCase() + ':', x + 2, y + 4);
         stroke(MUTED, 0.25); doc.line(x + 2, y + 16, x + SIGN_W - 2, y + 16);
         font('normal', 7.5); color(INK);
         nl.forEach(function (l, j) { doc.text(l, x + 2, y + 19.5 + j * 3.2); });
         var dyy = y + 19.5 + Math.max(nl.length, 1) * 3.2 + 0.2;
         font('normal', 6.5); color(MUTED);
-        if (o.date) doc.text('Date: ' + ymd(dayNum(o.date)), x + 2, dyy);
+        if (o.date) doc.text('Date: ' + ymd(dayNum(o.date)), x + SIGN_W / 2, dyy, { align: 'center' });
         else { doc.text('Date:', x + 2, dyy); stroke(LINE, 0.3); doc.line(x + 9, dyy + 0.3, x + SIGN_W - 2, dyy + 0.3); }
       });
     }
@@ -2342,12 +2380,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (pages > 1) doc.text('Page ' + pg + ' of ' + pages, W - M, H - 5, { align: 'right', baseline: 'middle' });
     }
     /* Black and white friendly: each person gets a pattern (0 solid, 1 /, 2 \, 3 |, 4 dots, 5 x), drawn in white or dark over the colour. */
-    function patOf(i) { return i < 0 ? 0 : i % 6; }
+    function patOf(i) { return i < 0 ? 0 : 1 + (i % 5); }
     function lightC(c) { var a = typeof c === 'string' ? rgb(c) : c; return 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2] > 150; }
     function hatch(x, y, w, h, pat, col) {
       if (!bwSafe || !pat || w < 1.2) return;
-      var ink = lightC(col) ? [20, 27, 36] : [255, 255, 255], step = 1.5, c, xx, yy;
-      stroke(ink, 0.22); fill(ink);
+      var ink = lightC(col) ? [20, 27, 36] : [255, 255, 255], step = 1.3, c, xx, yy;
+      stroke(ink, 0.3); fill(ink);
       if (pat === 1 || pat === 2 || pat === 5) {
         [pat === 2 ? -1 : 1].concat(pat === 5 ? [-1] : []).forEach(function (sg) {
           for (c = -h; c <= w; c += step) {
@@ -2393,12 +2431,13 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         dt = new Date(d * DAY);
         var nm = Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 1) / DAY, end = Math.min(re + 1, nm);
         var mx = GX + (d - rs) * DW, mw = (end - d) * DW;
-        stroke([200, 207, 216], 0.2); doc.line(mx, top, mx, top + 5.2);
+        stroke([31, 41, 51], 0.3); doc.line(mx, top, mx, top + 5.2);
         var lab = mw >= 16 ? dt.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' })
           : mw >= 7 ? dt.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }) : '';
-        if (lab) { font('bold', 6.5); color(INK); doc.text(pdfTxt(lab), mx + 1.5, top + 3.6); }
+        if (lab) { font('bold', 6.5); color(INK); doc.text(pdfTxt(lab), mx + mw / 2, top + 3.6, { align: 'center' }); }
         d = end;
       }
+      stroke([31, 41, 51], 0.3); doc.line(GX, top + 5.2, GX + GRID, top + 5.2); doc.line(M, yS, GX + GRID, yS);
       /* days or weeks */
       if (DW >= 3.2) {
         for (d = rs; d <= re; d++) {
@@ -2422,6 +2461,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       stroke([142, 152, 166], 0.12);
       if (DW >= 3.2) { for (d = rs; d <= re + 1; d++) doc.line(GX + (d - rs) * DW, yS, GX + (d - rs) * DW, yEnd); }
       else if (7 * DW >= 4) { for (d2 = rs; d2 <= re + 1; d2 += 7) doc.line(GX + (d2 - rs) * DW, yS, GX + (d2 - rs) * DW, yEnd); }
+      stroke([31, 41, 51], 0.2);
+      if (DW >= 3.2) { for (d = rs; d <= re + 1; d++) doc.line(GX + (d - rs) * DW, top + 5.2, GX + (d - rs) * DW, yS); }
+      else if (7 * DW >= 4) { for (d2 = rs; d2 <= re + 1; d2 += 7) doc.line(GX + (d2 - rs) * DW, top + 5.2, GX + (d2 - rs) * DW, yS); }
       /* horizontal lines */
       if (showA) { stroke([142, 152, 166], 0.15); for (var q2 = 0; q2 < Math.max(chunk.length, 1); q2++) doc.line(GX - PAW, y0 + q2 * RH + RH / 2, GX + GRID, y0 + q2 * RH + RH / 2); }
       stroke([31, 41, 51], 0.45);
@@ -2459,18 +2501,17 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         font('bold', 7); color(INK); doc.text(String(r.i + 1), M + NOW / 2, cy, { align: 'center', baseline: 'middle' });
         if (f.workforce && wfv == null) { font('bold', 7); color(MUTED); doc.text('-', GX - PAW - WFW / 2, cy, { align: 'center', baseline: 'middle' }); }
         if (wfv != null) {
-          font('bold', 7); var wtx = String(wfv), wbw = Math.min(WFW - 2, Math.max(6.4, doc.getTextWidth(wtx) + 2.4)), wcx = GX - PAW - WFW / 2;
-          stroke(INK, 0.3); fill([255, 255, 255]); doc.roundedRect(wcx - wbw / 2, cy - 2.2, wbw, 4.4, 0.8, 0.8, 'FD');
+          font('bold', 7); var wtx = String(wfv), wcx = GX - PAW - WFW / 2;
           color(INK); doc.text(wtx, wcx, cy, { align: 'center', baseline: 'middle' });
         }
         var maxW = GX - PAW - WFW - tx - 2;
         font('bold', 8.5); color(t.name ? INK : MUTED);
-        doc.text(fit(t.name || 'Item ' + (r.i + 1), maxW), tx, y + (f.notes ? 3.2 : 3.6), { baseline: 'middle' });
+        doc.text(fit(t.name || 'Item ' + (r.i + 1), maxW), tx, y + yo + (f.notes ? 3.2 : 3.6), { baseline: 'middle' });
         var meta = r.ok ? fmtShort(r.s) + ' - ' + fmtShort(r.e) + (f.duration ? '  |  ' + (r.e - r.s + 1) + 'd' : '')
           : (r.s != null && r.e != null ? 'End is before start' : 'No dates yet');
         font('normal', 6.5); color(MUTED);
-        doc.text(fit(meta, maxW), tx, y + (f.notes ? 6.9 : 7), { baseline: 'middle' });
-        if (f.notes && t.notes) { font('italic', 6); doc.text(fit(t.notes, maxW), tx, y + 10, { baseline: 'middle' }); }
+        doc.text(fit(meta, maxW), tx, y + yo + (f.notes ? 6.9 : 7), { baseline: 'middle' });
+        if (f.notes && t.notes) { font('italic', 6); doc.text(fit(t.notes, maxW), tx, y + yo + 10, { baseline: 'middle' }); }
 
         var bh = showA ? RH / 2 - 0.5 : RH - 0.7, ah = RH / 2 - 0.5, by = y + 0.35;
         if (r.ok) {
@@ -2486,21 +2527,25 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             band(bx, by, bw, bh, cols, false, pats);
           }
           stroke([0, 0, 0], 0.25); doc.rect(bx, by, bw, bh, 'S');
-          if (bwSafe && ppl.length && bh >= 3.2) {
-            var ini = ppl.slice(0, 3).map(function (p) { return initials(p.name); }).join(' ');
-            font('bold', 5); var itw = doc.getTextWidth(ini);
-            if (bw > itw + 3) {
-              fill([255, 255, 255]); stroke(INK, 0.15); doc.roundedRect(bx + 0.6, by + 0.4, itw + 1.6, bh - 0.8, 0.6, 0.6, 'FD');
-              color(INK); doc.text(ini, bx + 1.4, by + bh / 2, { baseline: 'middle' });
-            }
-          }
         }
         if (a) {
-          var base = [22, 101, 52];
+          var base = a.cls === 'late' ? [217, 48, 37] : [22, 101, 52];
           var ac = a.open ? base.map(function (v) { return Math.round(v * 0.6 + 255 * 0.4); }) : base;
           var ax = GX + (a.s - rs) * DW, aw = Math.max((a.e - a.s + 1) * DW, 1), ay = y + RH / 2 + 0.15;
-          fill(ac); doc.rect(ax, ay, aw, ah, 'F'); stroke([0, 0, 0], 0.25); doc.rect(ax, ay, aw, ah, 'S');
-          font('bold', 5.5); color(MUTED);
+          fill(ac); doc.rect(ax, ay, aw, ah, 'F');
+          if (a.cls !== 'ok') hatch(ax, ay, aw, ah, a.cls === 'early' ? 3 : 5, ac);
+          stroke([0, 0, 0], 0.25); doc.rect(ax, ay, aw, ah, 'S');
+          var dn = delayText(t, a, today);
+          if (dn) {
+            font('bold', 4.8); var stw = doc.getTextWidth(dn) + 3.2, stx = ax + aw + 1.5, sth = ah, fl = Math.min(1.4, sth / 3);
+            if (stx + stw > GX + GRID) stx = ax - stw - 1.5;
+            if (stx >= GX) {
+              fill([255, 209, 220]); stroke([201, 122, 142], 0.2);
+              doc.lines([[stw, 0], [0, sth - fl], [-fl, fl], [-(stw - fl), 0]], stx, ay, [1, 1], 'FD', true);
+              fill([229, 155, 175]); doc.lines([[0, -fl], [-fl, fl]], stx + stw, ay + sth, [1, 1], 'F', true);
+              color([122, 16, 32]); doc.text(dn, stx + 1.6, ay + sth / 2, { baseline: 'middle' });
+            }
+          }
         }
         if (showA) {
           font('bold', 5.5); color(INK);
@@ -2508,6 +2553,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           doc.text('A', GX - PAW / 2, y + RH * 0.75, { align: 'center', baseline: 'middle' });
         }
       });
+      stroke([31, 41, 51], 0.6); doc.rect(M, top, NAMEW + GRID, yEnd - top, 'S');
     }
 
     var idx = 0;
@@ -2529,7 +2575,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     try {
       idxs.forEach(function (i, n) {
         var sh = state.sheets[i]; state.tasks = sh.tasks; state.milestones = sh.milestones;
-        doc = pdfSheet(doc, JsPDF, n === 0, (state.title || 'Untitled project') + (multi ? ' - ' + sh.name : ''));
+        doc = pdfSheet(doc, JsPDF, n === 0, (state.title || 'Untitled project'));
       });
     } finally { state.tasks = keepT; state.milestones = keepM; }
     return doc;
@@ -2702,7 +2748,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
     renderLogo(); renderSigns(); renderMilestones(); renderSheets(); renderLegendEditor();
-    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#bwSafe').checked = state.bwSafe !== false;
+    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#padB').value = padB(); $('#padA').value = padA(); $('#weekSnap').checked = state.weekSnap !== false; $('#bwSafe').checked = state.bwSafe !== false;
     $('#address').value = state.address || ''; $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
@@ -2796,7 +2842,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.bwSafe = c.bwSafe;
+      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.padBefore = c.padBefore; state.padAfter = c.padAfter; state.weekSnap = c.weekSnap; state.bwSafe = c.bwSafe;
       state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; state.wfFilter = 'all'; sel = null;
       c.sheets.forEach(function (sh) { sh.tasks.forEach(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); }); });
       state.sheets = c.sheets; state.sheet = c.sheet; bindSheet(state);

@@ -279,6 +279,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 0 16px 12px; color: var(--muted); font-size: 12px; }
 .lg { display: inline-flex; align-items: center; gap: 6px; }
 .lg i { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--none)); }
+.lg i:not(.tl) { box-sizing: border-box; border: 1px solid #000; }
 .lg i.tl { width: 2px; height: 12px; border-radius: 0; background: var(--today); }
 .lg i.none { background: var(--unassigned); }
 
@@ -2381,10 +2382,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       legend.forEach(function (it, k) {
         var p = lpos[k], y = M + dy + 17 + p.row * 5 + 2;
         if (it.k === 'line') { stroke(it.c, 0.5); doc.line(p.x + 1, y - 2, p.x + 1, y + 2); }
-        else if (it.k === 'sq') { fill(it.c); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'F'); }
-        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); if (it.v === 'early') hatch(p.x, y - 1.2, 4.6, 2.4, 3, it.c); else if (it.v === 'late') hatch(p.x, y - 1.2, 4.6, 2.4, 5, it.c); }
-        else if (it.k === 'dot' && bwSafe && it.pi != null) { fill(it.c); doc.rect(p.x, y - 1.3, 4.6, 2.6, 'F'); hatch(p.x, y - 1.3, 4.6, 2.6, patOf(it.pi), it.c); }
-        else if (it.k === 'dot') { fill(it.c); doc.circle(p.x + 1.5, y, 1.3, 'F'); }
+        else if (it.k === 'sq') { fill(it.c); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'F'); stroke([0, 0, 0], 0.25); doc.rect(p.x, y - 1.3, 2.6, 2.6, 'S'); }
+        else if (it.k === 'bar') { fill(it.c); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'F'); if (it.v === 'early') hatch(p.x, y - 1.2, 4.6, 2.4, 3, it.c); else if (it.v === 'late') hatch(p.x, y - 1.2, 4.6, 2.4, 5, it.c); stroke([0, 0, 0], 0.25); doc.rect(p.x, y - 1.2, 4.6, 2.4, 'S'); }
+        else if (it.k === 'dot' && bwSafe && it.pi != null) { fill(it.c); doc.rect(p.x, y - 1.3, 4.6, 2.6, 'F'); hatch(p.x, y - 1.3, 4.6, 2.6, patOf(it.pi), it.c); stroke([0, 0, 0], 0.25); doc.rect(p.x, y - 1.3, 4.6, 2.6, 'S'); }
+        else if (it.k === 'dot') { fill(it.c); stroke([0, 0, 0], 0.25); doc.circle(p.x + 1.5, y, 1.3, 'FD'); }
         color(INK); doc.text(pdfTxt(it.t), p.x + (it.k === 'text' ? 0 : (it.k === 'bar' || (it.k === 'dot' && bwSafe && it.pi != null) ? 7 : 6)), y, { baseline: 'middle' });
       });
     }

@@ -617,7 +617,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 .g-noh, .g-wfh { font-size: 11px; font-weight: 800; letter-spacing: 0.02em; color: var(--ink); }
 .g-corner .cl span:first-child { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: 0.03em; }
 .g-noh, .g-wfh, .g-pah { align-items: center; padding-bottom: 0; }
-.g-corner .cl { align-self: stretch; align-items: center; padding-bottom: 0; }
+.g-corner .cl { align-self: stretch; align-items: center; padding-bottom: 0; }.co { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; resize: none; min-height: 124px; height: auto; }
+.co input, .co textarea { min-height: 0; overflow: hidden; line-height: 1.35; width: 100%; border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink); font: inherit; font-size: 13px; padding: 3px 2px; resize: none; border-radius: 0; }
+.co input:hover, .co textarea:hover, .co input:focus, .co textarea:focus { border-bottom-color: var(--line); outline: none; }
+.co #coName { font-weight: 700; }
 .g-dc.long span { font-size: 9px; letter-spacing: 0; }
 </style>
 
@@ -669,7 +672,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
               <button type="button" class="logo-btn" id="logoBtn" title="Shown above the title and on the PDF"><span>+ Add logo</span></button>
               <button type="button" class="linkbtn" id="logoRemove" hidden>Remove logo</button>
               <input type="file" id="logoFile" class="sr" accept="image/*" tabindex="-1" aria-label="Choose a logo image">
-              <textarea class="addr" id="address" maxlength="260" rows="5" placeholder="Company address (optional). Prints next to the logo." aria-label="Company address"></textarea>
+              <div class="addr co" id="company" role="group" aria-label="Company details. Prints next to the logo.">
+                <textarea id="coName" rows="1" maxlength="100" placeholder="Company name" aria-label="Company name" autocomplete="organization"></textarea>
+                <textarea id="coAddr" rows="2" maxlength="260" placeholder="Address" aria-label="Company address"></textarea>
+                <textarea id="coEmail" rows="1" maxlength="80" placeholder="Email" aria-label="Company email" autocomplete="email"></textarea>
+                <textarea id="coPhone" rows="1" maxlength="60" placeholder="Contact number" aria-label="Company contact number" autocomplete="tel"></textarea>
+              </div>
               <div class="signs" id="signs" title="Optional boxes with space to sign. They print at the top right of the PDF."></div>
             </div>
             <div class="updated" id="updated"></div>
@@ -953,7 +961,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function fmtStamp(d) { return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
   function blankState() {
     var tk = [mkTask(), mkTask(), mkTask(), mkTask(), mkTask()];
-    return bindSheet({ title: 'Untitled project', logo: '', address: '', legend: [], signoffs: defaultSign(), showToday: true, showWeekend: true, showActual: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', sheets: [mkSheet('Sheet 1', tk, [])], sheet: 0, example: false });
+    return bindSheet({ title: 'Untitled project', logo: '', address: '', company: emptyCo(), legend: [], signoffs: defaultSign(), showToday: true, showWeekend: true, showActual: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: [], sort: 'manual', filter: 'all', view: 'timeline', sheets: [mkSheet('Sheet 1', tk, [])], sheet: 0, example: false });
   }
   function exampleState() {
     var B = todayDay(); B -= wd(B) + 7; /* Monday of last week */
@@ -963,7 +971,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       return { id: uid(), name: name, assignees: [].concat(pi).map(function (k) { return people[k].id; }), start: toISO(B + s), end: toISO(B + e), progress: pct, status: pct >= 100 ? 'done' : pct > 0 ? 'doing' : 'todo', notes: notes || '' };
     }
     var ex = {
-      title: 'Website relaunch', logo: '', address: '', legend: [], showWeekend: true, showActual: true, signoffs: defaultSign(), milestones: [{ id: uid(), name: 'Initiation phase', start: toISO(B), end: toISO(B + 6), color: '#E0A02B' }, { id: uid(), name: 'Preparation phase', start: toISO(B + 7), end: toISO(B + 27), color: '#E0A02B' }, { id: uid(), name: 'Execution phase', start: toISO(B + 28), end: toISO(B + 45), color: '#E0A02B' }, { id: uid(), name: 'Go live', start: toISO(B + 46), end: '', color: '#C2410C' }], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
+      title: 'Website relaunch', logo: '', address: '', company: emptyCo(), legend: [], showWeekend: true, showActual: true, signoffs: defaultSign(), milestones: [{ id: uid(), name: 'Initiation phase', start: toISO(B), end: toISO(B + 6), color: '#E0A02B' }, { id: uid(), name: 'Preparation phase', start: toISO(B + 7), end: toISO(B + 27), color: '#E0A02B' }, { id: uid(), name: 'Execution phase', start: toISO(B + 28), end: toISO(B + 45), color: '#E0A02B' }, { id: uid(), name: 'Go live', start: toISO(B + 46), end: '', color: '#C2410C' }], showToday: true, scale: 'day', fields: Object.assign({}, DEFAULT_FIELDS), persons: people, sort: 'manual', filter: 'all', view: 'timeline', example: true,
       tasks: [
         T('Kickoff and scope', 0, 0, 2, 100),
         T('User research', 2, 1, 11, 100, 'Eight interviews'),
@@ -1014,6 +1022,19 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     return out;
   }
+  function emptyCo() { return { name: '', address: '', email: '', phone: '' }; }
+  function oneLine(v, n) { return typeof v === 'string' ? v.replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n) : ''; }
+  function cleanCompany(o, legacy) {
+    if (o && typeof o === 'object' && !Array.isArray(o)) {
+      var ad = typeof o.address === 'string' ? o.address.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ').split('\n').slice(0, 5).map(function (l) { return l.trim().slice(0, 80); }).filter(Boolean).join('\n') : '';
+      return { name: oneLine(o.name, 100), address: ad, email: oneLine(o.email, 80), phone: oneLine(o.phone, 60) };
+    }
+    var ls = cleanAddr(legacy).split('\n').filter(Boolean), co = emptyCo();
+    if (ls.length) { co.name = ls[0]; co.address = ls.slice(1, 4).join('\n'); }
+    return co;
+  }
+  function coOf() { return state.company || emptyCo(); }
+  function coText(c) { c = c || emptyCo(); return [c.name, c.address, c.email, c.phone].filter(Boolean).join('\n'); }
   function cleanAddr(v) {
     if (typeof v !== 'string') return '';
     return v.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ').split('\n').slice(0, 5).map(function (l) { return l.trim().slice(0, 60); }).join('\n').trim();
@@ -1049,7 +1070,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     });
     var act = Math.round(Number(o.sheet)); if (!(act >= 0 && act < sheets.length)) act = 0;
     return bindSheet({
-      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), address: cleanAddr(o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
+      title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), company: cleanCompany(o.company, o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
       showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, longDays: o.longDays === true, padBefore: cleanPad(o.padBefore, 2), padAfter: cleanPad(o.padAfter, 4), weekSnap: o.weekSnap !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
@@ -1061,7 +1082,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function exportChart() {
     syncSheet();
     return {
-      app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', address: state.address || '', legend: state.legend || [], signoffs: state.signoffs,
+      app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', company: coOf(), address: coText(state.company), legend: state.legend || [], signoffs: state.signoffs,
       showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, longDays: state.longDays === true, padBefore: padB(), padAfter: padA(), weekSnap: state.weekSnap !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: exportPersons(), sheet: state.sheet,
       sheets: state.sheets.map(function (sh) { return { name: sh.name, tasks: sh.tasks.map(exportTask), milestones: sh.milestones }; }),
@@ -1069,7 +1090,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     };
   }
   function exportTemplate() {
-    return { app: 'barline', type: 'template', version: 1, logo: state.logo || '', address: state.address || '', signoffs: state.signoffs, legend: state.legend || [], persons: exportPersons() };
+    return { app: 'barline', type: 'template', version: 1, logo: state.logo || '', company: coOf(), address: coText(state.company), signoffs: state.signoffs, legend: state.legend || [], persons: exportPersons() };
   }
   function exportPeople() {
     return { app: 'barline', type: 'people', version: 1, persons: state.persons.map(function (p) { return { id: p.id, name: p.name, role: p.role, color: p.color }; }) };
@@ -1725,9 +1746,16 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   $('#showToday').addEventListener('change', function (e) { state.showToday = e.target.checked; changed(); });
 
   /* ---------- address, legend entries, view toggles ---------- */
-  $('#address').addEventListener('input', function (e) {
-    var v = e.target.value.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ').split('\n').slice(0, 5).map(function (l) { return l.slice(0, 60); }).join('\n');
-    state.address = v; touch();
+  function autosize(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+  function sizeCompany() { ['coName', 'coAddr', 'coEmail', 'coPhone'].forEach(function (id) { autosize($('#' + id)); }); }
+  [['coName', 'name', 100], ['coAddr', 'address', 260], ['coEmail', 'email', 80], ['coPhone', 'phone', 60]].forEach(function (f) {
+    if (f[1] !== 'address') $('#' + f[0]).addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
+    $('#' + f[0]).addEventListener('input', function (e) {
+      var v = e.target.value.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f]/g, ' ');
+      if (f[1] === 'address') v = v.split('\n').slice(0, 5).map(function (l) { return l.slice(0, 80); }).join('\n'); else v = v.replace(/\n/g, ' ').slice(0, f[2]);
+      if (!state.company) state.company = emptyCo();
+      state.company[f[1]] = v; autosize(e.target); touch();
+    });
   });
   $('#showWeekend').addEventListener('change', function (e) { state.showWeekend = e.target.checked; changed(); });
   $('#padB').addEventListener('change', function (e) { state.padBefore = cleanPad(e.target.value, 2); e.target.value = state.padBefore; changed(); });
@@ -2305,12 +2333,18 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     }
     var addrX = M + (logoDim ? logoDim.w + 5 : 0), addrLines = [];
     var addrW = (signs.length ? W - M - signs.length * SIGN_W - (signs.length - 1) * SIGN_GAP : W - M) - addrX - 4;
-    if (state.address && addrW >= 24) {
-      font('normal', 7.5);
-      String(state.address).split('\n').forEach(function (l) { l = pdfTxt(l); if (l) addrLines = addrLines.concat(doc.splitTextToSize(l, addrW)); else addrLines.push(''); });
-      addrLines = addrLines.slice(0, Math.floor(topH / 3.4));
+    var addrH = 0;
+    if (coText(state.company) && addrW >= 24) {
+      var co = coOf();
+      function addL(txt, bold, size, lh) { font(bold ? 'bold' : 'normal', size); doc.splitTextToSize(pdfTxt(txt), addrW).forEach(function (l) { addrLines.push({ t: l, b: bold, z: size, h: lh }); }); }
+      if (co.name) addL(co.name, true, 9.5, 4.4);
+      if (co.address) co.address.split('\n').forEach(function (l) { if (l.trim()) addL(l, false, 7.5, 3.4); });
+      if (co.email) addL('Email: ' + co.email, false, 7.5, 3.4);
+      if (co.phone) addL('Tel: ' + co.phone, false, 7.5, 3.4);
+      var acc = 0; addrLines = addrLines.filter(function (l) { acc += l.h; return acc <= 60; });
+      addrLines.forEach(function (l) { addrH += l.h; });
     }
-    dy = Math.max(logoDim ? logoDim.h : 0, signs.length ? boxH : 0, addrLines.length * 3.4);
+    dy = Math.max(logoDim ? logoDim.h : 0, signs.length ? boxH : 0, addrH);
     if (dy) dy += 3;
     /* pages 2+: the same logo, smaller (max 8 mm tall, 30 mm wide). dy2 = how far their content moves down. */
     var logoDim2 = null, dy2 = 0;
@@ -2334,7 +2368,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
     function firstHead() {
       if (logoDim) doc.addImage(state.logo, 'PNG', M, M, logoDim.w, logoDim.h);
-      if (addrLines.length) { font('normal', 7.5); color(INK); addrLines.forEach(function (l, j) { if (l) doc.text(l, addrX, M + 3 + j * 3.4); }); }
+      if (addrLines.length) { color(INK); var ay0 = M + 3; addrLines.forEach(function (l) { font(l.b ? 'bold' : 'normal', l.z); doc.text(l.t, addrX, ay0); ay0 += l.h; }); }
       drawSigns();
       font('bold', 16); color(INK);
       doc.text(fit(ttl || 'Untitled project', W - 2 * M), M, M + dy + 6);
@@ -2761,7 +2795,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
     renderLogo(); renderSigns(); renderMilestones(); renderSheets(); renderLegendEditor();
     $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#longDays').checked = state.longDays === true; $('#padB').value = padB(); $('#padA').value = padA(); $('#weekSnap').checked = state.weekSnap !== false; $('#bwSafe').checked = state.bwSafe !== false;
-    $('#address').value = state.address || ''; $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
+    $('#coName').value = coOf().name; $('#coAddr').value = coOf().address; $('#coEmail').value = coOf().email; $('#coPhone').value = coOf().phone; sizeCompany(); setTimeout(sizeCompany, 150); $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
     $('#banner').hidden = !state.example;
@@ -2843,10 +2877,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   }
   function applyTemplate(data) {
     if (!data || data.type !== 'template') throw new Error('That is not a template file. Use Upload data for a saved chart.');
-    var list = cleanPeople(data.persons), logo = cleanLogo(data.logo), addr = cleanAddr(data.address), sg = cleanSign(data.signoffs), lg = cleanLegend(data.legend);
+    var list = cleanPeople(data.persons), logo = cleanLogo(data.logo), co = cleanCompany(data.company, data.address), sg = cleanSign(data.signoffs), lg = cleanLegend(data.legend);
     withUndo(function () {
       mergePeople(list);
-      state.logo = logo; state.address = addr; state.signoffs = sg; state.legend = lg;
+      state.logo = logo; state.company = co; state.signoffs = sg; state.legend = lg;
       return 'Template loaded: logo, address, boxes, legend and ' + list.length + (list.length === 1 ? ' person.' : ' people.');
     });
   }
@@ -2854,7 +2888,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.longDays = c.longDays; state.padBefore = c.padBefore; state.padAfter = c.padAfter; state.weekSnap = c.weekSnap; state.bwSafe = c.bwSafe;
+      state.title = c.title; state.logo = c.logo; state.company = c.company; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.longDays = c.longDays; state.padBefore = c.padBefore; state.padAfter = c.padAfter; state.weekSnap = c.weekSnap; state.bwSafe = c.bwSafe;
       state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; state.wfFilter = 'all'; sel = null;
       c.sheets.forEach(function (sh) { sh.tasks.forEach(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); }); });
       state.sheets = c.sheets; state.sheet = c.sheet; bindSheet(state);

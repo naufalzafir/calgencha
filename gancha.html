@@ -613,6 +613,12 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   .brand h1 { font-size: 22px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.g-mo { font: 800 13px var(--font-body); letter-spacing: 0.04em; }
+.g-noh, .g-wfh { font-size: 11px; font-weight: 800; letter-spacing: 0.02em; color: var(--ink); }
+.g-corner .cl span:first-child { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: 0.03em; }
+.g-noh, .g-wfh, .g-pah { align-items: center; padding-bottom: 0; }
+.g-corner .cl { align-self: stretch; align-items: center; padding-bottom: 0; }
+.g-dc.long span { font-size: 9px; letter-spacing: 0; }
 </style>
 
 <div class="app">
@@ -730,7 +736,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <select id="filterBy"></select>
           </div>
           <div class="vfield">
-            <label class="lbl" for="filterWf">Workforce</label>
+            <label class="lbl" for="filterWf">Manpower</label>
             <select id="filterWf"></select>
           </div>
           <div class="vfield">
@@ -752,6 +758,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <label class="msdone" for="padB">Extra days before <input type="number" id="padB" min="0" max="365" step="1" inputmode="numeric" style="width:64px"></label>
             <label class="msdone" for="padA">after <input type="number" id="padA" min="0" max="365" step="1" inputmode="numeric" style="width:64px"></label>
             <label class="msdone" for="weekSnap" title="Round the chart out to whole Monday-to-Sunday weeks. Turn off for the tightest fit."><input type="checkbox" id="weekSnap"> Whole weeks</label>
+          </div>
+          <div class="vfield">
+            <label class="msdone" for="longDays" title="Show three-letter day names (TUE 10) instead of one letter (T 10). The chart needs enough width; otherwise it keeps the single letter."><input type="checkbox" id="longDays"> Day names (TUE)</label>
           </div>
           <div class="vfield">
             <label class="msdone" for="showLegend" title="Show the legend on screen and in the PDF. It lists only people who are tagged on the items shown."><input type="checkbox" id="showLegend"> Show legend</label>
@@ -834,7 +843,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
             <legend class="lbl">Fields on each item</legend>
             <p class="fixed">Always included: task, start, end.</p>
             <label class="chk"><input type="checkbox" data-field="assignee"><span>Assignees (one or more people)</span></label>
-            <label class="chk"><input type="checkbox" data-field="workforce"><span>Workforce (number of people needed)</span></label>
+            <label class="chk"><input type="checkbox" data-field="workforce"><span>Manpower (number of people needed)</span></label>
             <label class="chk"><input type="checkbox" data-field="duration"><span>Duration in days</span></label>
             <label class="chk"><input type="checkbox" data-field="progress"><span>Progress percent (Done %)</span></label>
             <label class="chk sub"><input type="checkbox" data-field="progressShow"><span>Show progress on the chart and PDF</span></label>
@@ -1015,7 +1024,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       return { id: typeof o.id === 'string' && o.id ? o.id.slice(0, 40) : uid(), name: clampStr(o.name, 40), color: /^#[0-9a-fA-F]{6}$/.test(o.color || '') ? o.color : '#7C3AED' };
     });
   }
-  /* Workforce = how many people an item needs: a whole number 0 to 9999, or '' when not set. */
+  /* Manpower = how many people an item needs: a whole number 0 to 9999, or '' when not set. */
   function cleanWf(v) { if (v === '' || v == null) return ''; var n = Math.round(Number(v)); return isFinite(n) && n >= 0 ? Math.min(n, 9999) : ''; }
   function cleanTasks(arr) {
     return (Array.isArray(arr) ? arr : []).slice(0, MAX_ROWS).map(function (t) {
@@ -1041,7 +1050,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var act = Math.round(Number(o.sheet)); if (!(act >= 0 && act < sheets.length)) act = 0;
     return bindSheet({
       title: clampStr(o.title, 80) || 'Untitled project', logo: cleanLogo(o.logo), address: cleanAddr(o.address), legend: cleanLegend(o.legend), signoffs: cleanSign(o.signoffs),
-      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, padBefore: cleanPad(o.padBefore, 2), padAfter: cleanPad(o.padAfter, 4), weekSnap: o.weekSnap !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
+      showToday: o.showToday !== false, showWeekend: o.showWeekend !== false, showActual: o.showActual !== false, showMonthLines: o.showMonthLines !== false, showLegend: o.showLegend !== false, longDays: o.longDays === true, padBefore: cleanPad(o.padBefore, 2), padAfter: cleanPad(o.padAfter, 4), weekSnap: o.weekSnap !== false, bwSafe: o.bwSafe !== false, scale: o.scale === 'week' ? 'week' : 'day',
       sort: ['manual', 'person', 'start'].indexOf(o.sort) >= 0 ? o.sort : 'manual',
       view: o.view === 'board' ? 'board' : 'timeline',
       fields: fields, persons: cleanPeople(o.persons), sheets: sheets, sheet: act
@@ -1053,7 +1062,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     syncSheet();
     return {
       app: 'barline', type: 'chart', version: 2, title: state.title, logo: state.logo || '', address: state.address || '', legend: state.legend || [], signoffs: state.signoffs,
-      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, padBefore: padB(), padAfter: padA(), weekSnap: state.weekSnap !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
+      showToday: state.showToday !== false, showWeekend: state.showWeekend !== false, showActual: state.showActual !== false, showMonthLines: state.showMonthLines !== false, showLegend: state.showLegend !== false, longDays: state.longDays === true, padBefore: padB(), padAfter: padA(), weekSnap: state.weekSnap !== false, bwSafe: state.bwSafe !== false, scale: state.scale, sort: state.sort || 'manual', view: state.view || 'timeline', fields: Object.assign({}, state.fields),
       persons: exportPersons(), sheet: state.sheet,
       sheets: state.sheets.map(function (sh) { return { name: sh.name, tasks: sh.tasks.map(exportTask), milestones: sh.milestones }; }),
       tasks: state.tasks.map(exportTask), milestones: state.milestones
@@ -1120,7 +1129,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   /* ---------- sign-off boxes ---------- */
   /* Each box is optional. state.signoffs = { prepared: {on, name, date}, checked: {...}, approved: {...} }.
      The PDF prints every box that is ON with blank space above the line for a handwritten signature. */
-  var SIGNS = [['prepared', 'Prepared by'], ['checked', 'Checked by'], ['approved', 'Approved by'], ['acknowledged', 'Acknowledged by']];
+  var SIGNS = [['prepared', 'Prepared by'], ['checked', 'Checked by'], ['approved', 'Approved by'], ['acknowledged', 'Customer Acknowledge']];
   var ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
   function validIso(d) { return typeof d === 'string' && ISO_RE.test(d) && !isNaN(Date.parse(d)) ? d : ''; }
   function defaultSign() { var o = {}; SIGNS.forEach(function (s) { o[s[0]] = { on: false, name: '', date: '' }; }); return o; }
@@ -1399,7 +1408,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     return '<div class="irow' + (rowBad(t) ? ' bad' : '') + '" data-i="' + i + '">' +
       '<button type="button" class="idx" data-drag="1" title="Drag to move this item (or press the up and down arrow keys)" aria-label="Item ' + n + '. Drag to move, or press the up and down arrow keys.">' + n + '</button>' +
       '<label class="cell c-name"><span class="lbl">Task</span><input data-f="name" value="' + esc(t.name) + '" maxlength="120" placeholder="Task name" aria-label="Task name, item ' + n + '"></label>' +
-      (f.workforce ? '<label class="cell"><span class="lbl">Workforce</span><input type="number" min="0" max="9999" step="1" inputmode="numeric" data-f="wf" value="' + esc(t.wf === 0 || t.wf ? t.wf : '') + '" placeholder="0" aria-label="Workforce, item ' + n + '"></label>' : '') +
+      (f.workforce ? '<label class="cell"><span class="lbl">Manpower</span><input type="number" min="0" max="9999" step="1" inputmode="numeric" data-f="wf" value="' + esc(t.wf === 0 || t.wf ? t.wf : '') + '" placeholder="0" aria-label="Manpower, item ' + n + '"></label>' : '') +
       (f.assignee ? '<div class="cell"><span class="lbl">Assignees</span><button type="button" class="assign-btn" data-act="assign" aria-haspopup="dialog" aria-expanded="false">' + assignInner(t, n) + '</button></div>' : '') +
       '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan start' : 'Start') + '</span><input type="date" data-f="start" value="' + esc(t.start) + '" min="1990-01-01" max="2100-12-31" aria-label="Start date, item ' + n + '"></label>' +
       '<label class="cell"><span class="lbl">' + (state.showActual !== false ? 'Plan end' : 'End') + '</span><input type="date" data-f="end" value="' + esc(t.end) + '" min="1990-01-01" max="2100-12-31" aria-label="End date, item ' + n + '"></label>' +
@@ -1421,7 +1430,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var tpl = cols.map(function (c) { return c[1] ? 'minmax(' + c[0] + 'px,' + c[1] + 'fr)' : c[0] + 'px'; }).join(' ');
     var minW = cols.reduce(function (a, c) { return a + c[0]; }, 0) + (cols.length - 1) * 8 + 16;
     var heads = ['', 'Task'];
-    if (f.workforce) heads.push('Workforce');
+    if (f.workforce) heads.push('Manpower');
     if (f.assignee) heads.push('Assignees');
     if (state.showActual !== false) heads.push('Plan start', 'Plan end', 'Actual start', 'Actual end', 'Delay note'); else heads.push('Start', 'End');
     if (f.duration) heads.push('Days');
@@ -1490,6 +1499,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     if (pe != null) { var ed = a.open ? today - pe : a.e - pe; if (ed > 0) parts.push((a.open ? 'overdue +' : 'finish +') + ed + 'd'); }
     return parts.length ? 'DELAY: ' + parts.join(', ') : 'DELAY';
   }
+  var DAY3 = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   function padB() { var v = state.padBefore; return v == null ? 2 : v; }
   function padA() { var v = state.padAfter; return v == null ? 4 : v; }
   function chartRange(min, max) {
@@ -1547,9 +1557,10 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     }
     var days = '', stripes = '';
     if (scale === 'day') {
+      var longD = state.longDays === true && dw >= 24;
       for (var n = rs; n <= re; n++) {
         var k = wd(n);
-        days += '<div class="g-dc' + (showW && k >= 5 ? (k === 5 ? ' sat we' : ' sun we') : '') + (showT && n === today ? ' now' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + 'MTWTFSS'[k] + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
+        days += '<div class="g-dc' + (showW && k >= 5 ? (k === 5 ? ' sat we' : ' sun we') : '') + (showT && n === today ? ' now' : '') + (longD ? ' long' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"><span>' + (longD ? DAY3[k] : 'MTWTFSS'[k]) + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
         if (showW && k >= 5) stripes += '<div class="stripe ' + (k === 5 ? 'sat' : 'sun') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>';
       }
     } else {
@@ -1573,7 +1584,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       var act = showA ? actualOf(t, today) : null, wfv = f.workforce ? wfOf(t) : null, xcol = f.workforce || showA;
       names += '<div class="g-nrow' + (t.id === sel ? ' sel' : '') + (xcol ? ' x' : '') + '" data-id="' + esc(t.id) + '" role="button" tabindex="0" aria-label="Show details for ' + esc(t.name || 'item ' + (r.i + 1)) + '"' + (f.notes && t.notes ? ' title="' + esc(t.notes) + '"' : '') + '><div class="g-no">' + (r.i + 1) + '</div>' + av +
         '<div class="g-nm"><div class="g-t' + (t.name ? '' : ' ph') + '">' + esc(t.name || 'Item ' + (r.i + 1)) + '</div><div class="g-ds' + (bad ? ' bad' : '') + '">' + meta + '</div></div>' +
-        (f.workforce ? '<div class="g-wfc">' + (wfv != null ? '<span class="wf" title="Workforce: ' + wfv + (wfv === 1 ? ' person' : ' people') + '">' + wfv + '</span>' : '<span class="wfe">-</span>') + '</div>' : '') +
+        (f.workforce ? '<div class="g-wfc">' + (wfv != null ? '<span class="wf" title="Manpower: ' + wfv + (wfv === 1 ? ' person' : ' people') + '">' + wfv + '</span>' : '<span class="wfe">-</span>') + '</div>' : '') +
         (showA ? '<div class="g-pa"><span class="pc" title="Plan">P</span><span class="pc" title="Actual">A</span></div>' : '') + '</div>';
       var pTop = 1, pH = showA ? RH / 2 - 1 : RH - 3, nm0 = t.name || 'Item ' + (r.i + 1);
       if (r.ok) {
@@ -1617,7 +1628,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 
     el.style.setProperty('--nx', (34 + (f.workforce ? 72 : 0) + (showA ? 24 : 0)) + 'px');
     el.style.setProperty('--dw', dw + 'px'); el.style.setProperty('--cell', cell + 'px');
-    el.innerHTML = '<div class="g-names"><div class="g-corner"><div class="g-noh">No.</div><div class="cl"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + (f.workforce ? '<div class="g-wfh">Workforce</div>' : '') + (showA ? '<div class="g-pah"></div>' : '') + '</div>' + msNames + names + '</div>' +
+    el.innerHTML = '<div class="g-names"><div class="g-corner"><div class="g-noh">No.</div><div class="cl"><span>Item</span><span>' + (rows.length === all.length ? rows.length : rows.length + ' of ' + all.length) + '</span></div>' + (f.workforce ? '<div class="g-wfh">Manpower</div>' : '') + (showA ? '<div class="g-pah"></div>' : '') + '</div>' + msNames + names + '</div>' +
       '<div class="g-canvas" style="width:' + total * dw + 'px"><div class="g-head"><div class="g-months">' + months + '</div><div class="g-days">' + days + '</div></div>' +
       msBand + '<div class="g-body' + (showA ? ' pa2' : '') + '" style="height:' + rows.length * RH + 'px">' + stripes + mlines + line + bars + '</div></div>';
     el.scrollLeft = sl; el.scrollTop = stp;
@@ -1722,6 +1733,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   $('#padB').addEventListener('change', function (e) { state.padBefore = cleanPad(e.target.value, 2); e.target.value = state.padBefore; changed(); });
   $('#padA').addEventListener('change', function (e) { state.padAfter = cleanPad(e.target.value, 4); e.target.value = state.padAfter; changed(); });
   $('#weekSnap').addEventListener('change', function (e) { state.weekSnap = e.target.checked; changed(); });
+  $('#longDays').addEventListener('change', function (e) { state.longDays = e.target.checked; changed(); });
   $('#showLegend').addEventListener('change', function (e) { state.showLegend = e.target.checked; changed(); });
   $('#showMonthLines').addEventListener('change', function (e) { state.showMonthLines = e.target.checked; changed(); });
   $('#bwSafe').addEventListener('change', function (e) { state.bwSafe = e.target.checked; touch(); });
@@ -1791,7 +1803,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   var sel = null;
 
   var WF_RANGES = {
-    all: { label: 'All workforce' },
+    all: { label: 'All manpower' },
     none: { label: 'Not set', test: function (n) { return n == null; } },
     '1-2': { label: '1 to 2 people', test: function (n) { return n != null && n >= 1 && n <= 2; } },
     '3-5': { label: '3 to 5 people', test: function (n) { return n != null && n >= 3 && n <= 5; } },
@@ -1852,7 +1864,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     wfEl.innerHTML = Object.keys(WF_RANGES).map(function (k) { return '<option value="' + k + '">' + WF_RANGES[k].label + ' (' + wc[k] + ')</option>'; }).join('');
     if (!WF_RANGES[state.wfFilter]) state.wfFilter = 'all';
     wfEl.value = f.workforce ? state.wfFilter : 'all'; wfEl.disabled = !f.workforce;
-    wfEl.title = f.workforce ? '' : 'Turn on the Workforce field to filter by it.';
+    wfEl.title = f.workforce ? '' : 'Turn on the Manpower field to filter by it.';
   }
   $('#sortBy').addEventListener('change', function (e) { state.sort = e.target.value; renderChart(); persist(); });
   $('#filterBy').addEventListener('change', function (e) { state.filter = e.target.value; renderChart(); persist(); });
@@ -1913,7 +1925,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     $('#detailBody').innerHTML =
       '<div><div class="d-eyebrow">Item ' + (idx + 1) + ' of ' + state.tasks.length + '</div>' +
       '<div class="d-title"><h3>' + esc(t.name || 'Untitled item') + '</h3><span class="status ' + cls + '">' + st + '</span></div></div>' +
-      '<dl class="d-grid">' + ddRow('Assigned to', who) + ddRow('Dates', dates) + (state.showActual !== false ? ddRow('Actual', actTxt) : '') + (f.workforce && wfOf(t) != null ? ddRow('Workforce', plural(wfOf(t), 'person').replace('persons', 'people')) : '') + ddRow('Length', len) + ddRow('Timing', timing) + ddRow('Board column', STATUS_LABEL[t.status || 'todo']) +
+      '<dl class="d-grid">' + ddRow('Assigned to', who) + ddRow('Dates', dates) + (state.showActual !== false ? ddRow('Actual', actTxt) : '') + (f.workforce && wfOf(t) != null ? ddRow('Manpower', plural(wfOf(t), 'person').replace('persons', 'people')) : '') + ddRow('Length', len) + ddRow('Timing', timing) + ddRow('Board column', STATUS_LABEL[t.status || 'todo']) +
       (showP ? '<div class="wide"><dt class="lbl">Progress</dt><dd>' + prog + '</dd></div>' : '') +
       '<div class="wide"><dt class="lbl">Notes</dt><dd>' + notes + '</dd></div></dl>' + more;
     box.hidden = false;
@@ -2414,8 +2426,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       msH = msH || 0;
       var yS = top + HEAD, y0 = yS + msH, bodyH = Math.max(chunk.length, 1) * RH, yEnd = y0 + bodyH, d, dt, k, d2;
       fill([243, 245, 248]); doc.rect(M, top, NAMEW + GRID, HEAD, 'F');
-      font('bold', 6); color(MUTED); font('bold', 5); doc.text('NO.', M + NOW / 2, top + HEAD - 2.2, { align: 'center' }); font('bold', 6); doc.text('ITEM', M + NOW + (NAMEW - NOW - WFW - PAW) / 2, top + HEAD - 2.2, { align: 'center' });
-      if (WFW) { font('bold', 5); doc.text('WORKFORCE', GX - PAW - WFW / 2, top + HEAD - 2.2, { align: 'center' }); }
+      color(INK); font('bold', 6.5); doc.text('NO.', M + NOW / 2, top + HEAD / 2, { align: 'center', baseline: 'middle' }); font('bold', 9); doc.text('ITEM', M + NOW + (NAMEW - NOW - WFW - PAW) / 2, top + HEAD / 2, { align: 'center', baseline: 'middle' });
+      if (WFW) { font('bold', 5.6); doc.text('MANPOWER', GX - PAW - WFW / 2, top + HEAD / 2, { align: 'center', baseline: 'middle' }); }
 
       if (showW && DW >= 1) {
         for (d = rs; d <= re; d++) {
@@ -2432,9 +2444,9 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         var nm = Date.UTC(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 1) / DAY, end = Math.min(re + 1, nm);
         var mx = GX + (d - rs) * DW, mw = (end - d) * DW;
         stroke([31, 41, 51], 0.3); doc.line(mx, top, mx, top + 5.2);
-        var lab = mw >= 16 ? dt.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' })
+        var lab = mw >= 19 ? dt.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' })
           : mw >= 7 ? dt.toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }) : '';
-        if (lab) { font('bold', 6.5); color(INK); doc.text(pdfTxt(lab), mx + mw / 2, top + 3.6, { align: 'center' }); }
+        if (lab) { font('bold', 8.2); color(INK); doc.text(pdfTxt(lab), mx + mw / 2, top + 3.6, { align: 'center' }); }
         d = end;
       }
       stroke([31, 41, 51], 0.3); doc.line(GX, top + 5.2, GX + GRID, top + 5.2); doc.line(M, yS, GX + GRID, yS);
@@ -2445,7 +2457,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           var cx = GX + (d - rs) * DW + DW / 2, isT = showT && d === today, num = String(new Date(d * DAY).getUTCDate());
           color(isT ? RED : (showW && k === 5 ? SATINK : showW && k === 6 ? SUNINK : INK));
           if (DW >= 4.8) {
-            font('normal', 5.2); doc.text('MTWTFSS'.charAt(k), cx, top + 7.4, { align: 'center' });
+            font('normal', 5.2); doc.text(state.longDays === true && DW >= 6.6 ? DAY3[k] : 'MTWTFSS'.charAt(k), cx, top + 7.4, { align: 'center' });
             font(isT ? 'bold' : 'normal', 6.3); doc.text(num, cx, top + 10.4, { align: 'center' });
           } else {
             font(isT ? 'bold' : 'normal', 6); doc.text(num, cx, top + 9.4, { align: 'center' });
@@ -2748,7 +2760,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
   function renderAll() {
     $('#chartTitle').value = state.title === 'Untitled project' ? '' : state.title;
     renderLogo(); renderSigns(); renderMilestones(); renderSheets(); renderLegendEditor();
-    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#padB').value = padB(); $('#padA').value = padA(); $('#weekSnap').checked = state.weekSnap !== false; $('#bwSafe').checked = state.bwSafe !== false;
+    $('#showToday').checked = state.showToday !== false; $('#showWeekend').checked = state.showWeekend !== false; $('#showActual').checked = state.showActual !== false; $('#showMonthLines').checked = state.showMonthLines !== false; $('#showLegend').checked = state.showLegend !== false; $('#longDays').checked = state.longDays === true; $('#padB').value = padB(); $('#padA').value = padA(); $('#weekSnap').checked = state.weekSnap !== false; $('#bwSafe').checked = state.bwSafe !== false;
     $('#address').value = state.address || ''; $('#updated').textContent = 'Last updated: ' + fmtStamp(OPENED);
     var r = $('input[name="scale"][value="' + state.scale + '"]'); if (r) r.checked = true;
     var rv = $('input[name="view"][value="' + (state.view || 'timeline') + '"]'); if (rv) rv.checked = true;
@@ -2842,7 +2854,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
     var c = cleanChart(data);
     withUndo(function () {
       var res = mergePeople(c.persons);
-      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.padBefore = c.padBefore; state.padAfter = c.padAfter; state.weekSnap = c.weekSnap; state.bwSafe = c.bwSafe;
+      state.title = c.title; state.logo = c.logo; state.address = c.address; state.legend = c.legend; state.signoffs = c.signoffs; state.showToday = c.showToday; state.showWeekend = c.showWeekend; state.showActual = c.showActual; state.showMonthLines = c.showMonthLines; state.showLegend = c.showLegend; state.longDays = c.longDays; state.padBefore = c.padBefore; state.padAfter = c.padAfter; state.weekSnap = c.weekSnap; state.bwSafe = c.bwSafe;
       state.scale = c.scale; state.fields = c.fields; state.sort = c.sort; state.view = c.view; state.filter = 'all'; state.wfFilter = 'all'; sel = null;
       c.sheets.forEach(function (sh) { sh.tasks.forEach(function (t) { t.assignees = t.assignees.map(function (id) { return res.idMap[id]; }).filter(Boolean); }); });
       state.sheets = c.sheets; state.sheet = c.sheet; bindSheet(state);

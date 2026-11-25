@@ -301,6 +301,7 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; a
         <button type="button" class="btn" id="dApply">Fill date lines</button>
         <p class="subtle" style="flex:1 1 220px">Writes the date, like 12th – 13th September 2026, into every line below whose label has the word DATE.</p>
       </div>
+      <label class="msdone"><input type="checkbox" id="coverFit"> Fit the cover to the page <span class="subtle">(enlarges the title and lines to fill the empty space)</span></label>
       <div class="lbl">Lines under the title</div>
       <div class="stack" id="metaList" style="gap:8px"></div>
       <div class="chips" id="metaChips"></div>
@@ -472,7 +473,7 @@ const META_CHIPS = ['Customer', 'Date of service', 'Date of project', 'PIC', 'Se
 const INFO_CHIPS = ['Project', 'Date', 'Plant', 'Area', 'Section', 'Job scope'];
 const SEC_NAMES = { text: 'Text', bullets: 'Bullet list', table: 'Table', photos: 'Photos', beforeafter: 'Before / after', findings: 'Findings with photos' };
 
-let S = { company: clone(DEFAULT_COMPANY), signoff: clone(DEFAULT_SIGN), title: '', meta: [], info: [], sections: [] };
+let S = { coverFit: false, company: clone(DEFAULT_COMPANY), signoff: clone(DEFAULT_SIGN), title: '', meta: [], info: [], sections: [] };
 try { const t = JSON.parse(localStorage.getItem('rb_template') || 'null'); if (t && t.company) { S.company = t.company; S.signoff = t.signoff || S.signoff; } } catch (e) {}
 function saveTplLocal() { try { localStorage.setItem('rb_template', JSON.stringify({ company: S.company, signoff: S.signoff })); } catch (e) {} }
 
@@ -540,7 +541,7 @@ function move(arr, i, d) { const j = i + d; if (j < 0 || j >= arr.length) return
 
 function undoable(msg, prev, restore) { toast(msg, { undo: () => { restore(prev); } }); }
 let hist = null;
-function snapshot() { return clone({ title: S.title, meta: S.meta, info: S.info, sections: S.sections, signoff: S.signoff }); }
+function snapshot() { return clone({ coverFit: S.coverFit, title: S.title, meta: S.meta, info: S.info, sections: S.sections, signoff: S.signoff }); }
 function restore(snap) { Object.assign(S, clone(snap)); renderAll(); }
 
 /* ---------- header / company ---------- */
@@ -800,7 +801,8 @@ document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click',
 }));
 
 /* ---------- top-level actions ---------- */
-function renderAll() { renderCompany(); renderMeta(); renderInfo(); renderSigns(); renderSections(); schedulePreview(); scheduleDraft(); }
+function renderAll() { $('#coverFit').checked = !!S.coverFit; renderCompany(); renderMeta(); renderInfo(); renderSigns(); renderSections(); schedulePreview(); scheduleDraft(); }
+$('#coverFit').addEventListener('change', e => { S.coverFit = e.target.checked; touch(); });
 $('#layBtn').addEventListener('click', () => {
   const p = snapshot(); const L = layout($('#layout').value);
   S.meta = L.meta; S.info = L.info; S.sections = L.sections; touch(); renderAll();
@@ -815,11 +817,51 @@ $('#upData').addEventListener('change', e => { const f = e.target.files[0]; e.ta
   readJson(f, d => {
     if (d.kind === 'report-template') return toast('That is a template. Use Load template instead.', { error: true });
     if (d.kind !== 'report-data') return toast('That file is not saved report data.', { error: true });
-    const p = snapshot(); S.company = d.company || S.company; S.signoff = d.signoff || S.signoff; S.title = d.title || ''; S.meta = d.meta || []; S.info = d.info || []; S.sections = (d.sections || []);
+    const p = snapshot(); S.company = d.company || S.company; S.signoff = d.signoff || S.signoff; S.title = d.title || ''; S.coverFit = !!d.coverFit; S.meta = d.meta || []; S.info = d.info || []; S.sections = (d.sections || []);
     saveTplLocal(); renderAll(); undoable('Data loaded', p, restore);
   }); });
 $('#upTpl').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   readJson(f, d => { if (d.kind !== 'report-template') return toast('That file is not a template.', { error: true }); S.company = d.company; S.signoff = d.signoff; saveTplLocal(); renderCompany(); renderSigns(); toast('Template loaded.'); }); });
+
+/* ---- cover page: one description used by the preview, the PDF and the Word file ---- */
+function coverSpec(S, f) {
+  const sc = n => Math.round(n * f.s), out = [];
+  out.push({ t: S.title || 'Report', o: { sz: sc(44), before: Math.round(1000 * f.s), after: Math.round(700 * f.s) + f.gap, line: 260 } });
+  S.meta.filter(r => r.label.trim() || r.value.trim()).forEach(r => {
+    const lab = r.label.trim() ? r.label.trim() + ':' : '', lines = cleanTxt(r.value).split('\n'), z = sc(22);
+    if (lines.length > 1) {
+      out.push({ t: lab, o: { sz: z, after: 60, keepNext: 1 } });
+      lines.forEach((l, k) => out.push({ t: l, o: { sz: z, ind: [567, 0], after: k === lines.length - 1 ? Math.round(200 * f.s) + f.gap : 40 } }));
+    } else out.push({ t: (lab ? lab + ' ' : '') + r.value.trim(), o: { sz: z, after: Math.round(200 * f.s) + f.gap } });
+  });
+  return out;
+}
+/* "Fit the cover to the page": find the text size and spacing that fill the room above the sign-off boxes */
+function coverFitParams(S) {
+  const base = { s: 1, gap: 0 };
+  if (!S.coverFit) return base;
+  const host = hostEl(), tmp = document.createElement('div'); host.append(tmp);
+  try {
+    const pg = mkPage(S.company); tmp.append(pg);
+    const body = pg.querySelector('.dbody'), fc = pg.querySelector('.fc'), fh = pg.querySelector('.dft').offsetHeight;
+    const bodyH = PGH - TOPPX - Math.max(96, fh + 24 + 14); body.style.height = bodyH + 'px';
+    const st = signTable(S); let signH = 0; if (st) { st.classList.add('dsign'); body.append(st); signH = st.offsetHeight; }
+    const avail = bodyH - signH - 36;
+    const heightAt = f => { fc.innerHTML = ''; coverSpec(S, f).forEach(x => fc.append(P(x.t, { sans: 1, b: 1, caps: 1, ...x.o }))); return fc.offsetHeight; };
+    if (heightAt(base) >= avail) return base;
+    let lo = 1, hi = 1.6; for (let i = 0; i < 10; i++) { const m = (lo + hi) / 2; if (heightAt({ s: m, gap: 0 }) <= avail) lo = m; else hi = m; }
+    const f = { s: Math.floor(lo * 100) / 100, gap: 0 }, left = avail - heightAt(f), n = S.meta.filter(r => r.label.trim() || r.value.trim()).length + 1;
+    f.gap = Math.max(0, Math.min(900, Math.floor(left * 15 / n)));
+    return f;
+  } finally { tmp.remove(); }
+}
+function signTable(S) {
+  const boxes = S.signoff.filter(s => s.label.trim() || s.name.trim()); if (!boxes.length) return null;
+  const W2 = 9893, cw = Math.floor(W2 / boxes.length), ws = boxes.map(() => cw); ws[ws.length - 1] += W2 - cw * boxes.length;
+  const t = TBL(ws), cp = x => P(x, { sans: 1, sz: 16, caps: 1, jc: 'center', before: 30, after: 30 });
+  t.append(TR(boxes.map((b, i) => TD(ws[i], [cp(b.label)]))), TR(boxes.map((b, i) => TD(ws[i], [cp(b.name)], { h: 1500, va: 'bottom' }))));
+  return t;
+}
 
 /* ---- photo frames: every photo in a group gets the same fixed frame ---- */
 function frameCm(cols, cwTw) { return [cwTw / 567 - 0.5, cols === 1 ? 11 : cols === 2 ? 6.2 : 4.2]; }
@@ -902,15 +944,7 @@ function buildDocx(S) {
   const T = { font: TNR, sz: 22 };
   const body = [];
   /* ---- cover ---- */
-  body.push(para(runs(S.title || 'Report', { font: ARI, b: 1, sz: 44, caps: 1 }), { before: 1000, after: 700, line: 260 }));
-  S.meta.filter(r => r.label.trim() || r.value.trim()).forEach(r => {
-    const lab = r.label.trim() ? r.label.trim() + ':' : '';
-    const lines = cleanTxt(r.value).split('\n');
-    if (lines.length > 1) {
-      body.push(para(runs(lab, { font: ARI, b: 1, sz: 22, caps: 1 }), { after: 60, keepNext: 1 }));
-      lines.forEach((l, k) => body.push(para(runs(l, { font: ARI, b: 1, sz: 22, caps: 1 }), { ind: [567, 0], after: k === lines.length - 1 ? 200 : 40 })));
-    } else body.push(para(runs((lab ? lab + ' ' : '') + r.value.trim(), { font: ARI, b: 1, sz: 22, caps: 1 }), { after: 200 }));
-  });
+  coverSpec(S, coverFitParams(S)).forEach(x => body.push(para(runs(x.t, { font: ARI, b: 1, sz: x.o.sz, caps: 1 }), { before: x.o.before, after: x.o.after, line: x.o.line, ind: x.o.ind, keepNext: x.o.keepNext })));
   const boxes = S.signoff.filter(s => s.label.trim() || s.name.trim());
   if (boxes.length) {
     const cw = Math.floor(W / boxes.length), ws = boxes.map(() => cw); ws[ws.length - 1] += W - cw * boxes.length;
@@ -1189,19 +1223,10 @@ function renderDoc(S) {
   const host = hostEl(); host.innerHTML = '';
   const C = S.company, F = new Flow(host, C), fc0 = F.fc, W2 = 9893;
   /* cover page */
-  fc0.append(P(S.title || 'Report', { sans: 1, b: 1, sz: 44, caps: 1, before: 1000, after: 700, line: 260 }));
-  S.meta.filter(r => r.label.trim() || r.value.trim()).forEach(r => {
-    const lab = r.label.trim() ? r.label.trim() + ':' : '', lines = cleanTxt(r.value).split('\n'), o = { sans: 1, b: 1, sz: 22, caps: 1 };
-    if (lines.length > 1) { fc0.append(P(lab, { ...o, after: 60 })); lines.forEach((l, k) => fc0.append(P(l, { ...o, ind: [567, 0], after: k === lines.length - 1 ? 200 : 40 }))); }
-    else fc0.append(P((lab ? lab + ' ' : '') + r.value.trim(), { ...o, after: 200 }));
-  });
-  const boxes = S.signoff.filter(s => s.label.trim() || s.name.trim());
-  if (boxes.length) {
-    const cw = Math.floor(W2 / boxes.length), ws = boxes.map(() => cw); ws[ws.length - 1] += W2 - cw * boxes.length;
-    const t = TBL(ws), cp = x => P(x, { sans: 1, sz: 16, caps: 1, jc: 'center', before: 30, after: 30 });
-    t.append(TR(boxes.map((b, i) => TD(ws[i], [cp(b.label)]))), TR(boxes.map((b, i) => TD(ws[i], [cp(b.name)], { h: 1500, va: 'bottom' }))));
-    t.classList.add('dsign'); F.cur.querySelector('.dbody').append(t);
-  }
+  const cf = coverFitParams(S);
+  coverSpec(S, cf).forEach(x => fc0.append(P(x.t, { sans: 1, b: 1, caps: 1, ...x.o })));
+  const st = signTable(S);
+  if (st) { st.classList.add('dsign'); F.cur.querySelector('.dbody').append(st); }
   const T = { sz: 22 };
   const info = S.info.filter(r => r.label.trim() || r.value.trim());
   if (info.length) {
@@ -1428,7 +1453,7 @@ async function saveDraft() {
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && draftReady && draftTimer) saveDraft(); });
 function normalise(d) {
-  return { company: { ...DEFAULT_COMPANY, ...(d.company || {}) }, signoff: Array.isArray(d.signoff) ? d.signoff : clone(DEFAULT_SIGN), title: d.title || '',
+  return { company: { ...DEFAULT_COMPANY, ...(d.company || {}) }, signoff: Array.isArray(d.signoff) ? d.signoff : clone(DEFAULT_SIGN), title: d.title || '', coverFit: !!d.coverFit,
     meta: Array.isArray(d.meta) ? d.meta : [], info: Array.isArray(d.info) ? d.info : [], sections: Array.isArray(d.sections) ? d.sections : [] };
 }
 $('#newBtn').addEventListener('click', () => {

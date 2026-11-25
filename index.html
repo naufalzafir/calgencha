@@ -30,6 +30,8 @@
   --teal-soft: #D8F1EE;
   --violet: #6D28D9;
   --violet-soft: #EFE9FC;
+  --amber: #B45309;
+  --amber-soft: #FBEBD3;
   --accent: #2347C8;
   --on-accent: #FFFFFF;
   --over: #C2410C;
@@ -53,6 +55,8 @@
     --teal-soft: #123D38;
     --violet: #A78BFA;
     --violet-soft: #2A2347;
+    --amber: #FBBF24;
+    --amber-soft: #3A2D12;
     --accent: #8AA4FF;
     --on-accent: #0B1226;
     --over: #FB923C;
@@ -105,6 +109,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-stretch: 125%; fon
 }
 .card.teal { --a: var(--teal); --soft: var(--teal-soft); }
 .card.violet { --a: var(--violet); --soft: var(--violet-soft); }
+.card.amber { --a: var(--amber); --soft: var(--amber-soft); }
 .card:hover { border-color: var(--a); transform: translateY(-2px); }
 .card:focus-visible { outline: 3px solid var(--a); outline-offset: 3px; }
 .art { background: var(--soft); border-radius: 8px; line-height: 0; overflow: hidden; }
@@ -254,6 +259,30 @@ h2 { font-family: var(--font-display); font-weight: 700; font-stretch: 112%; fon
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
             </span>
             <span class="file">HabitTracker.html</span>
+          </div>
+        </a>
+      </li>
+
+      <li>
+        <a class="card amber" href="report.html">
+          <div class="art" aria-hidden="true">
+            <svg viewBox="0 0 320 120" focusable="false">
+              <rect class="fl" x="24" y="12" width="120" height="14" rx="4"/>
+              <rect class="tr" x="24" y="34" width="150" height="8" rx="4"/><rect class="tr" x="24" y="50" width="130" height="8" rx="4"/>
+              <rect class="tr" x="24" y="66" width="150" height="8" rx="4"/><rect class="tr" x="24" y="82" width="90" height="8" rx="4"/>
+              <rect class="tr" x="196" y="12" width="100" height="96" rx="8"/>
+              <path class="fl" d="M204 100l28-34 18 20 14-14 22 28z"/><circle class="fl" cx="272" cy="36" r="9"/>
+            </svg>
+          </div>
+          <div class="body">
+            <h2>Report Builder</h2>
+            <p>Write service, inspection and project reports with photos. Save as Word or PDF.</p>
+          </div>
+          <div class="foot">
+            <span class="open">Open
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </span>
+            <span class="file">report.html</span>
           </div>
         </a>
       </li>

@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Report Builder</title>
+<meta name="theme-color" content="#2347C8">
+<meta name="description" content="Build service, inspection and project reports with photos, preview them live and save as Word or PDF. Runs in your browser.">
+<link rel="manifest" href="report.webmanifest">
+<link rel="icon" href="icons/report-icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/report-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Reports">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+:root {
+  --bg: #EDF0F4; --surface: #FFFFFF; --surface-2: #F5F7FA; --ink: #141B24; --muted: #586474;
+  --line: #D6DCE4; --rowline: #B4BDCA; --accent: #2347C8; --on-accent: #FFFFFF;
+  --ok: #166534; --bad: #C62828; --shadow: 0 1px 2px rgba(20, 27, 36, 0.06);
+  --font-display: 'Archivo', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1319; --surface: #161D26; --surface-2: #1C2530; --ink: #E8EDF3; --muted: #94A1B1;
+    --line: #2B3644; --rowline: #4B5666; --accent: #8AA4FF; --on-accent: #0B1226;
+    --ok: #3FAE6A; --bad: #FF8A80; --shadow: none; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1319; --surface: #161D26; --surface-2: #1C2530; --ink: #E8EDF3; --muted: #94A1B1;
+  --line: #2B3644; --rowline: #4B5666; --accent: #8AA4FF; --on-accent: #0B1226;
+  --ok: #3FAE6A; --bad: #FF8A80; --shadow: none; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.45; }
+h1, h2, h3, p, ul, fieldset { margin: 0; padding: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.app { max-width: 1100px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 48px; display: flex; flex-direction: column; gap: 16px; }
+
+.sitebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.home { display: inline-flex; align-items: center; gap: 8px; padding: 4px 0; color: var(--muted); text-decoration: none; font-weight: 600; font-size: 13px; }
+.home svg { width: 20px; height: 20px; color: var(--accent); }
+.home:hover { color: var(--ink); }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; }
+.brand h1 { font-family: var(--font-display); font-weight: 800; font-stretch: 125%; font-size: 24px; letter-spacing: -0.01em; line-height: 1.05; }
+.brand p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.hint { color: var(--muted); font-size: 12.5px; max-width: 46ch; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); font-weight: 600; font-size: 13px; line-height: 1.2; cursor: pointer; white-space: nowrap; transition: background .12s, border-color .12s; }
+.btn:hover { background: var(--surface-2); border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.btn.primary:hover { background: var(--accent); filter: brightness(1.08); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn svg { width: 15px; height: 15px; flex: none; }
+.btn:focus-within, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.icon-btn { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-size: 14px; }
+.icon-btn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+.icon-btn:disabled { opacity: .3; cursor: default; }
+.icon-btn svg { width: 15px; height: 15px; }
+input, select, textarea { width: 100%; min-width: 0; min-height: 34px; padding: 6px 9px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; }
+textarea { resize: vertical; line-height: 1.35; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+input[type="number"], input[type="date"] { font-family: var(--font-mono); font-size: 13px; }
+input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; accent-color: var(--accent); }
+::placeholder { color: var(--muted); opacity: .8; }
+.lbl { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 12px 16px; }
+.panel-head h2 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.count { font: 600 11px var(--font-mono); color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 0 7px; }
+.panel-body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+
+/* header block: logo, company, title */
+.titlebox { flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.logo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.logo-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 160px; min-width: 176px; align-self: stretch; max-width: 220px; padding: 4px 12px; border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+.logo-btn:hover { border-color: var(--muted); color: var(--ink); }
+.logo-btn.has { position: relative; width: 176px; max-width: none; border-style: solid; padding: 0; }
+.logo-btn img { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); max-width: none; object-fit: contain; }
+.linkbtn { background: none; border: 0; padding: 6px 2px; min-height: 36px; color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; }
+.linkbtn:hover { color: var(--ink); }
+.co { width: 320px; max-width: 100%; align-self: stretch; display: flex; flex-direction: column; gap: 2px; padding: 6px 8px; border: 1.5px dashed var(--line); border-radius: 8px; }
+.co:hover { border-color: var(--muted); }
+.co textarea { min-height: 0; overflow: hidden; line-height: 1.35; width: 100%; border: 0; border-bottom: 1px solid transparent; background: transparent; font-size: 13px; padding: 3px 2px; resize: none; border-radius: 0; }
+.co textarea:hover, .co textarea:focus { border-bottom-color: var(--line); outline: none; }
+.co #coName { font-weight: 700; }
+.co #coReg { color: var(--bad); font-size: 12px; }
+.sbox { display: grid; gap: 4px; width: 176px; padding: 6px 8px 8px; border: 1px solid var(--line); border-radius: 8px; }
+.sbox .shead { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); }
+.sbox textarea { width: 100%; min-height: 34px; padding: 6px 8px; font-size: 13px; line-height: 1.3; resize: none; overflow: hidden; }
+.sbox input { min-height: 34px; padding: 2px 8px; font-size: 13px; }
+.sx { min-width: 32px; min-height: 32px; border: 0; background: none; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; border-radius: 6px; }
+.sx:hover { color: var(--ink); }
+.chip { min-height: 36px; padding: 0 12px; border: 1.5px dashed var(--line); border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; }
+.chip:hover { border-color: var(--muted); color: var(--ink); }
+.title-input { background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 2px 0; min-height: 0; font-family: var(--font-display); font-weight: 800; font-stretch: 125%; font-size: 21px; letter-spacing: -0.01em; }
+.title-input:hover { border-bottom-color: var(--line); }
+.title-input:focus-visible { outline: none; border-bottom-color: var(--accent); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field.wide { grid-column: 1 / -1; }
+
+.viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 0 16px 12px; }
+.msdone { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); cursor: pointer; }
+.msdone.boss { font-weight: 700; }
+.vlbl { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+
+/* items */
+.irows { border-top: 1px solid var(--line); }
+.irow { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 14px 14px; border-bottom: 1px solid var(--rowline); }
+.irow.head { background: var(--surface-2); }
+.ihead { flex: 1 1 100%; display: flex; align-items: center; gap: 6px; }
+.idx { font: 600 11px var(--font-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.ihead .sp { flex: 1; }
+.cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.c-name { flex: 1 1 240px; } .c-qty { flex: 0 0 90px; } .c-uom { flex: 0 0 80px; } .c-money { flex: 0 0 140px; } .c-desc { flex: 1 1 100%; } .c-opt { flex: 1 1 180px; } .c-full { flex: 1 1 100%; }
+.c-qty input, .c-money input { text-align: right; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.thumb { position: relative; width: 86px; height: 64px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface-2); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb button { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; line-height: 1; cursor: pointer; }
+.add-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+
+
+
+/* sign-off panel (bottom of the quotation) */
+.signs { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-left: auto; }
+
+
+
+.sitefoot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.sitefoot a { color: inherit; }
+.toast { position: fixed; z-index: 3000; pointer-events: none; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; }
+.pill { pointer-events: auto; display: flex; align-items: center; gap: 14px; max-width: 520px; padding: 10px 14px; background: var(--ink); color: var(--bg); border-radius: 8px; font-weight: 500; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.toast.error .pill { background: var(--bad); color: #fff; }
+.toast-btn { border: 0; background: transparent; color: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 2px 4px; }
+@media (max-width: 759px) { body, input, select, textarea { font-size: 16px; } .brand h1 { font-size: 22px; } .co { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.titlebox { flex: 1 1 100%; }
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row2 { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.row2 .grow { flex: 1 1 200px; min-width: 0; }
+.lrow { display: grid; grid-template-columns: minmax(110px, 1fr) minmax(0, 3fr) auto; gap: 8px; align-items: start; }
+.lrow textarea { min-height: 34px; }
+.lrow .acts { display: flex; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sec { border-bottom: 1px solid var(--rowline); padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.sec.head { background: var(--surface-2); }
+.sechead { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.sechead .hd { flex: 1 1 220px; min-width: 0; font-weight: 600; }
+.badge { font: 600 11px var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.gbox { border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+.gbox.drag { border-color: var(--accent); background: var(--surface-2); }
+.gtop { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.gtop .field { flex: 1 1 180px; } .gtop .field.sm { flex: 0 0 110px; }
+.pgrid { display: flex; flex-wrap: wrap; gap: 10px; }
+.pcard { width: 148px; display: flex; flex-direction: column; gap: 4px; }
+.pcard .pimg { position: relative; height: 104px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface-2); }
+.pcard .pimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pcard .pimg .pn { position: absolute; left: 4px; top: 4px; font: 600 10px var(--font-mono); background: rgba(0,0,0,.65); color: #fff; padding: 1px 5px; border-radius: 99px; }
+.pcard .pimg .px { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; line-height: 1; cursor: pointer; }
+.pcard .pmv { display: flex; justify-content: space-between; }
+.pcard textarea { min-height: 52px; font-size: 12.5px; padding: 4px 6px; }
+.pcard.empty .pimg { display: grid; place-items: center; border-style: dashed; cursor: pointer; color: var(--muted); font-weight: 600; font-size: 12.5px; background: transparent; }
+.pcard.empty .pimg:hover { border-color: var(--muted); color: var(--ink); }
+.pair { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; padding: 8px; border: 1px solid var(--line); border-radius: 8px; }
+.pair .tag { font: 700 10.5px var(--font-body); letter-spacing: .08em; color: var(--muted); }
+.tscroll { overflow-x: auto; padding-bottom: 4px; }
+.tgrid { display: grid; gap: 6px; min-width: min-content; }
+.tgrid textarea { min-height: 34px; font-size: 13px; padding: 5px 7px; }
+.tgrid .th { font-weight: 700; background: var(--surface); }
+.fcard { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.fcard .fl { flex: 1 1 180px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fcard .fl.wide { flex: 2 1 240px; }
+.subtle { color: var(--muted); font-size: 12.5px; }
+.sbox { width: 190px; }
+.mini { font-size: 12px; min-height: 28px; padding: 3px 8px; }
+.drop-note { color: var(--muted); font-size: 12px; }
+.datebar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; }
+.datebar .field { width: 160px; }
+@media (max-width: 759px) { .lrow { grid-template-columns: 1fr; } .lrow .acts { justify-content: flex-end; } }
+
+.shell { max-width: 1100px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.shell > .app { max-width: none; margin: 0; padding-inline: 0; }
+.pvpane { display: none; position: sticky; top: 12px; height: calc(100vh - 24px); margin-top: 20px; flex-direction: column; overflow: hidden; }
+.pvpages, .svpages { scrollbar-gutter: stable; flex: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 12px; background: var(--bg); border-top: 1px solid var(--line); }
+.pgwrap { flex: none; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); overflow: hidden; }
+@media (min-width: 1280px) { .shell.pv { max-width: 1720px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, 560px); gap: 20px; align-items: start; } .shell.pv > .pvpane { display: flex; } }
+.pdfview { position: fixed; inset: 0; z-index: 2000; background: #0E1319; display: flex; flex-direction: column; padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); gap: 8px; }
+.pv-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: #fff; }
+.pv-bar b { margin-right: 4px; } .pv-bar span { font-size: 12px; opacity: .85; margin-right: auto; }
+.svpages { border: 0; border-radius: 8px; background: #3a4048; }
+#host { position: absolute; left: -12000px; top: 0; width: 794px; visibility: hidden; pointer-events: none; }
+.dpage { position: relative; width: 794px; height: 1123px; background: #fff; color: #000; overflow: hidden; font-family: 'Times New Roman', 'Liberation Serif', Times, serif; font-size: 14.67px; line-height: 1.15; text-align: left; }
+.dpage .sa, .dp.sa { font-family: Arial, 'Liberation Sans', Helvetica, sans-serif; }
+.dp { overflow-wrap: break-word; }
+.dhd { position: absolute; top: 18.7px; left: 67px; right: 67px; text-align: right; line-height: 0; }
+.dbody { position: absolute; left: 67px; top: 135px; width: 660px; height: 892px; overflow: hidden; }
+.fc { display: flow-root; }
+.dft { position: absolute; left: 67px; right: 67px; bottom: 24px; }
+.co select { margin-top: 4px; font-size: 12.5px; }
+.dfl1 { border-top: 1px solid #000; padding-top: 5px; }
+.dt { border-collapse: collapse; table-layout: fixed; margin: 0 auto; }
+.dt td { border: 1px solid #000; padding: 0 6.7px; overflow-wrap: break-word; }
+.dt.nb td { border: 0; padding: 0 2.7px; }
+.dt.dsign { position: absolute; left: 0; bottom: 0; }
+.dpage img { max-width: none; }
+.dpage sup { font-size: 65%; line-height: 0; vertical-align: super; }
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="app">
+  <div class="sitebar">
+    <a class="home" href="index.html" aria-label="Back to the CalGencha menu">
+      <svg viewBox="0 0 34 34" aria-hidden="true" fill="none"><rect x="2" y="5" width="14" height="6" rx="2" fill="currentColor"/><rect x="9" y="14" width="18" height="6" rx="2" fill="currentColor" opacity="0.65"/><rect x="16" y="23" width="16" height="6" rx="2" fill="currentColor" opacity="0.35"/></svg>
+      <span>&larr; CalGencha</span>
+    </a>
+    <button type="button" class="btn" id="installBtn" hidden>Install app</button>
+  </div>
+  <header class="top">
+    <div class="brand"><h1>Report Builder</h1><p>Fill in the details, add photos, then preview and save it as Word or PDF</p></div>
+    <p class="hint">Nothing is uploaded. Your report is saved automatically in this browser on this device. Use Save data to keep a copy or move it to another device.</p>
+  </header>
+
+  <section class="panel" aria-label="Report header">
+    <div class="panel-head">
+      <div class="titlebox">
+        <div class="logo-row">
+          <button type="button" class="logo-btn" id="logoBtn" title="Shown at the top right of every page"><span>+ Add logo</span></button>
+          <button type="button" class="linkbtn" id="logoClean" hidden title="Makes a plain grey or white box behind the logo transparent and trims the empty edge">Clean logo background</button>
+          <button type="button" class="linkbtn" id="logoRemove" hidden>Remove logo</button>
+          <div class="co" role="group" aria-label="Company details. Printed in the footer of every page.">
+            <textarea id="coName" rows="1" maxlength="100" placeholder="Company name" aria-label="Company name"></textarea>
+            <textarea id="coReg" rows="1" maxlength="60" placeholder="Company no. (prints in brackets)" aria-label="Company registration number"></textarea>
+            <textarea id="coAddr" rows="2" maxlength="260" placeholder="Address" aria-label="Company address"></textarea>
+            <textarea id="coTel" rows="1" maxlength="80" placeholder="Telephone" aria-label="Telephone"></textarea>
+            <textarea id="coEmail" rows="1" maxlength="100" placeholder="Email" aria-label="Email"></textarea>
+            <textarea id="coWeb" rows="1" maxlength="80" placeholder="Website" aria-label="Website"></textarea>
+            <select id="coAlign" aria-label="Footer text alignment" title="How the company lines line up in the footer"><option value="center">Footer text: centred</option><option value="left">Footer text: left</option><option value="right">Footer text: right</option></select>
+          </div>
+        </div>
+        <p class="subtle" id="draftState" aria-live="polite"></p>
+        <label class="sr" for="rTitle">Report title</label>
+        <input id="rTitle" class="title-input" maxlength="140" placeholder="Report title, e.g. Report for service of …" autocomplete="off">
+      </div>
+      <div class="toolbar">
+        <button type="button" class="btn" id="pvBtn" aria-pressed="false">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/></svg>
+          Preview
+        </button>
+        <button type="button" class="btn primary" id="docBtn">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 1.8h5.2L12.5 5v9.2H4z"/><path d="M9 1.8V5.2h3.5M6 9h4.5M6 11.5h4.5"/></svg>
+          Save documents
+        </button>
+        <button type="button" class="btn" id="newBtn" title="Clears the report. Company details and sign-off boxes stay.">New report</button>
+        <button type="button" class="btn" id="saveData">Save data</button>
+        <label class="btn"><span>Upload data</span><input class="sr" type="file" id="upData" accept=".json,application/json"></label>
+        <button type="button" class="btn" id="saveTpl" title="Saves only the logo, company details and sign-off boxes">Save template</button>
+        <label class="btn" title="Loads the logo, company details and sign-off boxes from a template file"><span>Load template</span><input class="sr" type="file" id="upTpl" accept=".json,application/json"></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="layHead">
+    <div class="panel-head"><h2 id="layHead">Start from a layout</h2></div>
+    <div class="panel-body">
+      <div class="row2">
+        <div class="field grow"><label class="lbl" for="layout">Layout</label>
+          <select id="layout">
+            <option value="blank">Blank</option>
+            <option value="service">Service &amp; inspection (findings table, photos, summary)</option>
+            <option value="cleaning">Cleaning &amp; service (units checked, photo log)</option>
+            <option value="install">Installation with results (schedule, before/after, test table)</option>
+            <option value="works">Site works (sequence drawing, photo log)</option>
+          </select></div>
+        <button type="button" class="btn" id="layBtn">Use this layout</button>
+      </div>
+      <p class="subtle" style="margin-top:8px">Sets up the cover lines, project details and sections below as empty scaffolding to fill in. Your title, company details and sign-off boxes stay as they are.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="covHead">
+    <div class="panel-head"><h2 id="covHead">Cover page</h2></div>
+    <div class="panel-body stack">
+      <div class="datebar">
+        <div class="field"><label class="lbl" for="dFrom">Work date (from)</label><input type="date" id="dFrom" min="1990-01-01" max="2100-12-31"></div>
+        <div class="field"><label class="lbl" for="dTo">To (optional)</label><input type="date" id="dTo" min="1990-01-01" max="2100-12-31"></div>
+        <button type="button" class="btn" id="dApply">Fill date lines</button>
+        <p class="subtle" style="flex:1 1 220px">Writes the date, like 12th – 13th September 2026, into every line below whose label has the word DATE.</p>
+      </div>
+      <div class="lbl">Lines under the title</div>
+      <div class="stack" id="metaList" style="gap:8px"></div>
+      <div class="chips" id="metaChips"></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="sgHead">
+    <div class="panel-head"><h2 id="sgHead">Sign-off boxes</h2><span class="subtle">Printed at the bottom of the cover page</span></div>
+    <div class="panel-body">
+      <div class="signs" id="signs" style="margin-left:0"></div>
+      <div style="margin-top:10px"><button type="button" class="btn" id="addSign">Add box</button></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="infHead">
+    <div class="panel-head"><h2 id="infHead">Project details</h2><span class="subtle">Top of page 2. Leave empty to skip.</span></div>
+    <div class="panel-body stack">
+      <div class="stack" id="infoList" style="gap:8px"></div>
+      <div class="chips" id="infoChips"></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="secHead">
+    <div class="panel-head">
+      <h2 id="secHead">Sections <span class="count" id="secCount">0</span></h2>
+      <span class="subtle" id="photoCount"></span>
+    </div>
+    <div class="irows" id="sections"></div>
+    <div class="add-row">
+      <button type="button" class="btn" data-add="text">+ Text</button>
+      <button type="button" class="btn" data-add="bullets">+ Bullet list</button>
+      <button type="button" class="btn" data-add="table">+ Table</button>
+      <button type="button" class="btn" data-add="photos">+ Photos</button>
+      <button type="button" class="btn" data-add="beforeafter">+ Before / after</button>
+      <button type="button" class="btn" data-add="findings">+ Findings with photos</button>
+    </div>
+  </section>
+
+  <footer class="sitefoot">
+    <span>&copy; 2026 rgchaos. All rights reserved. <a href="license.html">Licence</a></span>
+    <a href="index.html">CalGencha</a>
+  </footer>
+</div>
+<aside class="pvpane panel" aria-label="Live preview">
+  <div class="panel-head"><h2>Live preview <span class="count" id="pvInfo"></span></h2><button type="button" class="btn" id="pvClose">Hide</button></div>
+  <p class="subtle" style="padding:0 16px 8px">Updates as you type. Page breaks in Word can differ slightly; the PDF matches this view.</p>
+  <div class="pvpages" id="pvPages"></div>
+</aside>
+</div>
+
+<div class="pdfview" id="saveView" role="dialog" aria-modal="true" aria-label="Preview and save" hidden>
+  <div class="pv-bar"><b>Preview</b><span id="svInfo"></span>
+    <button type="button" class="btn primary" id="svWord">Save as Word (.docx)</button>
+    <button type="button" class="btn primary" id="svPdf">Save as PDF</button>
+    <button type="button" class="btn" id="svClose">Close</button></div>
+  <div class="svpages" id="svPages"></div>
+</div>
+
+<input class="sr" type="file" id="photoFile" accept="image/*" multiple tabindex="-1" aria-label="Choose photos">
+<input class="sr" type="file" id="logoFile" accept="image/*" tabindex="-1" aria-label="Choose a logo image">
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <div class="pill"><span id="toastMsg"></span><button type="button" class="toast-btn" id="toastUndo" hidden>Undo</button></div>
+</div>
+
+<script>
+'use strict';
+/* ================= helpers ================= */
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'value') e.value = v;
+    else if (k === 'checked') e.checked = !!v;
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) { if (c == null || c === false) continue; e.append(c.nodeType ? c : document.createTextNode(c)); }
+  return e;
+}
+const clone = o => JSON.parse(JSON.stringify(o));
+let dirty = false;
+const touch = () => { dirty = true; schedulePreview(); scheduleDraft(); };
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+let toastTimer = 0, undoFn = null;
+function toast(msg, o = {}) {
+  clearTimeout(toastTimer);
+  $('#toastMsg').textContent = msg;
+  const t = $('#toast'); t.hidden = false; t.classList.toggle('error', !!o.error);
+  undoFn = o.undo || null; $('#toastUndo').hidden = !undoFn;
+  toastTimer = setTimeout(() => { t.hidden = true; undoFn = null; }, o.undo ? 9000 : o.error ? 7000 : 4000);
+}
+$('#toastUndo').addEventListener('click', () => { if (undoFn) undoFn(); $('#toast').hidden = true; undoFn = null; });
+
+function saveBlob(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.append(a); a.click(); setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 3000);
+}
+const safeName = s => (s || 'Report').replace(/[^\p{L}\p{N} ._,()&'+-]+/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 90) || 'Report';
+
+/* images: shrink every photo so the Word file stays small */
+async function readImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    return await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Could not read ' + file.name)); i.src = url; });
+  } finally { setTimeout(() => URL.revokeObjectURL(url), 5000); }
+}
+async function loadPhoto(file, maxPx = 1400, q = 0.85) {
+  const img = await readImage(file);
+  const k = Math.min(1, maxPx / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * k)), hh = Math.max(1, Math.round(img.naturalHeight * k));
+  const c = document.createElement('canvas'); c.width = w; c.height = hh;
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, hh); x.drawImage(img, 0, 0, w, hh);
+  return { src: c.toDataURL('image/jpeg', q), w, h: hh, caption: '' };
+}
+async function loadLogo(file) {
+  const img = await readImage(file);
+  const k = Math.min(1, 600 / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.round(img.naturalWidth * k), hh = Math.round(img.naturalHeight * k);
+  const c = document.createElement('canvas'); c.width = w; c.height = hh; c.getContext('2d').drawImage(img, 0, 0, w, hh);
+  return cleanLogoCanvas(c);
+}
+/* Logos often come with a light grey or off-white box behind them. Make that background transparent
+   and trim the empty edge, so the logo itself fills the logo area on every page. */
+function cleanLogoCanvas(c) {
+  const w = c.width, hh = c.height, x = c.getContext('2d'), im = x.getImageData(0, 0, w, hh), d = im.data;
+  const px = (i) => [d[i * 4], d[i * 4 + 1], d[i * 4 + 2], d[i * 4 + 3]];
+  const corners = [0, w - 1, (hh - 1) * w, hh * w - 1].map(px).filter(p => p[3] > 200);
+  if (corners.length >= 3) {
+    const bg = [0, 1, 2].map(k => corners.reduce((a, p) => a + p[k], 0) / corners.length);
+    const dist = i => Math.hypot(d[i * 4] - bg[0], d[i * 4 + 1] - bg[1], d[i * 4 + 2] - bg[2]);
+    if (corners.every(p => Math.hypot(p[0] - bg[0], p[1] - bg[1], p[2] - bg[2]) < 30)) {
+      const seen = new Uint8Array(w * hh), stack = []; const push = i => { if (!seen[i] && d[i * 4 + 3] > 0 && dist(i) < 42) { seen[i] = 1; stack.push(i); } };
+      for (let i = 0; i < w; i++) { push(i); push((hh - 1) * w + i); } for (let j = 0; j < hh; j++) { push(j * w); push(j * w + w - 1); }
+      while (stack.length) { const i = stack.pop(), cx = i % w; if (cx > 0) push(i - 1); if (cx < w - 1) push(i + 1); if (i >= w) push(i - w); if (i < w * (hh - 1)) push(i + w); }
+      for (let i = 0; i < w * hh; i++) if (seen[i] || dist(i) < 14) d[i * 4 + 3] = 0;
+      x.putImageData(im, 0, 0);
+    }
+  }
+  /* trim transparent margins */
+  let x0 = w, y0 = hh, x1 = -1, y1 = -1;
+  for (let j = 0; j < hh; j++) for (let i = 0; i < w; i++) if (d[(j * w + i) * 4 + 3] > 12) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+  if (x1 < 0) return c.toDataURL('image/png');          // nothing left: keep the picture as it was
+  const m = 2; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(hh - 1, y1 + m);
+  const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1;
+  o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
+  return o.toDataURL('image/png');
+}
+/* one hidden file input serves every "add photo" button */
+let pickCb = null;
+function pickPhotos(multiple, cb) { pickCb = cb; const f = $('#photoFile'); f.multiple = !!multiple; f.value = ''; f.click(); }
+$('#photoFile').addEventListener('change', e => { const fs = [...e.target.files]; e.target.value = ''; if (fs.length && pickCb) pickCb(fs); });
+async function filesToPhotos(files, big) {
+  const out = []; let bad = 0;
+  for (const f of files) {
+    if (!/^image\//.test(f.type)) { bad++; continue; }
+    try { out.push(await loadPhoto(f, big ? 2000 : 1400, big ? 0.9 : 0.85)); } catch (e) { bad++; }
+  }
+  if (bad) toast(bad + ' file' + (bad > 1 ? 's' : '') + ' could not be added. Use JPG or PNG photos.', { error: true });
+  return out;
+}
+
+/* ================= state ================= */
+const DEFAULT_COMPANY = { logo: '', name: '', reg: '', addr: '', tel: '', email: '', web: '', falign: 'center' };
+const DEFAULT_SIGN = [{ label: 'Prepared by', name: '' }, { label: 'Checked by', name: '' }, { label: 'Verified by', name: '' }, { label: 'Approved by', name: '' }];
+const META_CHIPS = ['Customer', 'Date of service', 'Date of project', 'PIC', 'Service batch', 'Service area', 'Location'];
+const INFO_CHIPS = ['Project', 'Date', 'Plant', 'Area', 'Section', 'Job scope'];
+const SEC_NAMES = { text: 'Text', bullets: 'Bullet list', table: 'Table', photos: 'Photos', beforeafter: 'Before / after', findings: 'Findings with photos' };
+
+let S = { company: clone(DEFAULT_COMPANY), signoff: clone(DEFAULT_SIGN), title: '', meta: [], info: [], sections: [] };
+try { const t = JSON.parse(localStorage.getItem('rb_template') || 'null'); if (t && t.company) { S.company = t.company; S.signoff = t.signoff || S.signoff; } } catch (e) {}
+function saveTplLocal() { try { localStorage.setItem('rb_template', JSON.stringify({ company: S.company, signoff: S.signoff })); } catch (e) {} }
+
+const newSection = type => {
+  const base = { type, heading: '', intro: '', newPage: false };
+  switch (type) {
+    case 'text': return { ...base, heading: 'New section', body: '' };
+    case 'bullets': return { ...base, heading: 'New list', items: '' };
+    case 'table': return { ...base, heading: 'New table', cols: ['Column 1', 'Column 2', 'Column 3'], rows: [['', '', '']], center: false };
+    case 'photos': return { ...base, heading: 'Photos', newPage: true, intro: 'Please refer to the attachment on the following page', groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: [] }] };
+    case 'beforeafter': return { ...base, heading: 'Completed project photos', newPage: true, groups: [{ sub: '', title: '', fit: 'frame', pborder: true, pairs: [{ before: null, after: null }] }] };
+    case 'findings': return { ...base, heading: 'Report summary', newPage: true, rows: [{ loc: '', photo: null, cap: '', finding: '', action: '' }] };
+  }
+};
+
+/* starting layouts: structure only, no sample text */
+function layout(id) {
+  const rows = (n, c) => Array.from({ length: n }, () => Array(c).fill(''));
+  const slots = n => Array.from({ length: n }, () => ({ caption: '' }));
+  const ml = (...l) => l.map(label => ({ label, value: '' }));
+  const sec = (type, heading, extra = {}) => ({ ...newSection(type), heading, ...extra });
+  const L = {
+    blank: { meta: ml('Customer', 'Date of service', 'PIC'), info: [], sections: [] },
+    service: { meta: ml('Customer', 'Date of service', 'PIC', 'Service area'), info: ml('Project', 'Date', 'Plant'), sections: [
+      sec('text', 'Executive summary'),
+      sec('table', 'Inspection findings', { cols: ['Location', 'Item', 'Inspection status', 'Key finding'], rows: rows(3, 4) }),
+      sec('bullets', 'Summary recommendation'),
+      sec('photos', 'Photo of working activities', { groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: slots(4) }] }),
+      sec('findings', 'Report summary', { rows: [{ loc: '', photo: null, cap: '', finding: '', action: '' }] })] },
+    cleaning: { meta: ml('Customer', 'Date of service', 'PIC'), info: ml('Service', 'Date', 'Plant'), sections: [
+      sec('text', 'Executive summary'),
+      sec('table', 'Inspection findings and condition assessment', { cols: ['Location', 'Unit no.', 'Inspection status', 'Key finding'], rows: rows(3, 4) }),
+      sec('photos', 'Photo of working activities', { groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: slots(2) }] }),
+      sec('text', 'Report summary')] },
+    install: { meta: ml('Customer', 'Date of project', 'Attention'), info: ml('Project', 'Date', 'Plant', 'Area'), sections: [
+      sec('photos', 'Working schedule', { newPage: false, groups: [{ sub: '', title: '', cols: 1, frame: false, fit: 'natural', photos: slots(1) }] }),
+      sec('photos', 'Photo of working activities', { groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: slots(4) }] }),
+      sec('beforeafter', 'Completed project photos', { groups: [{ sub: '', title: '', fit: 'frame', pborder: true, pairs: [{ before: null, after: null }] }] }),
+      sec('table', 'Result', { center: true, cols: ['Item', 'Check 1', 'Check 2', 'Reading'], rows: rows(3, 4) }),
+      sec('text', 'Conclusion')] },
+    works: { meta: ml('Customer', 'Date of project', 'PIC'), info: ml('Date', 'Section', 'Area', 'Job scope'), sections: [
+      sec('text', 'Executive summary'),
+      sec('photos', 'Sequence drawing', { newPage: false, groups: [{ sub: '', title: '', cols: 1, frame: false, fit: 'natural', photos: slots(1) }] }),
+      sec('photos', 'Photo of working activities', { groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: slots(4) }] })] }
+  };
+  const out = clone(L[id] || L.blank); out.title = ''; out.sections.forEach(fixPhotos); return out;
+}
+/* sample layouts list photo slots with only a caption; give them the full shape */
+function fixPhotos(sec) {
+  (sec.groups || []).forEach(g => (g.photos || []).forEach(p => { p.src = p.src || ''; p.w = p.w || 0; p.h = p.h || 0; }));
+  return sec;
+}
+const hasSrc = p => p && p.src;
+
+/* ================= small UI pieces ================= */
+function bindInput(obj, key, attrs, tag = 'input', after) {
+  const el = h(tag, { ...attrs, value: obj[key] ?? '' });
+  if (tag === 'textarea') el.value = obj[key] ?? '';
+  el.addEventListener('input', () => { obj[key] = el.value; touch(); if (after) after(); });
+  return el;
+}
+const iconBtn = (txt, title, fn, dis) => h('button', { type: 'button', class: 'icon-btn', title, 'aria-label': title, onclick: fn, disabled: dis }, txt);
+function field(label, el, cls) { const id = 'f' + Math.random().toString(36).slice(2, 8); el.id = id; return h('div', { class: 'field ' + (cls || '') }, h('label', { class: 'lbl', for: id }, label), el); }
+function move(arr, i, d) { const j = i + d; if (j < 0 || j >= arr.length) return false; [arr[i], arr[j]] = [arr[j], arr[i]]; return true; }
+
+function undoable(msg, prev, restore) { toast(msg, { undo: () => { restore(prev); } }); }
+let hist = null;
+function snapshot() { return clone({ title: S.title, meta: S.meta, info: S.info, sections: S.sections, signoff: S.signoff }); }
+function restore(snap) { Object.assign(S, clone(snap)); renderAll(); }
+
+/* ---------- header / company ---------- */
+function renderCompany() {
+  const c = S.company;
+  [['coName', 'name'], ['coReg', 'reg'], ['coAddr', 'addr'], ['coTel', 'tel'], ['coEmail', 'email'], ['coWeb', 'web']].forEach(([id, k]) => {
+    const el = $('#' + id); el.value = c[k] || ''; grow(el);
+    el.oninput = () => { c[k] = el.value; grow(el); touch(); saveTplLocal(); };
+  });
+  const b = $('#logoBtn'); b.innerHTML = '';
+  if (c.logo) { b.classList.add('has'); b.append(h('img', { src: c.logo, alt: 'Logo' })); } else { b.classList.remove('has'); b.append(h('span', {}, '+ Add logo')); }
+  $('#logoRemove').hidden = !c.logo; $('#logoClean').hidden = !c.logo;
+  $('#coAlign').value = c.falign || 'center'; $('#coAlign').onchange = e => { c.falign = e.target.value; touch(); saveTplLocal(); };
+  $('#rTitle').value = S.title;
+}
+function growAll(root) { root.querySelectorAll('textarea').forEach(t => { if (t.rows <= 2) grow(t); }); }
+function grow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+$('#rTitle').addEventListener('input', e => { S.title = e.target.value; touch(); });
+$('#logoBtn').addEventListener('click', () => $('#logoFile').click());
+$('#logoFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { S.company.logo = await loadLogo(f); saveTplLocal(); touch(); renderCompany(); } catch (err) { toast(err.message, { error: true }); }
+});
+$('#logoClean').addEventListener('click', async () => {
+  try {
+    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = S.company.logo; });
+    const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext('2d').drawImage(im, 0, 0);
+    S.company.logo = cleanLogoCanvas(c); saveTplLocal(); touch(); renderCompany(); toast('Logo background cleaned.');
+  } catch (e) { toast('Could not clean the logo.', { error: true }); }
+});
+$('#logoRemove').addEventListener('click', () => { S.company.logo = ''; saveTplLocal(); touch(); renderCompany(); });
+
+/* ---------- label/value lists (cover lines, project details) ---------- */
+function renderPairs(listSel, chipSel, arr, chips, multiline) {
+  const list = $(listSel); list.innerHTML = '';
+  arr.forEach((r, i) => {
+    list.append(h('div', { class: 'lrow' },
+      bindInput(r, 'label', { placeholder: 'Label', 'aria-label': 'Label', maxlength: 60 }),
+      bindInput(r, 'value', { placeholder: 'Text. Press Enter for a new line.', rows: 1, 'aria-label': 'Text', maxlength: 800 }, 'textarea', null),
+      h('div', { class: 'acts' },
+        iconBtn('↑', 'Move up', () => { if (move(arr, i, -1)) { touch(); renderPairs(listSel, chipSel, arr, chips); } }, i === 0),
+        iconBtn('↓', 'Move down', () => { if (move(arr, i, 1)) { touch(); renderPairs(listSel, chipSel, arr, chips); } }, i === arr.length - 1),
+        iconBtn('×', 'Remove line', () => { const p = snapshot(); arr.splice(i, 1); touch(); renderPairs(listSel, chipSel, arr, chips); undoable('Line removed', p, restore); }))));
+  });
+  list.querySelectorAll('textarea').forEach(t => { grow(t); t.addEventListener('input', () => grow(t)); });
+  const cs = $(chipSel); cs.innerHTML = '';
+  chips.forEach(c => cs.append(h('button', { type: 'button', class: 'chip', onclick: () => { arr.push({ label: c, value: '' }); touch(); renderPairs(listSel, chipSel, arr, chips); } }, '+ ' + c)));
+  cs.append(h('button', { type: 'button', class: 'chip', onclick: () => { arr.push({ label: '', value: '' }); touch(); renderPairs(listSel, chipSel, arr, chips); } }, '+ Other'));
+}
+const renderMeta = () => renderPairs('#metaList', '#metaChips', S.meta, META_CHIPS);
+const renderInfo = () => renderPairs('#infoList', '#infoChips', S.info, INFO_CHIPS);
+
+/* ---------- date helper ---------- */
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function ord(n) { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+function fmtDates(a, b) {
+  const A = new Date(a + 'T00:00:00'); if (isNaN(A)) return '';
+  const one = d => `${ord(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  if (!b || b === a) return one(A);
+  const B = new Date(b + 'T00:00:00'); if (isNaN(B)) return one(A);
+  if (B < A) return one(A);
+  if (A.getMonth() === B.getMonth() && A.getFullYear() === B.getFullYear()) return `${ord(A.getDate())} – ${ord(B.getDate())} ${MONTHS[A.getMonth()]} ${A.getFullYear()}`;
+  return `${one(A)} – ${one(B)}`;
+}
+$('#dApply').addEventListener('click', () => {
+  const t = fmtDates($('#dFrom').value, $('#dTo').value);
+  if (!t) { toast('Pick a start date first.', { error: true }); return; }
+  let n = 0;
+  [...S.meta, ...S.info].forEach(r => { if (/date/i.test(r.label)) { r.value = t; n++; } });
+  if (!n) { toast('Add a line labelled Date of service, Date of project or Date first.', { error: true }); return; }
+  touch(); renderMeta(); renderInfo(); toast('Date filled in ' + n + ' line' + (n > 1 ? 's' : '') + '.');
+});
+
+/* ---------- sign-off ---------- */
+function renderSigns() {
+  const box = $('#signs'); box.innerHTML = '';
+  S.signoff.forEach((s, i) => box.append(h('div', { class: 'sbox' },
+    h('div', { class: 'shead' }, h('span', {}, 'Box ' + (i + 1)), h('button', { type: 'button', class: 'sx', title: 'Remove box', 'aria-label': 'Remove box', onclick: () => { S.signoff.splice(i, 1); saveTplLocal(); touch(); renderSigns(); } }, '×')),
+    bindInput(s, 'label', { placeholder: 'Heading, e.g. Prepared by', 'aria-label': 'Box heading', maxlength: 40 }, 'input', saveTplLocal),
+    bindInput(s, 'name', { placeholder: 'Name under the box', rows: 2, 'aria-label': 'Name', maxlength: 80 }, 'textarea', saveTplLocal))));
+  box.querySelectorAll('textarea').forEach(t => { grow(t); t.addEventListener('input', () => grow(t)); });
+}
+$('#addSign').addEventListener('click', () => { if (S.signoff.length >= 5) { toast('Five boxes is the most that fit across the page.', { error: true }); return; } S.signoff.push({ label: '', name: '' }); touch(); renderSigns(); });
+
+/* ================= sections ================= */
+function secNo(i) { if (!S.sections[i].heading.trim()) return ''; let n = 0; for (let k = 0; k <= i; k++) if (S.sections[k].heading.trim()) n++; return n + '.'; }
+const photoSlots = () => S.sections.reduce((n, s) => n + countPhotos(s), 0);
+function countPhotos(s) {
+  if (s.type === 'photos') return s.groups.reduce((n, g) => n + g.photos.filter(hasSrc).length, 0);
+  if (s.type === 'beforeafter') return s.groups.reduce((n, g) => n + g.pairs.reduce((m, p) => m + (hasSrc(p.before) ? 1 : 0) + (hasSrc(p.after) ? 1 : 0), 0), 0);
+  if (s.type === 'findings') return s.rows.filter(r => hasSrc(r.photo)).length;
+  return 0;
+}
+function updateCounts() { $('#secCount').textContent = S.sections.length; const n = photoSlots(); $('#photoCount').textContent = n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : ''; }
+
+function renderSections() {
+  const box = $('#sections'); box.innerHTML = '';
+  S.sections.forEach((s, i) => box.append(sectionCard(s, i)));
+  growAll(box);
+  if (!S.sections.length) box.append(h('p', { class: 'subtle', style: 'padding:14px 16px' }, 'No sections yet. Add one with the buttons below.'));
+  updateCounts();
+}
+function redo(i) { const old = $('#sections').children[i]; const nu = sectionCard(S.sections[i], i); old.replaceWith(nu); growAll(nu); updateCounts(); }
+
+function sectionCard(s, i) {
+  const rerender = () => redo(i);
+  const head = h('div', { class: 'sechead' },
+    h('span', { class: 'badge' }, 'Section ' + (i + 1) + ' · ' + SEC_NAMES[s.type]),
+    bindInput(s, 'heading', { class: 'hd', placeholder: 'Heading (empty = no heading or number)', maxlength: 120, 'aria-label': 'Section heading' }, 'input', () => { /* numbers refresh on next full render */ }),
+    h('span', { class: 'badge num' }, secNo(i)),
+    iconBtn('↑', 'Move section up', () => { if (move(S.sections, i, -1)) { touch(); renderSections(); } }, i === 0),
+    iconBtn('↓', 'Move section down', () => { if (move(S.sections, i, 1)) { touch(); renderSections(); } }, i === S.sections.length - 1),
+    iconBtn('×', 'Remove section', () => { const p = snapshot(); S.sections.splice(i, 1); touch(); renderSections(); undoable('Section removed', p, restore); }));
+  const body = [];
+  body.push(field('Note under the heading (optional)', bindInput(s, 'intro', { rows: 1, maxlength: 600, placeholder: 'e.g. Please refer to the attachment on the following page' }, 'textarea', null)));
+  if (s.type === 'text') body.push(field('Text (leave a blank line between paragraphs)', bindInput(s, 'body', { rows: 5, maxlength: 6000 }, 'textarea')));
+  if (s.type === 'bullets') body.push(field('One bullet per line', bindInput(s, 'items', { rows: 5, maxlength: 4000 }, 'textarea')));
+  if (s.type === 'table') body.push(tableEditor(s, rerender));
+  if (s.type === 'photos') body.push(photosEditor(s, rerender));
+  if (s.type === 'beforeafter') body.push(baEditor(s, rerender));
+  if (s.type === 'findings') body.push(findingsEditor(s, rerender));
+  body.push(h('label', { class: 'msdone' }, h('input', { type: 'checkbox', checked: s.newPage, onchange: e => { s.newPage = e.target.checked; touch(); } }), 'Start this section on a new page'));
+  const card = h('div', { class: 'sec' }, head, body);
+  card.querySelectorAll('textarea').forEach(t => { if (t.rows <= 2) { grow(t); t.addEventListener('input', () => grow(t)); } });
+  return card;
+}
+
+/* ---- table ---- */
+function tableEditor(s, rerender) {
+  const n = s.cols.length;
+  const grid = h('div', { class: 'tgrid', style: `grid-template-columns: repeat(${n}, minmax(130px, 1fr)) 30px` });
+  s.cols.forEach((c, ci) => grid.append(h('textarea', { class: 'th', rows: 1, 'aria-label': 'Column ' + (ci + 1) + ' heading', value: c, oninput: e => { s.cols[ci] = e.target.value; touch(); } })));
+  grid.append(h('span'));
+  s.rows.forEach((r, ri) => {
+    r.forEach((c, ci) => grid.append(h('textarea', { rows: 1, 'aria-label': 'Row ' + (ri + 1) + ' column ' + (ci + 1), value: c, oninput: e => { r[ci] = e.target.value; touch(); grow(e.target); } })));
+    grid.append(iconBtn('×', 'Remove row', () => { s.rows.splice(ri, 1); touch(); rerender(); }));
+  });
+  return h('div', { class: 'stack', style: 'gap:8px' },
+    h('div', { class: 'tscroll' }, grid),
+    h('div', { class: 'row2' },
+      h('button', { type: 'button', class: 'btn', onclick: () => { s.rows.push(s.cols.map(() => '')); touch(); rerender(); } }, '+ Row'),
+      h('button', { type: 'button', class: 'btn', onclick: () => { if (s.cols.length >= 8) return toast('Eight columns is the most that fit.', { error: true }); s.cols.push('Column ' + (s.cols.length + 1)); s.rows.forEach(r => r.push('')); touch(); rerender(); } }, '+ Column'),
+      h('button', { type: 'button', class: 'btn', disabled: s.cols.length <= 1, onclick: () => { s.cols.pop(); s.rows.forEach(r => r.pop()); touch(); rerender(); } }, '− Last column'),
+      h('label', { class: 'msdone' }, h('input', { type: 'checkbox', checked: s.center, onchange: e => { s.center = e.target.checked; touch(); } }), 'Centre the cell text')));
+}
+
+/* ---- photo card ---- */
+function photoCard(p, o) {
+  const img = h('div', { class: 'pimg' }, h('img', { src: p.src, alt: p.caption || 'Photo' }));
+  if (o.n) img.append(h('span', { class: 'pn' }, o.n));
+  if (o.onDel) img.append(h('button', { type: 'button', class: 'px', title: 'Remove photo', 'aria-label': 'Remove photo', onclick: o.onDel }, '×'));
+  const cap = h('textarea', { rows: 2, placeholder: 'Caption', 'aria-label': 'Photo caption', maxlength: 240, oninput: e => { p.caption = e.target.value; touch(); } });
+  cap.value = p.caption || '';
+  const el = h('div', { class: 'pcard' }, img, cap);
+  if (o.onLeft) el.append(h('div', { class: 'pmv' }, iconBtn('←', 'Move earlier', o.onLeft), iconBtn('→', 'Move later', o.onRight)));
+  return el;
+}
+function emptySlot(label, onPick, caption) {
+  const el = h('div', { class: 'pcard empty' }, h('button', { type: 'button', class: 'pimg', onclick: onPick }, '+ ' + label));
+  if (caption) { const c = h('textarea', { rows: 2, placeholder: 'Caption', 'aria-label': 'Photo caption', maxlength: 240, oninput: e => { caption.obj.caption = e.target.value; touch(); } }); c.value = caption.obj.caption || ''; el.append(c); }
+  return el;
+}
+
+/* ---- photos ---- */
+function fitControls(g) {
+  const opts = [['natural', 'Keep proportions'], ['frame', 'Fit to frame (same size)'], ['fill', 'Fill frame (crops edges)']];
+  return [
+    field('Photo size', h('select', { onchange: e => { g.fit = e.target.value; touch(); } }, opts.map(([v, t]) => h('option', { value: v, selected: (g.fit || 'natural') === v }, t)))),
+    h('label', { class: 'msdone', style: 'padding-bottom:8px' }, h('input', { type: 'checkbox', checked: !!g.pborder, onchange: e => { g.pborder = e.target.checked; touch(); } }), 'Photo border')
+  ];
+}
+function photosEditor(s, rerender) {
+  const wrap = h('div', { class: 'stack' });
+  s.groups.forEach((g, gi) => {
+    const grid = h('div', { class: 'pgrid' });
+    g.photos.forEach((p, pi) => {
+      if (hasSrc(p)) grid.append(photoCard(p, { n: pi + 1, onDel: () => { g.photos.splice(pi, 1); touch(); rerender(); }, onLeft: () => { if (move(g.photos, pi, -1)) { touch(); rerender(); } }, onRight: () => { if (move(g.photos, pi, 1)) { touch(); rerender(); } } }));
+      else grid.append(emptySlot('Photo', () => pickPhotos(false, async fs => { const [ph] = await filesToPhotos(fs, g.cols === 1); if (ph) { ph.caption = p.caption || ''; g.photos[pi] = ph; touch(); rerender(); } }), { obj: p }));
+    });
+    const addMany = async fs => { const ph = await filesToPhotos(fs, g.cols === 1); if (!ph.length) return; const holes = g.photos.map((p, k) => hasSrc(p) ? -1 : k).filter(k => k >= 0); ph.forEach(x => { const k = holes.shift(); if (k != null) { x.caption = g.photos[k].caption || ''; g.photos[k] = x; } else g.photos.push(x); }); touch(); rerender(); };
+    const box = h('div', { class: 'gbox' },
+      h('div', { class: 'gtop' },
+        field('Sub-heading (optional)', bindInput(g, 'sub', { maxlength: 100, placeholder: 'e.g. Barrier gate Post A' })),
+        field('Title above the photos (optional)', bindInput(g, 'title', { maxlength: 100, placeholder: 'e.g. Left barrier gate Post A' })),
+        field('Photos per row', h('select', { onchange: e => { g.cols = +e.target.value; touch(); rerender(); } }, [1, 2, 3].map(n => h('option', { value: n, selected: g.cols === n }, n)), ), 'sm'),
+        ...fitControls(g),
+        h('label', { class: 'msdone', style: 'padding-bottom:8px' }, h('input', { type: 'checkbox', checked: g.frame !== false, onchange: e => { g.frame = e.target.checked; touch(); } }), 'Outer border'),
+        iconBtn('↑', 'Move group up', () => { if (move(s.groups, gi, -1)) { touch(); rerender(); } }, gi === 0),
+        iconBtn('↓', 'Move group down', () => { if (move(s.groups, gi, 1)) { touch(); rerender(); } }, gi === s.groups.length - 1),
+        iconBtn('×', 'Remove group', () => { const p = snapshot(); s.groups.splice(gi, 1); touch(); rerender(); undoable('Photo group removed', p, restore); })),
+      grid,
+      h('div', { class: 'row2' },
+        h('button', { type: 'button', class: 'btn', onclick: () => pickPhotos(true, addMany) }, '+ Add photos'),
+        h('button', { type: 'button', class: 'btn', onclick: () => { g.photos.push({ src: '', w: 0, h: 0, caption: '' }); touch(); rerender(); } }, '+ Empty slot'),
+        h('span', { class: 'drop-note' }, 'You can also drop photos here')));
+    box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('drag'); });
+    box.addEventListener('dragleave', () => box.classList.remove('drag'));
+    box.addEventListener('drop', e => { e.preventDefault(); box.classList.remove('drag'); addMany([...e.dataTransfer.files]); });
+    wrap.append(box);
+  });
+  wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.groups.push({ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: [] }); touch(); rerender(); } }, '+ Add photo group')));
+  return wrap;
+}
+
+/* ---- before / after ---- */
+function baEditor(s, rerender) {
+  const wrap = h('div', { class: 'stack' });
+  s.groups.forEach((g, gi) => {
+    const slot = (pair, key, ck, label) => {
+      const p = pair[key];
+      if (hasSrc(p)) return photoCard(p, { onDel: () => { pair[key] = null; touch(); rerender(); } });
+      return emptySlot(label, () => pickPhotos(false, async fs => { const [ph] = await filesToPhotos(fs); if (ph) { pair[key] = ph; touch(); rerender(); } }));
+    };
+    const pairs = g.pairs.map((pr, pi) => h('div', { class: 'pair' },
+      h('div', {}, h('div', { class: 'tag' }, 'BEFORE'), slot(pr, 'before', 'bc', 'Before')),
+      h('div', {}, h('div', { class: 'tag' }, 'AFTER'), slot(pr, 'after', 'ac', 'After')),
+      iconBtn('×', 'Remove this pair', () => { g.pairs.splice(pi, 1); touch(); rerender(); })));
+    wrap.append(h('div', { class: 'gbox' },
+      h('div', { class: 'gtop' },
+        field('Sub-heading (optional)', bindInput(g, 'sub', { maxlength: 100 })),
+        field('Title above the photos', bindInput(g, 'title', { maxlength: 100, placeholder: 'e.g. Lamella 1 pump 1' })),
+        ...fitControls(g),
+        iconBtn('×', 'Remove group', () => { const p = snapshot(); s.groups.splice(gi, 1); touch(); rerender(); undoable('Group removed', p, restore); })),
+      h('div', { class: 'stack', style: 'gap:8px' }, pairs),
+      h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { g.pairs.push({ before: null, after: null }); touch(); rerender(); } }, '+ Add pair'))));
+  });
+  wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.groups.push({ sub: '', title: '', fit: 'frame', pborder: true, pairs: [{ before: null, after: null }] }); touch(); rerender(); } }, '+ Add group')));
+  return wrap;
+}
+
+/* ---- findings with photos ---- */
+function findingsEditor(s, rerender) {
+  const wrap = h('div', { class: 'stack' });
+  s.rows.forEach((r, ri) => {
+    const ph = hasSrc(r.photo)
+      ? photoCard(r.photo, { onDel: () => { r.photo = null; touch(); rerender(); } })
+      : emptySlot('Photo', () => pickPhotos(false, async fs => { const [p] = await filesToPhotos(fs); if (p) { r.photo = p; touch(); rerender(); } }));
+    const cap = bindInput(r, 'cap', { placeholder: 'Caption under photo', maxlength: 160, 'aria-label': 'Photo caption' });
+    wrap.append(h('div', { class: 'fcard' },
+      h('div', { class: 'fl', style: 'flex:0 0 150px' }, h('span', { class: 'lbl' }, 'No. ' + (ri + 1)), ph, cap),
+      h('div', { class: 'fl' }, field('Location / component', bindInput(r, 'loc', { rows: 3, maxlength: 300, placeholder: 'Post B – Line 2\nRight barrier gate (relay)' }, 'textarea'))),
+      h('div', { class: 'fl wide' },
+        field('Problem finding / condition', bindInput(r, 'finding', { rows: 2, maxlength: 400, placeholder: 'What was found' }, 'textarea')),
+        field('Recommended countermeasure', bindInput(r, 'action', { rows: 2, maxlength: 400, placeholder: 'What should be done' }, 'textarea'))),
+      h('div', { class: 'acts', style: 'display:flex;flex-direction:column' },
+        iconBtn('↑', 'Move up', () => { if (move(s.rows, ri, -1)) { touch(); rerender(); } }, ri === 0),
+        iconBtn('↓', 'Move down', () => { if (move(s.rows, ri, 1)) { touch(); rerender(); } }, ri === s.rows.length - 1),
+        iconBtn('×', 'Remove row', () => { const p = snapshot(); s.rows.splice(ri, 1); touch(); rerender(); undoable('Row removed', p, restore); }))));
+  });
+  wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.rows.push({ loc: '', photo: null, cap: '', finding: '', action: '' }); touch(); rerender(); } }, '+ Add row')));
+  return wrap;
+}
+
+document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+  S.sections.push(newSection(b.dataset.add)); touch(); renderSections();
+  const last = $('#sections').lastElementChild; if (last) last.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}));
+
+/* ---------- top-level actions ---------- */
+function renderAll() { renderCompany(); renderMeta(); renderInfo(); renderSigns(); renderSections(); schedulePreview(); scheduleDraft(); }
+$('#layBtn').addEventListener('click', () => {
+  const p = snapshot(); const L = layout($('#layout').value);
+  S.meta = L.meta; S.info = L.info; S.sections = L.sections; touch(); renderAll();
+  undoable('Layout loaded', p, restore);
+});
+
+function download(obj, name) { saveBlob(new Blob([JSON.stringify(obj)], { type: 'application/json' }), name); }
+$('#saveData').addEventListener('click', () => { download({ kind: 'report-data', v: 1, ...clone(S) }, safeName(S.title) + ' (data).json'); dirty = false; toast('Data saved. Upload it later to carry on.'); });
+$('#saveTpl').addEventListener('click', () => { download({ kind: 'report-template', v: 1, company: S.company, signoff: S.signoff }, 'Report template.json'); toast('Template saved.'); });
+function readJson(file, cb) { const r = new FileReader(); r.onload = () => { try { cb(JSON.parse(r.result)); } catch (e) { toast('That file is not a valid saved file.', { error: true }); } }; r.readAsText(file); }
+$('#upData').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  readJson(f, d => {
+    if (d.kind === 'report-template') return toast('That is a template. Use Load template instead.', { error: true });
+    if (d.kind !== 'report-data') return toast('That file is not saved report data.', { error: true });
+    const p = snapshot(); S.company = d.company || S.company; S.signoff = d.signoff || S.signoff; S.title = d.title || ''; S.meta = d.meta || []; S.info = d.info || []; S.sections = (d.sections || []);
+    saveTplLocal(); renderAll(); undoable('Data loaded', p, restore);
+  }); });
+$('#upTpl').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  readJson(f, d => { if (d.kind !== 'report-template') return toast('That file is not a template.', { error: true }); S.company = d.company; S.signoff = d.signoff; saveTplLocal(); renderCompany(); renderSigns(); toast('Template loaded.'); }); });
+
+/* ---- photo frames: every photo in a group gets the same fixed frame ---- */
+function frameCm(cols, cwTw) { return [cwTw / 567 - 0.5, cols === 1 ? 11 : cols === 2 ? 6.2 : 4.2]; }
+function cropOf(w, hh, boxAspect) {
+  const a = w / hh; let l = 0, t = 0;
+  if (a > boxAspect) l = (1 - boxAspect / a) / 2; else t = (1 - a / boxAspect) / 2;
+  const v = x => Math.round(x * 100000);
+  return `l="${v(l)}" r="${v(l)}" t="${v(t)}" b="${v(t)}"`;
+}
+
+/* ================= Word (.docx) writer ================= */
+const W = 9893;              // text width in twips (A4 with 1008 side margins)
+const TNR = 'Times New Roman', ARI = 'Arial';
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const cleanTxt = s => String(s ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, '').replace(/\r/g, '');
+function rpr(o) {
+  let x = '';
+  if (o.font) x += `<w:rFonts w:ascii="${o.font}" w:hAnsi="${o.font}" w:cs="${o.font}"/>`;
+  if (o.b) x += '<w:b/><w:bCs/>';
+  if (o.i) x += '<w:i/>';
+  if (o.caps) x += '<w:caps/>';
+  if (o.color) x += `<w:color w:val="${o.color}"/>`;
+  if (o.sz) x += `<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>`;
+  if (o.u) x += '<w:u w:val="single"/>';
+  if (o.sup) x += '<w:vertAlign w:val="superscript"/>';
+  return x ? `<w:rPr>${x}</w:rPr>` : '';
+}
+const wr = (t, o) => t ? `<w:r>${rpr(o)}<w:t xml:space="preserve">${esc(t)}</w:t></w:r>` : '';
+/* text -> runs. New lines become line breaks; 1st, 2nd, 12th get a raised ending automatically */
+function runs(text, o = {}) {
+  const out = []; const lines = cleanTxt(text).split('\n');
+  lines.forEach((ln, li) => {
+    if (li) out.push(`<w:r>${rpr(o)}<w:br/></w:r>`);
+    const re = /(\d)(st|nd|rd|th)\b/g; let last = 0, m;
+    while ((m = re.exec(ln))) { out.push(wr(ln.slice(last, m.index + 1), o), wr(m[2], { ...o, sup: 1 })); last = m.index + m[0].length; }
+    out.push(wr(ln.slice(last), o));
+  });
+  return out.join('');
+}
+function para(inner, p = {}) {
+  let x = '';
+  if (p.keepNext) x += '<w:keepNext/>';
+  if (p.keepLines) x += '<w:keepLines/>';
+  if (p.pb) x += '<w:pageBreakBefore/>';
+  if (p.num) x += '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>';
+  if (p.border) x += '<w:pBdr><w:top w:val="single" w:sz="6" w:space="4" w:color="000000"/></w:pBdr>';
+  x += `<w:spacing w:before="${p.before ?? 0}" w:after="${p.after ?? 0}"${p.line ? ` w:line="${p.line}" w:lineRule="${p.rule || 'auto'}"` : ''}/>`;
+  if (p.ind) x += `<w:ind w:left="${p.ind[0]}" w:hanging="${p.ind[1] || 0}"/>`;
+  if (p.jc) x += `<w:jc w:val="${p.jc}"/>`;
+  return `<w:p><w:pPr>${x}</w:pPr>${inner || ''}</w:p>`;
+}
+const bord = (sz = 4, val = 'single') => ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(s => `<w:${s} w:val="${val}" w:sz="${sz}" w:space="0" w:color="000000"/>`).join('');
+function tc(w, paras, o = {}) {
+  let x = `<w:tcW w:w="${w}" w:type="dxa"/>`;
+  if (o.span) x += `<w:gridSpan w:val="${o.span}"/>`;
+  if (o.shade) x += `<w:shd w:val="clear" w:color="auto" w:fill="${o.shade}"/>`;
+  x += `<w:vAlign w:val="${o.va || 'center'}"/>`;
+  return `<w:tc><w:tcPr>${x}</w:tcPr>${paras.join('') || para('')}</w:tc>`;
+}
+const tr = (cells, o = {}) => `<w:tr><w:trPr>${o.cant === false ? '' : '<w:cantSplit/>'}${o.h ? `<w:trHeight w:val="${o.h}" w:hRule="${o.exact ? 'exact' : 'atLeast'}"/>` : ''}${o.hdr ? '<w:tblHeader/>' : ''}</w:trPr>${cells.join('')}</w:tr>`;
+function tbl(widths, rows, o = {}) {
+  const tot = widths.reduce((a, b) => a + b, 0);
+  return `<w:tbl><w:tblPr>${o.float || ''}<w:tblW w:w="${tot}" w:type="dxa"/><w:jc w:val="center"/><w:tblBorders>${o.none ? bord(0, 'nil') : bord(4)}</w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="${o.pad ?? 100}" w:type="dxa"/><w:right w:w="${o.pad ?? 100}" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>${rows.join('')}</w:tbl>`;
+}
+
+function buildDocx(S) {
+  const media = [], seen = new Map(); let dp = 1;
+  function media_(src) {
+    if (seen.has(src)) return seen.get(src);
+    const m = /^data:image\/(png|jpe?g|gif);base64,(.*)$/s.exec(src || ''); if (!m) return null;
+    const bin = atob(m[2]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const ext = m[1] === 'png' ? 'png' : m[1] === 'gif' ? 'gif' : 'jpeg';
+    const o = { n: media.length + 1, ext, data: u8 }; o.file = `image${o.n}.${ext}`; o.rid = 'rIdImg' + o.n; media.push(o); seen.set(src, o); return o;
+  }
+  const fit = (w, hh, mw, mh) => { let cw = mw, ch = mw * hh / w; if (ch > mh) { ch = mh; cw = mh * w / hh; } return [Math.round(cw * 360000), Math.round(ch * 360000)]; };
+  function pic(src, cx, cy, rid, crop) {
+    const o = media_(src); if (!o) return ''; const id = dp++;
+    return `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="Picture ${id}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="${id}" name="${o.file}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid || o.rid}"/>${crop ? `<a:srcRect ${crop}/>` : ''}<a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`;
+  }
+  const T = { font: TNR, sz: 22 };
+  const body = [];
+  /* ---- cover ---- */
+  body.push(para(runs(S.title || 'Report', { font: ARI, b: 1, sz: 44, caps: 1 }), { before: 1000, after: 700, line: 260 }));
+  S.meta.filter(r => r.label.trim() || r.value.trim()).forEach(r => {
+    const lab = r.label.trim() ? r.label.trim() + ':' : '';
+    const lines = cleanTxt(r.value).split('\n');
+    if (lines.length > 1) {
+      body.push(para(runs(lab, { font: ARI, b: 1, sz: 22, caps: 1 }), { after: 60, keepNext: 1 }));
+      lines.forEach((l, k) => body.push(para(runs(l, { font: ARI, b: 1, sz: 22, caps: 1 }), { ind: [567, 0], after: k === lines.length - 1 ? 200 : 40 })));
+    } else body.push(para(runs((lab ? lab + ' ' : '') + r.value.trim(), { font: ARI, b: 1, sz: 22, caps: 1 }), { after: 200 }));
+  });
+  const boxes = S.signoff.filter(s => s.label.trim() || s.name.trim());
+  if (boxes.length) {
+    const cw = Math.floor(W / boxes.length), ws = boxes.map(() => cw); ws[ws.length - 1] += W - cw * boxes.length;
+    const cp = (t, o) => para(runs(t, { font: ARI, sz: 16, caps: 1, ...o }), { jc: 'center', before: 30, after: 30 });
+    body.push(tbl(ws, [
+      tr(boxes.map((b, i) => tc(ws[i], [cp(b.label, {})]))),
+      tr(boxes.map((b, i) => tc(ws[i], [cp(b.name, {})], { va: 'bottom' })), { h: 1500 })
+    ], { float: '<w:tblpPr w:leftFromText="0" w:rightFromText="0" w:vertAnchor="margin" w:horzAnchor="margin" w:tblpXSpec="center" w:tblpYSpec="bottom"/><w:tblOverlap w:val="never"/>' }));
+    body.push(para(''));   // anchor paragraph keeps the floating boxes on the cover page
+  }
+  /* ---- page 2: project details ---- */
+  const pbp = () => para('', { pb: 1, line: 20, rule: 'exact' });
+  const info = S.info.filter(r => r.label.trim() || r.value.trim());
+  if (info.length) {
+    body.push(pbp());
+    const ws = [1900, 300, W - 2200];
+    body.push(tbl(ws, info.map(r => tr([
+      tc(ws[0], [para(runs(r.label, { ...T, b: 1, caps: 1 }), { before: 40, after: 40 })], { va: 'top' }),
+      tc(ws[1], [para(runs(':', { ...T, b: 1 }), { before: 40, after: 40 })], { va: 'top' }),
+      tc(ws[2], cleanTxt(r.value).split('\n').map(l => para(runs(l, T), { before: 40, after: 40 })), { va: 'top' })], { cant: false })), { none: 1, pad: 40 }));
+    body.push(para('', { after: 120 }));
+  }
+  /* ---- sections ---- */
+  let num = 0, forceBreak = !info.length;   // no project details: first section starts a fresh page after the cover
+  S.sections.forEach(s => {
+    const hasHead = s.heading.trim(), pb = s.newPage || forceBreak; forceBreak = false;
+    if (hasHead) { num++; body.push(para(runs(`${num}. ${s.heading.trim()}`, { ...T, b: 1, u: 1, sz: 24 }), { keepNext: 1, before: 240, after: 120, pb })); }
+    else if (pb) body.push(pbp());
+    if (s.intro.trim()) body.push(para(runs(s.intro.trim(), { ...T, i: 0 }), { after: 140, ind: [284, 0] }));
+    if (s.type === 'text') cleanTxt(s.body).split(/\n\s*\n/).filter(x => x.trim()).forEach(p => body.push(para(runs(p.trim(), T), { after: 140, line: 276, jc: 'both' })));
+    if (s.type === 'bullets') cleanTxt(s.items).split('\n').filter(x => x.trim()).forEach(l => body.push(para(runs(l.trim(), T), { num: 1, ind: [567, 283], after: 80 })));
+    if (s.type === 'table') body.push(...tableXml(s), para('', { after: 120 }));
+    if (s.type === 'photos') { let k = 0; s.groups.forEach(g => body.push(...photoGroup(g, g.sub && g.sub.trim() ? String.fromCharCode(97 + k++) : null))); }
+    if (s.type === 'beforeafter') { let k = 0; s.groups.forEach(g => body.push(...baGroup(g, g.sub && g.sub.trim() ? String.fromCharCode(97 + k++) : null))); }
+    if (s.type === 'findings') body.push(...findingsXml(s), para('', { after: 120 }));
+  });
+
+  function tableXml(s) {
+    const n = s.cols.length, cw = Math.floor(W / n), ws = s.cols.map(() => cw); ws[n - 1] += W - cw * n;
+    const f = { font: TNR, sz: 20 }, jc = s.center ? 'center' : 'left';
+    const cell = (t, i, o = {}) => tc(ws[i], (cleanTxt(t).split('\n').length ? cleanTxt(t).split('\n') : ['']).map(l => para(runs(l, { ...f, ...o }), { jc: o.b ? 'center' : jc, before: 40, after: 40 })), o.b ? { shade: 'D9E2F3' } : {});
+    return [tbl(ws, [tr(s.cols.map((c, i) => cell(c, i, { b: 1 })), { hdr: 1 }), ...s.rows.map(r => tr(r.map((c, i) => cell(c, i))))])];
+  }
+  function photoCell(p, cw, cols, g) {
+    const out = [], mode = (g && g.fit) || 'natural';
+    if (hasSrc(p) && media_(p.src)) {
+      if (mode === 'natural') {
+        const [cx, cy] = fit(p.w, p.h, cw / 567 - 0.5, cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6);
+        out.push(para(pic(p.src, cx, cy), { jc: 'center', keepNext: 1, before: 80, after: 40 }));
+      } else {
+        const [fw, fh] = frameCm(cols, cw), Wt = Math.round(fw * 567), Ht = Math.round(fh * 567), iw = fw - 0.12, ih = fh - 0.12;
+        let cx, cy, crop = null;
+        if (mode === 'fill') { cx = Math.round(iw * 360000); cy = Math.round(ih * 360000); crop = cropOf(p.w, p.h, iw / ih); } else [cx, cy] = fit(p.w, p.h, iw, ih);
+        out.push(para('', { line: 100, rule: 'exact', keepNext: 1 }));
+        out.push(tbl([Wt], [tr([tc(Wt, [para(pic(p.src, cx, cy, null, crop), { jc: 'center' })], { va: 'center' })], { h: Ht, exact: 1 })], { none: !g.pborder, pad: 0 }));
+        out.push(para('', { line: 60, rule: 'exact', after: 40 }));
+      }
+    }
+    if (p && p.caption && p.caption.trim()) out.push(para(runs(p.caption.trim(), { font: TNR, sz: 20 }), { jc: 'center', before: 20, after: 80 }));
+    return out;
+  }
+  function subHead(letter, text) { return para(runs(`${letter}) ${text.trim()}`, { ...T, b: 1, u: 1 }), { keepNext: 1, before: 200, after: 100 }); }
+  function photoGroup(g, letter) {
+    const out = []; const cols = g.cols || 2, cw = Math.floor(W / cols), ws = Array.from({ length: cols }, () => cw); ws[cols - 1] += W - cw * cols;
+    if (letter) out.push(subHead(letter, g.sub));
+    const rows = [];
+    if (g.title && g.title.trim()) rows.push(tr([tc(W, [para(runs(g.title.trim(), { font: TNR, sz: 20, b: 1, caps: 1 }), { jc: 'center', keepNext: 1, before: 40, after: 40 })], { span: cols })]));
+    const ph = g.photos.filter(p => hasSrc(p) || (p.caption && p.caption.trim()));
+    for (let i = 0; i < ph.length; i += cols) rows.push(tr(ws.map((w, k) => tc(w, photoCell(ph[i + k], w, cols, g))), {}));
+    if (!rows.length) return out;
+    out.push(tbl(ws, rows, { none: g.frame === false }), para('', { after: 120 }));
+    return out;
+  }
+  function baGroup(g, letter) {
+    const out = []; const cw = Math.floor(W / 2), ws = [cw, W - cw];
+    if (letter) out.push(subHead(letter, g.sub));
+    const rows = [];
+    if (g.title && g.title.trim()) rows.push(tr([tc(W, [para(runs(g.title.trim(), { font: TNR, sz: 20, b: 1, caps: 1 }), { jc: 'center', keepNext: 1, before: 40, after: 40 })], { span: 2 })]));
+    rows.push(tr(['Before', 'After'].map((t, i) => tc(ws[i], [para(runs(t, { font: TNR, sz: 20, b: 1, caps: 1 }), { jc: 'center', keepNext: 1, before: 30, after: 30 })])), { hdr: 1 }));
+    g.pairs.forEach(p => rows.push(tr([tc(ws[0], photoCell(p.before, ws[0], 2, g)), tc(ws[1], photoCell(p.after, ws[1], 2, g))])));
+    out.push(tbl(ws, rows), para('', { after: 120 }));
+    return out;
+  }
+  function findingsXml(s) {
+    const ws = [560, 1750, 2450, 2700, 2433], A = { font: ARI, sz: 17 };
+    const hd = ['No.', 'Location / component', 'Inspection photo', 'Problem finding / condition', 'Recommended countermeasure / solution'];
+    const lab = (pre, t) => { t = (t || '').trim(); if (!t) return [para('')]; const rest = t.replace(new RegExp('^' + pre + ':?\\s*', 'i'), ''); return [para(runs(pre + ': ', { ...A, b: 1 }) + runs(rest, A), { before: 40, after: 40 })]; };
+    const rows = [tr(hd.map((t, i) => tc(ws[i], [para(runs(t, { ...A, b: 1 }), { jc: 'center', before: 40, after: 40 })], { shade: 'DDEBF7' })), { hdr: 1 })];
+    s.rows.forEach((r, ri) => {
+      const pc = [];
+      if (hasSrc(r.photo) && media_(r.photo.src)) { const [cx, cy] = fit(r.photo.w, r.photo.h, ws[2] / 567 - 0.4, 3.8); pc.push(para(pic(r.photo.src, cx, cy), { jc: 'center', keepNext: 1, before: 60, after: 30 })); }
+      if (r.cap && r.cap.trim()) pc.push(para(runs(r.cap.trim(), { ...A, b: 1 }), { jc: 'center', after: 60 }));
+      rows.push(tr([
+        tc(ws[0], [para(runs(String(ri + 1), A), { jc: 'center' })]),
+        tc(ws[1], cleanTxt(r.loc).split('\n').map((l, k) => para(runs(l, { ...A, b: k === 0 }), { before: 20, after: 20 })), { va: 'top' }),
+        tc(ws[2], pc),
+        tc(ws[3], lab('Finding', r.finding), { va: 'top' }),
+        tc(ws[4], lab('Action', r.action), { va: 'top' })], { }));
+    });
+    return [tbl(ws, rows, { pad: 70 })];
+  }
+
+  /* ---- header / footer ---- */
+  const c = S.company; let hdrRels = '';
+  let logoXml = '';
+  if (c.logo) {
+    const dims = pngSize(c.logo);
+    const [cx, cy] = fit(dims[0], dims[1], LOGO_W, LOGO_H); const o = media_(c.logo);
+    if (o) { logoXml = pic(c.logo, cx, cy, 'rId1'); hdrRels = `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${o.file}"/>`; }
+  }
+  const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+  const header = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ${NS}>${para(logoXml, { jc: 'right' })}</w:hdr>`;
+  const fl = [], al = ['left', 'right'].includes(c.falign) ? c.falign : 'center', FP = { jc: al, line: 210, rule: 'exact' };
+  const nm = (c.name || '').trim(), rg = (c.reg || '').trim();
+  if (nm) fl.push(para(runs(nm, { font: ARI, b: 1, sz: 15 }) + (rg ? runs(' ' + (rg.startsWith('(') ? rg : '(' + rg + ')'), { font: ARI, sz: 15 }) : ''), { ...FP, border: 1 }));
+  if ((c.addr || '').trim()) fl.push(para(runs(c.addr.trim(), { font: ARI, sz: 15 }), { ...FP, border: !nm }));
+  const cs = contactSegs(c);
+  if (cs.length) fl.push(para(cs.map(g => runs(g.t, { font: ARI, sz: 15, b: g.b })).join(''), { ...FP, border: !nm && !(c.addr || '').trim() }));
+  const footer = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ${NS}>${fl.join('') || para('')}</w:ftr>`;
+
+  const sect = `<w:sectPr><w:headerReference w:type="default" r:id="rIdHdr"/><w:footerReference w:type="default" r:id="rIdFtr"/><w:pgSz w:w="11909" w:h="16834"/><w:pgMar w:top="2020" w:right="1008" w:bottom="1440" w:left="1008" w:header="280" w:footer="360" w:gutter="0"/></w:sectPr>`;
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body.join('')}${para('')}${sect}</w:body></w:document>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="${TNR}" w:hAnsi="${TNR}" w:cs="${TNR}" w:eastAsia="${TNR}"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style><w:style w:type="table" w:default="1" w:styleId="TableNormal"><w:name w:val="Normal Table"/><w:uiPriority w:val="99"/><w:semiHidden/><w:tblPr><w:tblInd w:w="0" w:type="dxa"/><w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:left w:w="108" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="108" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`;
+  const numbering = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="567" w:hanging="283"/></w:pPr><w:rPr><w:rFonts w:ascii="${ARI}" w:hAnsi="${ARI}" w:cs="${ARI}"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>`;
+  const R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const docRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdSt" Type="${R}/styles" Target="styles.xml"/><Relationship Id="rIdNum" Type="${R}/numbering" Target="numbering.xml"/><Relationship Id="rIdHdr" Type="${R}/header" Target="header1.xml"/><Relationship Id="rIdFtr" Type="${R}/footer" Target="footer1.xml"/>${media.map(m => `<Relationship Id="${m.rid}" Type="${R}/image" Target="media/${m.file}"/>`).join('')}</Relationships>`;
+  const hdrRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${hdrRels}</Relationships>`;
+  const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="png" ContentType="image/png"/><Default Extension="gif" ContentType="image/gif"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/><Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>`;
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${R}/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const te = new TextEncoder();
+  return zip([
+    { name: '[Content_Types].xml', data: te.encode(ct) }, { name: '_rels/.rels', data: te.encode(rootRels) },
+    { name: 'word/document.xml', data: te.encode(doc) }, { name: 'word/_rels/document.xml.rels', data: te.encode(docRels) },
+    { name: 'word/styles.xml', data: te.encode(styles) }, { name: 'word/numbering.xml', data: te.encode(numbering) },
+    { name: 'word/header1.xml', data: te.encode(header) }, { name: 'word/_rels/header1.xml.rels', data: te.encode(hdrRelsXml) },
+    { name: 'word/footer1.xml', data: te.encode(footer) },
+    ...media.map(m => ({ name: 'word/media/' + m.file, data: m.data }))
+  ]);
+}
+/* read width/height from a PNG data URL without decoding it */
+function pngSize(src) {
+  try { const b = atob(src.split(',')[1].slice(0, 60)); const u = i => (b.charCodeAt(i) << 24 | b.charCodeAt(i + 1) << 16 | b.charCodeAt(i + 2) << 8 | b.charCodeAt(i + 3)) >>> 0; const w = u(16), hh = u(20); if (w && hh) return [w, hh]; } catch (e) {}
+  return [3, 2];
+}
+
+/* ---- minimal zip (stored, no compression; photos are already compressed) ---- */
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function zip(files) {
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  const d = new Date(), time = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), date = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  for (const f of files) {
+    const name = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(10, time, true); lh.setUint16(12, date, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(12, time, true); ch.setUint16(14, date, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + size;
+  }
+  let cs = 0; central.forEach(c => cs += c.length);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cs, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+/* ================= preview renderer (also the source for the PDF) ================= */
+const PGW = 794, PGH = 1123, TOPPX = 135;          // A4 at 96 dpi; text area starts 135px down (below the logo band)
+const LOGO_W = 10, LOGO_H = 2.8;                     // logo box in cm: the same on every page, in Word, preview and PDF
+const cmPx = c => c * 37.795, twp = t => t / 15;
+function hostEl() { let e = $('#host'); if (!e) { e = document.createElement('div'); e.id = 'host'; document.body.append(e); } return e; }
+function fitCm(w, hh, mw, mh) { let cw = mw, ch = mw * hh / w; if (ch > mh) { ch = mh; cw = mh * w / hh; } return [cw, ch]; }
+
+function addText(el, text) {
+  cleanTxt(text).split('\n').forEach((ln, li) => {
+    if (li) el.append(document.createElement('br'));
+    const re = /(\d)(st|nd|rd|th)\b/g; let last = 0, m;
+    while ((m = re.exec(ln))) { el.append(ln.slice(last, m.index + 1)); const s = document.createElement('sup'); s.textContent = m[2]; el.append(s); last = m.index + m[0].length; }
+    el.append(ln.slice(last));
+  });
+}
+function P(content, o = {}) {
+  const d = document.createElement('div'), s = d.style; d.className = 'dp' + (o.sans ? ' sa' : '');
+  s.fontSize = ((o.sz || 22) * 2 / 3) + 'px';
+  if (o.b) s.fontWeight = '700'; if (o.u) s.textDecoration = 'underline'; if (o.caps) s.textTransform = 'uppercase';
+  s.textAlign = o.jc === 'both' ? 'justify' : (o.jc || 'left');
+  s.margin = `${twp(o.before || 0)}px 0 ${twp(o.after || 0)}px 0`;
+  if (o.ind) { s.marginLeft = twp(o.ind[0]) + 'px'; if (o.ind[1]) s.textIndent = -twp(o.ind[1]) + 'px'; }
+  s.lineHeight = o.rule === 'exact' ? twp(o.line) + 'px' : String(1.15 * (o.line ? o.line / 240 : 1));
+  const segs = Array.isArray(content) ? content : [{ t: content }]; let any = false;
+  segs.forEach(g => { if (g.t == null || g.t === '') return; any = true; if (g.b) { const sp = document.createElement('span'); sp.style.fontWeight = '700'; addText(sp, String(g.t)); d.append(sp); } else addText(d, String(g.t)); });
+  if (!any) d.append(' ');
+  return d;
+}
+function IMG(p, mwCm, mhCm, o = {}) {
+  const [cw, ch] = fitCm(p.w, p.h, mwCm, mhCm), d = document.createElement('div'), im = new Image();
+  d.className = 'dp'; d.style.margin = `${twp(o.before || 0)}px 0 ${twp(o.after || 0)}px 0`;
+  im.src = p.src; im.style.cssText = `display:block;margin:0 auto;width:${cmPx(cw)}px;height:${cmPx(ch)}px`; d.append(im); return d;
+}
+function FRAME(p, cols, cwTw, g, o = {}) {
+  const [fw, fh] = frameCm(cols, cwTw), W = cmPx(fw), H = cmPx(fh), bd = g.pborder ? 1 : 0, IW = W - 2 * bd, IH = H - 2 * bd, iw = cmPx(fw - 0.12), ih = cmPx(fh - 0.12);
+  const d = document.createElement('div'), box = document.createElement('div'), ib = document.createElement('div'), im = new Image();
+  d.className = 'dp'; d.style.margin = `${twp(o.before || 0)}px 0 ${twp(o.after || 0)}px 0`;
+  box.style.cssText = `position:relative;box-sizing:border-box;width:${W}px;height:${H}px;margin:0 auto;border:${bd}px solid #000`;
+  ib.style.cssText = `position:absolute;overflow:hidden;width:${iw}px;height:${ih}px;left:${(IW - iw) / 2}px;top:${(IH - ih) / 2}px`; ib.dataset.clip = '1';
+  const k = g.fit === 'fill' ? Math.max(iw / p.w, ih / p.h) : Math.min(iw / p.w, ih / p.h), dw = p.w * k, dh = p.h * k;
+  im.src = p.src; im.style.cssText = `position:absolute;display:block;width:${dw}px;height:${dh}px;left:${(iw - dw) / 2}px;top:${(ih - dh) / 2}px`;
+  ib.append(im); box.append(ib); d.append(box); return d;
+}
+function TBL(widths, o = {}) {
+  const t = document.createElement('table'); t.className = 'dt' + (o.none ? ' nb' : ''); t.style.width = twp(widths.reduce((a, b) => a + b, 0)) + 'px';
+  const cg = document.createElement('colgroup'); widths.forEach(w => { const c = document.createElement('col'); c.style.width = twp(w) + 'px'; cg.append(c); }); t.append(cg); return t;
+}
+function TD(w, kids, o = {}) {
+  const c = document.createElement('td'); c.style.width = twp(w) + 'px'; if (o.span) c.colSpan = o.span;
+  if (o.shade) c.style.background = '#' + o.shade; c.style.verticalAlign = o.va === 'top' ? 'top' : o.va === 'bottom' ? 'bottom' : 'middle'; if (o.h) c.style.height = twp(o.h) + 'px';
+  (kids.length ? kids : [P('')]).forEach(k => c.append(k)); return c;
+}
+const TR = cells => { const r = document.createElement('tr'); cells.forEach(c => r.append(c)); return r; };
+
+/* tel | email | website: each item keeps its words together, so a long line wraps between items */
+function contactSegs(C) {
+  const out = [];
+  [['Tel:', C.tel], ['Email:', C.email], ['Website:', C.web]].filter(x => (x[1] || '').trim()).forEach((x, i) => {
+    if (i) out.push({ t: ' | ' });
+    out.push({ t: x[0], b: 1 }, { t: '\u00A0' + x[1].trim().replace(/ /g, '\u00A0') });
+  });
+  return out;
+}
+function mkPage(C) {
+  const pg = document.createElement('div'); pg.className = 'dpage';
+  const hd = document.createElement('div'); hd.className = 'dhd';
+  if (C.logo) { const [w, hh] = pngSize(C.logo), [cw, ch] = fitCm(w, hh, LOGO_W, LOGO_H), im = new Image(); im.src = C.logo; im.style.cssText = `width:${cmPx(cw)}px;height:${cmPx(ch)}px;display:inline-block`; hd.append(im); }
+  const body = document.createElement('div'); body.className = 'dbody'; const fc = document.createElement('div'); fc.className = 'fc'; body.append(fc);
+  const ft = document.createElement('div'); ft.className = 'dft sa';
+  const lines = [], nm = (C.name || '').trim(), rg = (C.reg || '').trim(), al = ['left', 'right'].includes(C.falign) ? C.falign : 'center';
+  if (nm) lines.push([{ t: nm, b: 1 }, { t: rg ? ' ' + (rg.startsWith('(') ? rg : '(' + rg + ')') : '' }]);
+  if ((C.addr || '').trim()) lines.push([{ t: C.addr.trim() }]);
+  const cs = contactSegs(C);
+  if (cs.length) lines.push(cs);
+  lines.forEach((l, i) => { const d = P(l, { sans: 1, sz: 15, jc: al, line: 210, rule: 'exact' }); if (i === 0) d.classList.add('dfl1'); ft.append(d); });
+  pg.append(hd, body, ft); return pg;
+}
+
+class Flow {
+  constructor(host, C) { this.host = host; this.C = C; this.pages = []; this.pending = []; this.newPage(); }
+  newPage() {
+    const pg = mkPage(this.C); this.host.append(pg); this.pages.push(pg); this.cur = pg; this.fc = pg.querySelector('.fc');
+    /* the text area stops above the footer, however many lines the footer has */
+    const fh = pg.querySelector('.dft').offsetHeight, bottom = Math.max(96, fh + 24 + 14);
+    this.bodyH = PGH - TOPPX - bottom; pg.querySelector('.dbody').style.height = this.bodyH + 'px';
+  }
+  over() { return this.fc.offsetHeight > this.bodyH + 0.5; }
+  breakPage() { if (this.fc.children.length) this.newPage(); }
+  hold(el) { this.pending.push(el); }
+  block(el) {
+    const els = [...this.pending, el]; this.pending = []; els.forEach(e => this.fc.append(e));
+    if (this.over() && this.fc.children.length > els.length) { els.forEach(e => e.remove()); this.newPage(); els.forEach(e => this.fc.append(e)); }
+  }
+  /* spec: make() -> empty table, repeat: header rows, units: arrays of rows that must stay together */
+  table(spec) {
+    let lead = this.pending, frag = null; this.pending = [];
+    spec.units.forEach(unit => {
+      const attempt = () => { if (!frag) { lead.forEach(e => this.fc.append(e)); frag = spec.make(); this.fc.append(frag); spec.repeat.forEach(r => frag.append(r.cloneNode(true))); } unit.forEach(r => frag.append(r)); };
+      attempt(); if (!this.over()) return;
+      const prev = frag.rows.length - spec.repeat.length - unit.length;
+      if (prev > 0) { unit.forEach(r => r.remove()); lead = []; frag = null; this.newPage(); attempt(); return; }
+      if (this.fc.children.length > 1 + lead.length) { lead.forEach(e => e.remove()); frag.remove(); frag = null; this.newPage(); attempt(); }
+    });
+  }
+}
+
+function renderDoc(S) {
+  const host = hostEl(); host.innerHTML = '';
+  const C = S.company, F = new Flow(host, C), fc0 = F.fc, W2 = 9893;
+  /* cover page */
+  fc0.append(P(S.title || 'Report', { sans: 1, b: 1, sz: 44, caps: 1, before: 1000, after: 700, line: 260 }));
+  S.meta.filter(r => r.label.trim() || r.value.trim()).forEach(r => {
+    const lab = r.label.trim() ? r.label.trim() + ':' : '', lines = cleanTxt(r.value).split('\n'), o = { sans: 1, b: 1, sz: 22, caps: 1 };
+    if (lines.length > 1) { fc0.append(P(lab, { ...o, after: 60 })); lines.forEach((l, k) => fc0.append(P(l, { ...o, ind: [567, 0], after: k === lines.length - 1 ? 200 : 40 }))); }
+    else fc0.append(P((lab ? lab + ' ' : '') + r.value.trim(), { ...o, after: 200 }));
+  });
+  const boxes = S.signoff.filter(s => s.label.trim() || s.name.trim());
+  if (boxes.length) {
+    const cw = Math.floor(W2 / boxes.length), ws = boxes.map(() => cw); ws[ws.length - 1] += W2 - cw * boxes.length;
+    const t = TBL(ws), cp = x => P(x, { sans: 1, sz: 16, caps: 1, jc: 'center', before: 30, after: 30 });
+    t.append(TR(boxes.map((b, i) => TD(ws[i], [cp(b.label)]))), TR(boxes.map((b, i) => TD(ws[i], [cp(b.name)], { h: 1500, va: 'bottom' }))));
+    t.classList.add('dsign'); F.cur.querySelector('.dbody').append(t);
+  }
+  const T = { sz: 22 };
+  const info = S.info.filter(r => r.label.trim() || r.value.trim());
+  if (info.length) {
+    F.breakPage();
+    const ws = [1900, 300, W2 - 2200];
+    F.table({ make: () => TBL(ws, { none: 1 }), repeat: [], units: info.map(r => [TR([
+      TD(ws[0], [P(r.label, { ...T, b: 1, caps: 1, before: 40, after: 40 })], { va: 'top' }), TD(ws[1], [P(':', { ...T, b: 1, before: 40, after: 40 })], { va: 'top' }),
+      TD(ws[2], cleanTxt(r.value).split('\n').map(l => P(l, { ...T, before: 40, after: 40 })), { va: 'top' })])]) });
+    F.block(P('', { after: 120 }));
+  }
+  let num = 0, force = !info.length;
+  const photoCell = (p, cw, cols, g) => {
+    const out = [];
+    if (hasSrc(p)) out.push(g.fit === 'frame' || g.fit === 'fill' ? FRAME(p, cols, cw, g, { before: 80, after: 40 }) : IMG(p, cw / 567 - 0.5, cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6, { jc: 'center', before: 80, after: 40 }));
+    if (p && p.caption && p.caption.trim()) out.push(P(p.caption.trim(), { sz: 20, jc: 'center', before: 20, after: 80 }));
+    return out;
+  };
+  const subHead = (l, t) => F.hold(P(`${l}) ${t.trim()}`, { ...T, b: 1, u: 1, before: 200, after: 100 }));
+  const titleRow = (t, span, W) => TR([TD(W, [P(t.trim(), { sz: 20, b: 1, caps: 1, jc: 'center', before: 40, after: 40 })], { span })]);
+  S.sections.forEach(s => {
+    const pb = s.newPage || force; force = false; if (pb) F.breakPage();
+    if (s.heading.trim()) { num++; F.hold(P(`${num}. ${s.heading.trim()}`, { ...T, sz: 24, b: 1, u: 1, before: 240, after: 120 })); }
+    if (s.intro.trim()) F.hold(P(s.intro.trim(), { ...T, ind: [284, 0], after: 140 }));
+    if (s.type === 'text') { const ps = cleanTxt(s.body).split(/\n\s*\n/).filter(x => x.trim()); if (!ps.length) F.block(P('', {})); ps.forEach(p => F.block(P(p.trim(), { ...T, after: 140, line: 276, jc: 'both' }))); }
+    else if (s.type === 'bullets') { const ls = cleanTxt(s.items).split('\n').filter(x => x.trim()); if (!ls.length) F.block(P('', {})); ls.forEach(l => F.block(P('•  ' + l.trim(), { ...T, ind: [567, 283], after: 80 }))); }
+    else if (s.type === 'table') {
+      const n = s.cols.length, cw = Math.floor(W2 / n), ws = s.cols.map(() => cw); ws[n - 1] += W2 - cw * n;
+      const cell = (t, i, hd) => TD(ws[i], cleanTxt(t).split('\n').map(l => P(l, { sz: 20, b: hd, jc: hd || s.center ? 'center' : 'left', before: 40, after: 40 })), hd ? { shade: 'D9E2F3' } : {});
+      F.table({ make: () => TBL(ws), repeat: [TR(s.cols.map((c, i) => cell(c, i, 1)))], units: s.rows.map(r => [TR(r.map((c, i) => cell(c, i, 0)))]) });
+      F.block(P('', { after: 120 }));
+    } else if (s.type === 'photos' || s.type === 'beforeafter') {
+      let k = 0;
+      s.groups.forEach(g => {
+        if (g.sub && g.sub.trim()) subHead(String.fromCharCode(97 + k++), g.sub);
+        const cols = s.type === 'photos' ? (g.cols || 2) : 2, cw = Math.floor(W2 / cols), ws = Array.from({ length: cols }, () => cw); ws[cols - 1] += W2 - cw * cols;
+        const units = [], head = [];
+        if (g.title && g.title.trim()) head.push(titleRow(g.title, cols, W2));
+        if (s.type === 'photos') {
+          const ph = g.photos.filter(p => hasSrc(p) || (p.caption && p.caption.trim()));
+          for (let i = 0; i < ph.length; i += cols) units.push([TR(ws.map((w, j) => TD(w, photoCell(ph[i + j], w, cols, g))))]);
+        } else {
+          head.push(TR(['Before', 'After'].map((t, i) => TD(ws[i], [P(t, { sz: 20, b: 1, caps: 1, jc: 'center', before: 30, after: 30 })]))));
+          g.pairs.forEach(p => units.push([TR([TD(ws[0], photoCell(p.before, ws[0], 2, g)), TD(ws[1], photoCell(p.after, ws[1], 2, g))])]));
+        }
+        if (!units.length) { if (head.length && s.type === 'beforeafter') units.push([]); else { return; } }
+        if (units.length) units[0] = [...head, ...units[0]];
+        F.table({ make: () => TBL(ws, { none: s.type === 'photos' && g.frame === false }), repeat: [], units });
+        F.block(P('', { after: 120 }));
+      });
+    } else if (s.type === 'findings') {
+      const ws = [560, 1750, 2450, 2700, 2433], A = { sans: 1, sz: 17 };
+      const hd = ['No.', 'Location / component', 'Inspection photo', 'Problem finding / condition', 'Recommended countermeasure / solution'];
+      const lab = (pre, t) => { t = (t || '').trim(); if (!t) return [P('')]; return [P([{ t: pre + ': ', b: 1 }, { t: t.replace(new RegExp('^' + pre + ':?\\s*', 'i'), '') }], { ...A, before: 40, after: 40 })]; };
+      const units = s.rows.map((r, ri) => {
+        const pc = [];
+        if (hasSrc(r.photo)) pc.push(IMG(r.photo, ws[2] / 567 - 0.4, 3.8, { before: 60, after: 30 }));
+        if (r.cap && r.cap.trim()) pc.push(P(r.cap.trim(), { ...A, b: 1, jc: 'center', after: 60 }));
+        return [TR([TD(ws[0], [P(String(ri + 1), { ...A, jc: 'center' })]), TD(ws[1], cleanTxt(r.loc).split('\n').map((l, k) => P(l, { ...A, b: k === 0, before: 20, after: 20 })), { va: 'top' }), TD(ws[2], pc), TD(ws[3], lab('Finding', r.finding), { va: 'top' }), TD(ws[4], lab('Action', r.action), { va: 'top' })])];
+      });
+      F.table({ make: () => TBL(ws), repeat: [TR(hd.map((t, i) => TD(ws[i], [P(t, { ...A, b: 1, jc: 'center', before: 40, after: 40 })], { shade: 'DDEBF7' })))], units });
+      F.block(P('', { after: 120 }));
+    }
+  });
+  return F.pages;
+}
+
+/* ================= PDF writer: reads positions straight from the rendered pages ================= */
+const WINANSI = { 0x2013: 0x96, 0x2014: 0x97, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2026: 0x85, 0x20AC: 0x80, 0x2122: 0x99 };
+function pdfStr(s) {
+  let o = ''; for (const ch of s) { let c = ch.codePointAt(0); if (WINANSI[c]) c = WINANSI[c]; else if (c > 255) c = 63;
+    if (c === 40 || c === 41 || c === 92) o += '\\' + String.fromCharCode(c); else if (c < 32 || c > 126) o += '\\' + c.toString(8).padStart(3, '0'); else o += String.fromCharCode(c); }
+  return o;
+}
+const dataBytes = src => { const bin = atob(src.split(',')[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+function jpegInfo(u) { let i = 2; while (i < u.length - 9) { if (u[i] !== 0xFF) { i++; continue; } const m = u[i + 1]; if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) return { h: (u[i + 5] << 8) | u[i + 6], w: (u[i + 7] << 8) | u[i + 8], nc: u[i + 9] }; i += 2 + ((u[i + 2] << 8) | u[i + 3]); } return null; }
+const rgbOf = c => { const m = /rgba?\(([^)]+)\)/.exec(c); if (!m) return null; const p = m[1].split(',').map(parseFloat); return { r: p[0] / 255, g: p[1] / 255, b: p[2] / 255, a: p.length > 3 ? p[3] : 1 }; };
+const f2 = n => (Math.round(n * 100) / 100).toString();
+
+async function buildPdf(pages, title) {
+  const enc = s => { const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i) & 255; return u; };
+  const objs = []; const add = parts => { objs.push(parts); return objs.length; };
+  const catalog = add(null), pagesObj = add(null);
+  const stream = (dict, bytes) => [`<<${dict}/Length ${bytes.length}>>\nstream\n`, bytes, '\nendstream'];
+  const fonts = {}, FN = { 'sa': ['Helvetica', 'Helvetica-Bold', 'Helvetica-Oblique', 'Helvetica-BoldOblique'], 'se': ['Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-BoldItalic'] };
+  const fontRef = (sans, b, i) => { const nm = FN[sans ? 'sa' : 'se'][(b ? 1 : 0) + (i ? 2 : 0)]; if (!fonts[nm]) fonts[nm] = { key: 'F' + (Object.keys(fonts).length + 1), id: add(`<</Type/Font/Subtype/Type1/BaseFont/${nm}/Encoding/WinAnsiEncoding>>`) }; return fonts[nm]; };
+  const images = new Map();
+  async function imageRef(src) {
+    if (images.has(src)) return images.get(src);
+    let ref;
+    if (/^data:image\/jpe?g/.test(src)) {
+      const u = dataBytes(src), inf = jpegInfo(u); if (!inf) return null;
+      ref = { id: add(stream(`/Type/XObject/Subtype/Image/Width ${inf.w}/Height ${inf.h}/ColorSpace/${inf.nc === 1 ? 'DeviceGray' : 'DeviceRGB'}/BitsPerComponent 8/Filter/DCTDecode`, u)) };
+    } else {
+      const im = await readImageSrc(src), w = im.naturalWidth, hh = im.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = hh;
+      const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, w, hh).data, rgb = new Uint8Array(w * hh * 3), al = new Uint8Array(w * hh); let hasA = false;
+      for (let i = 0, j = 0; i < w * hh; i++) { rgb[j++] = d[i * 4]; rgb[j++] = d[i * 4 + 1]; rgb[j++] = d[i * 4 + 2]; al[i] = d[i * 4 + 3]; if (al[i] < 255) hasA = true; }
+      const sm = hasA ? add(stream(`/Type/XObject/Subtype/Image/Width ${w}/Height ${hh}/ColorSpace/DeviceGray/BitsPerComponent 8`, al)) : 0;
+      ref = { id: add(stream(`/Type/XObject/Subtype/Image/Width ${w}/Height ${hh}/ColorSpace/DeviceRGB/BitsPerComponent 8${sm ? `/SMask ${sm} 0 R` : ''}`, rgb)) };
+    }
+    ref.key = 'Im' + (images.size + 1); images.set(src, ref); return ref;
+  }
+  const PW = 595.28, PHt = 841.89, pageIds = [];
+  for (const pg of pages) {
+    const R = pg.getBoundingClientRect(), k = PW / R.width, X = v => f2((v - R.left) * k), Y = v => f2(PHt - (v - R.top) * k);
+    const ops = [], used = new Set(), els = [...pg.querySelectorAll('*')];
+    const rect = (l, t, w, h, c) => { if (w <= 0 || h <= 0) return; ops.push(`${f2(c.r)} ${f2(c.g)} ${f2(c.b)} rg ${X(l)} ${Y(t + h)} ${f2(w * k)} ${f2(h * k)} re f`); };
+    /* 1 backgrounds, 2 borders */
+    els.forEach(e => { const cs = getComputedStyle(e), c = rgbOf(cs.backgroundColor); if (c && c.a > 0.01 && e.tagName !== 'IMG') { const b = e.getBoundingClientRect(); rect(b.left, b.top, b.width, b.height, c); } });
+    const drawn = [];   // shared table borders are specified by both neighbouring cells: draw each line once
+    const seg = (horiz, pos, a, z, w, c) => {
+      if (drawn.some(d => d.h === horiz && Math.abs(d.pos - pos) < 1.8 && Math.min(d.z, z) - Math.max(d.a, a) > 0.5 * (z - a))) return;
+      drawn.push({ h: horiz, pos, a, z });
+      if (horiz) rect(a, pos, z - a, w, c); else rect(pos, a, w, z - a, c);
+    };
+    els.forEach(e => { const cs = getComputedStyle(e), b = e.getBoundingClientRect();
+      [['Top', 0], ['Bottom', 1], ['Left', 2], ['Right', 3]].forEach(([sd, n]) => { const w = parseFloat(cs['border' + sd + 'Width']); if (!(w > 0) || cs['border' + sd + 'Style'] === 'none') return; const c = rgbOf(cs['border' + sd + 'Color']) || { r: 0, g: 0, b: 0 };
+        if (n === 0) seg(true, b.top, b.left, b.right, w, c); if (n === 1) seg(true, b.bottom - w, b.left, b.right, w, c); if (n === 2) seg(false, b.left, b.top, b.bottom, w, c); if (n === 3) seg(false, b.right - w, b.top, b.bottom, w, c); }); });
+    /* 3 images */
+    for (const im of pg.querySelectorAll('img')) { const ref = await imageRef(im.getAttribute('src')); if (!ref) continue; const b = im.getBoundingClientRect(), pc = im.parentElement && im.parentElement.dataset.clip ? im.parentElement.getBoundingClientRect() : null; used.add(ref); ops.push(`q ${pc ? `${X(pc.left)} ${Y(pc.bottom)} ${f2(pc.width * k)} ${f2(pc.height * k)} re W n ` : ''}${f2(b.width * k)} 0 0 ${f2(b.height * k)} ${X(b.left)} ${Y(b.bottom)} cm /${ref.key} Do Q`); }
+    /* 4 text, word by word at the position the browser gave it */
+    const tw = document.createTreeWalker(pg, NodeFilter.SHOW_TEXT);
+    for (let n; (n = tw.nextNode());) {
+      const par = n.parentElement, v = n.nodeValue; if (!par || !/\S/.test(v)) continue;
+      const cs = getComputedStyle(par), sans = /arial|helvetica|sans/i.test(cs.fontFamily) && !/times|serif$/i.test(cs.fontFamily.split(',')[0]);
+      const f = fontRef(sans, parseInt(cs.fontWeight) >= 600 || cs.fontWeight === 'bold', cs.fontStyle === 'italic'), px = parseFloat(cs.fontSize), c = rgbOf(cs.color) || { r: 0, g: 0, b: 0 }, up = cs.textTransform === 'uppercase', asc = (sans ? 0.905 : 0.891) * px;
+      const rg = document.createRange(), lines = new Map(); const re = /\S+/g; let m;
+      const put = (str, r) => { if (!str) return; ops.push(`BT /${f.key} ${f2(px * k)} Tf ${f2(c.r)} ${f2(c.g)} ${f2(c.b)} rg 1 0 0 1 ${X(r.left)} ${Y(r.top + asc)} Tm (${pdfStr(up ? str.toUpperCase() : str)}) Tj ET`);
+        const key = Math.round(r.top); const L = lines.get(key) || { l: r.left, r: r.right, base: r.top + asc }; L.l = Math.min(L.l, r.left); L.r = Math.max(L.r, r.right); lines.set(key, L); };
+      while ((m = re.exec(v))) {
+        rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const rs = rg.getClientRects();
+        if (rs.length === 1) put(m[0], rs[0]); else for (let i = 0; i < m[0].length; i++) { rg.setStart(n, m.index + i); rg.setEnd(n, m.index + i + 1); const r1 = rg.getClientRects()[0]; if (r1) put(m[0][i], r1); }
+      }
+      if (/underline/.test(cs.textDecorationLine)) lines.forEach(L => rect(L.l, L.base + px * 0.1, L.r - L.l, Math.max(0.8, px * 0.06), c));
+    }
+    const body = enc(ops.join('\n')), cid = add(stream('', body));
+    pageIds.push({ cid, imgs: [...used] });
+  }
+  const fontRes = Object.values(fonts).map(f => `/${f.key} ${f.id} 0 R`).join(' ');
+  const kids = pageIds.map(p => add(`<</Type/Page/Parent ${pagesObj} 0 R/MediaBox[0 0 ${PW} ${PHt}]/Resources<</Font<<${fontRes}>>/XObject<<${p.imgs.map(r => `/${r.key} ${r.id} 0 R`).join(' ')}>>>>/Contents ${p.cid} 0 R>>`));
+  objs[catalog - 1] = `<</Type/Catalog/Pages ${pagesObj} 0 R>>`;
+  objs[pagesObj - 1] = `<</Type/Pages/Kids[${kids.map(i => i + ' 0 R').join(' ')}]/Count ${kids.length}>>`;
+  const hex16 = t => 'FEFF' + [...t].map(ch => { const c = ch.codePointAt(0); return c > 0xFFFF ? [0xD800 + ((c - 0x10000) >> 10), 0xDC00 + ((c - 0x10000) & 0x3FF)].map(x => x.toString(16).padStart(4, '0')).join('') : c.toString(16).padStart(4, '0'); }).join('');
+  const info = add(`<</Title <${hex16(title || 'Report')}>/Producer (Report Builder)>>`);
+  const out = [enc('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n')], offs = []; let pos = out[0].length;
+  objs.forEach((parts, i) => { offs.push(pos); const ps = [`${i + 1} 0 obj\n`, ...(Array.isArray(parts) ? parts : [parts]), '\nendobj\n'].map(p => typeof p === 'string' ? enc(p) : p); ps.forEach(p => { out.push(p); pos += p.length; }); });
+  let xr = `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('');
+  xr += `trailer\n<</Size ${objs.length + 1}/Root ${catalog} 0 R/Info ${info} 0 R>>\nstartxref\n${pos}\n%%EOF`;
+  out.push(enc(xr));
+  return new Blob(out, { type: 'application/pdf' });
+}
+function readImageSrc(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('image')); i.src = src; }); }
+
+/* ================= live pane, preview dialog, saving ================= */
+const wideScreen = () => matchMedia('(min-width: 1280px)').matches;
+let prevTimer = 0, lastPages = [], paneOn = false;
+function showPages(box, pages, avail) {
+  box.innerHTML = ''; const k = Math.min(1.25, Math.max(0.2, avail / PGW));
+  pages.forEach((pg, i) => { const w = document.createElement('div'); w.className = 'pgwrap'; w.style.width = PGW * k + 'px'; w.style.height = PGH * k + 'px';
+    const c = pg.cloneNode(true); c.style.transform = `scale(${k})`; c.style.transformOrigin = '0 0'; c.setAttribute('aria-label', 'Page ' + (i + 1)); w.append(c); box.append(w); });
+}
+function refreshPane() {
+  if (!paneOn) return; const box = $('#pvPages');
+  try { lastPages = renderDoc(S); } catch (e) { console.error(e); return; }
+  paneW = Math.round(box.clientWidth); showPages(box, lastPages, paneW - 24); $('#pvInfo').textContent = lastPages.length + (lastPages.length === 1 ? ' page' : ' pages');
+}
+function schedulePreview() { if (!paneOn) return; clearTimeout(prevTimer); prevTimer = setTimeout(refreshPane, 450); }
+function setPane(on) { paneOn = on; $('.shell').classList.toggle('pv', on); $('#pvBtn').setAttribute('aria-pressed', on); if (on) requestAnimationFrame(refreshPane); }
+let paneW = 0;
+new ResizeObserver(() => { const w = Math.round($('#pvPages').clientWidth); if (Math.abs(w - paneW) < 3) return; paneW = w; if (paneOn && lastPages.length) showPages($('#pvPages'), lastPages, w - 24); }).observe($('#pvPages'));
+$('#pvBtn').addEventListener('click', () => { if (wideScreen()) setPane(!paneOn); else openSave(); });
+$('#pvClose').addEventListener('click', () => setPane(false));
+matchMedia('(min-width: 1280px)').addEventListener('change', e => { if (!e.matches && paneOn) setPane(false); });
+
+function emptySlots() {
+  return S.sections.reduce((n, s) => {
+    if (s.type === 'photos') return n + s.groups.reduce((m, g) => m + g.photos.filter(p => !hasSrc(p)).length, 0);
+    if (s.type === 'beforeafter') return n + s.groups.reduce((m, g) => m + g.pairs.reduce((k, p) => k + (hasSrc(p.before) ? 0 : 1) + (hasSrc(p.after) ? 0 : 1), 0), 0);
+    return n;
+  }, 0);
+}
+function openSave() {
+  if (!S.title.trim()) { toast('Give the report a title first.', { error: true }); $('#rTitle').focus(); return; }
+  let pages; try { pages = renderDoc(S); } catch (e) { console.error(e); toast('Could not build the preview: ' + e.message, { error: true }); return; }
+  const v = $('#saveView'); v.hidden = false; document.body.style.overflow = 'hidden';
+  const box = $('#svPages'); showPages(box, pages, Math.min(PGW, box.clientWidth - 24));
+  const em = emptySlots(); $('#svInfo').textContent = pages.length + (pages.length === 1 ? ' page' : ' pages') + (em ? ' · ' + em + ' empty photo slot' + (em > 1 ? 's' : '') + ' will stay blank' : '');
+  $('#svWord').focus();
+}
+function closeSave() { $('#saveView').hidden = true; document.body.style.overflow = ''; if (paneOn) refreshPane(); }
+$('#docBtn').addEventListener('click', openSave);
+$('#svClose').addEventListener('click', closeSave);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#saveView').hidden) closeSave(); });
+$('#svWord').addEventListener('click', () => {
+  try { const name = safeName(S.title) + '.docx'; saveBlob(buildDocx(S), name); dirty = false; toast('Saved ' + name); }
+  catch (e) { console.error(e); toast('Could not build the Word file: ' + e.message, { error: true }); }
+});
+$('#svPdf').addEventListener('click', async () => {
+  const b = $('#svPdf'); b.disabled = true; const t0 = b.textContent; b.textContent = 'Making PDF…';
+  try { const pages = renderDoc(S), name = safeName(S.title) + '.pdf'; saveBlob(await buildPdf(pages, S.title), name); dirty = false; toast('Saved ' + name); }
+  catch (e) { console.error(e); toast('Could not build the PDF: ' + e.message, { error: true }); }
+  finally { b.disabled = false; b.textContent = t0; }
+});
+
+/* ================= install as an app ================= */
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('#installBtn').hidden = false; });
+window.addEventListener('appinstalled', () => { installEvt = null; $('#installBtn').hidden = true; toast('Installed. Open it from your apps.'); });
+$('#installBtn').addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; $('#installBtn').hidden = true; });
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('report-sw.js', { scope: './report.html' }).catch(() => {}));
+}
+
+/* ================= autosave in this browser (IndexedDB holds the photos too) ================= */
+const idb = () => new Promise((res, rej) => { const r = indexedDB.open('report-builder', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+async function idbGet(k) { const db = await idb(); return new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+async function idbSet(k, v) { const db = await idb(); return new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = t.onabort = () => rej(t.error); }); }
+let draftReady = false, draftTimer = 0;
+const setDraftLabel = t => { $('#draftState').textContent = t; };
+function scheduleDraft() { if (!draftReady) return; clearTimeout(draftTimer); setDraftLabel('Saving…'); draftTimer = setTimeout(saveDraft, 800); }
+async function saveDraft() {
+  clearTimeout(draftTimer); draftTimer = 0;
+  try { await idbSet('draft', { v: 1, at: Date.now(), state: S }); dirty = false; setDraftLabel('Saved in this browser at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {} }
+  catch (e) { dirty = true; setDraftLabel('Could not save in this browser. Use Save data to keep your work.'); }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && draftReady && draftTimer) saveDraft(); });
+function normalise(d) {
+  return { company: { ...DEFAULT_COMPANY, ...(d.company || {}) }, signoff: Array.isArray(d.signoff) ? d.signoff : clone(DEFAULT_SIGN), title: d.title || '',
+    meta: Array.isArray(d.meta) ? d.meta : [], info: Array.isArray(d.info) ? d.info : [], sections: Array.isArray(d.sections) ? d.sections : [] };
+}
+$('#newBtn').addEventListener('click', () => {
+  const p = snapshot(), L = layout('blank'); S.title = ''; S.meta = L.meta; S.info = L.info; S.sections = L.sections; touch(); renderAll();
+  undoable('Started a new report', p, restore);
+});
+
+/* ================= start ================= */
+(async function init() {
+  let restored = false;
+  try { const d = await idbGet('draft'); if (d && d.state && Array.isArray(d.state.sections)) { S = normalise(d.state); restored = true; } } catch (e) {}
+  if (!restored) { const L = layout('blank'); S.company = { ...DEFAULT_COMPANY, ...S.company }; S.title = ''; S.meta = L.meta; S.info = L.info; S.sections = L.sections; }
+  draftReady = true; renderAll(); dirty = false;
+  if (restored) { setDraftLabel('Restored from this browser'); toast('Restored your last report from this browser.'); }
+  if (wideScreen()) setPane(true);
+})();
+</script>
+</body>
+</html>

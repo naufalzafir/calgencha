@@ -627,8 +627,8 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
 .srow .stag { font: 800 11px var(--font-body); letter-spacing: 0.1em; color: var(--muted); }
 .srow input { flex: 1; min-width: 0; font-weight: 700; text-align: center; text-transform: uppercase; }
 .srow .sgrip { display: flex; gap: 2px; }
-.stripe.hol { background: var(--hol); overflow: hidden; }
-.holv { position: absolute; left: 0; width: 100%; z-index: 2; display: flex; align-items: center; justify-content: center; text-align: center; font: 800 10px/11px var(--font-body); color: var(--hol-ink); white-space: pre; pointer-events: none; }
+.stripe.hol { background: var(--hol); overflow: hidden; bottom: auto; z-index: 3; pointer-events: none; }
+.holv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; font: 800 10px/11px var(--font-body); color: var(--hol-ink); white-space: pre; pointer-events: none; }
 .g-dc.hol { background: var(--hol); color: var(--hol-ink); } .g-dc.hol b { color: var(--hol-ink); }
 .secband { position: absolute; left: 0; right: 0; box-sizing: border-box; background: var(--secbg); border-bottom: 2px solid var(--itemline); z-index: 1; pointer-events: none; }
 .g-nrow.g-sechead { background: var(--secbg); padding-left: 0; cursor: default; }
@@ -1711,15 +1711,19 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       months += '<div class="g-mo" style="left:' + (d - rs) * dw + 'px;width:' + w + 'px">' + label + '</div>';
       d = end;
     }
-    var days = '', stripes = '', hol = holMap(), secs = '';
+    var days = '', stripes = '', msStripes = '', hol = holMap(), secs = '';
     if (scale === 'day') {
       var longD = state.longDays === true && dw >= 24;
       for (var n = rs; n <= re; n++) {
         var k = wd(n);
         var hn = hol[n];
         days += '<div class="g-dc' + (hn ? ' hol' : showW && k >= 5 ? (k === 5 ? ' sat we' : ' sun we') : '') + (showT && n === today ? ' now' : '') + (longD ? ' long' : '') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"' + (hn ? ' title="' + esc(hn) + '"' : '') + '><span>' + (longD ? DAY3[k] : 'MTWTFSS'[k]) + '</span><b>' + new Date(n * DAY).getUTCDate() + '</b></div>';
-        if (hn) stripes += '<div class="stripe hol" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px">' + holSegs(drows).map(function (sg) { var tx = holFit(hn, Math.floor((((sg[1] - sg[0]) * RH) - 8) / 11)); return tx ? '<span class="holv" style="top:' + sg[0] * RH + 'px;height:' + (sg[1] - sg[0]) * RH + 'px">' + esc(tx.split('').join('\n')) + '</span>' : ''; }).join('') + '</div>';
-        else if (showW && k >= 5) stripes += '<div class="stripe ' + (k === 5 ? 'sat' : 'sun') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>';
+        if (hn) msStripes += '<div class="stripe hol" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px;top:0;height:100%;z-index:0"></div>';
+        if (hn) holSegs(drows).forEach(function (sg) {
+          var tx = holFit(hn, Math.floor((((sg[1] - sg[0]) * RH) - 8) / 11));
+          stripes += '<div class="stripe hol" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px;top:' + sg[0] * RH + 'px;height:' + (sg[1] - sg[0]) * RH + 'px">' + (tx ? '<span class="holv">' + esc(tx.split('').join('\n')) + '</span>' : '') + '</div>';
+        });
+        else if (showW && k >= 5) { var wk = '<div class="stripe ' + (k === 5 ? 'sat' : 'sun') + '" style="left:' + (n - rs) * dw + 'px;width:' + dw + 'px"></div>'; stripes += wk; msStripes += wk; }
       }
     } else {
       for (var m = rs; m <= re; m += 7) {
@@ -1786,7 +1790,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
         }
       });
       msNames = '<div class="g-msname" style="height:' + lanes * LANE + 'px">Milestone</div>';
-      msBand = '<div class="g-ms" style="height:' + lanes * LANE + 'px">' + stripes + mlines + line + msBand + '</div>';
+      msBand = '<div class="g-ms" style="height:' + lanes * LANE + 'px">' + msStripes + mlines + line + msBand + '</div>';
     }
 
     el.style.setProperty('--nx', (34 + (f.workforce ? 72 : 0) + (showA ? 24 : 0)) + 'px');
@@ -2695,6 +2699,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
       if (showA) { stroke([142, 152, 166], 0.15); for (var q2 = 0; q2 < Math.max(chunk.length, 1); q2++) doc.line(GX - PAW, y0 + q2 * RH + RH / 2, GX + GRID, y0 + q2 * RH + RH / 2); }
       stroke([31, 41, 51], 0.45);
       for (var q = 0; q <= Math.max(chunk.length, 1); q++) doc.line(M, y0 + q * RH, GX + GRID, y0 + q * RH);
+      var drawHol = function () {
       if (hasHol && DW >= 1) {
         fill(HOLC);
         for (d = rs; d <= re; d++) if (hol[d]) holSegs(chunk).forEach(function (sg) { doc.rect(GX + (d - rs) * DW + 0.1, y0 + sg[0] * RH + 0.2, DW - 0.2, (sg[1] - sg[0]) * RH - 0.4, 'F'); });
@@ -2716,6 +2721,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           }
         }
       }
+      };
       stroke([142, 152, 166], 0.15); doc.line(M + NOW, top, M + NOW, yEnd);
       stroke(LINE, 0.25); doc.line(GX, top, GX, yEnd);
       if (WFW) doc.line(GX - PAW - WFW, top, GX - PAW - WFW, yEnd);
@@ -2809,6 +2815,7 @@ code { font-family: var(--font-mono); font-size: 12.5px; }
           doc.text('A', GX - PAW / 2, y + RH * 0.75, { align: 'center', baseline: 'middle' });
         }
       });
+      drawHol();
       stroke([31, 41, 51], 0.6); doc.rect(M, top, NAMEW + GRID, yEnd - top, 'S');
     }
 

@@ -1,6 +1,6 @@
 /* CalGencha service worker: keeps the tools working offline.
    Bump VERSION whenever you publish new files so visitors get them. */
-const VERSION = 'calgencha-v10-15';
+const VERSION = 'calgencha-v10-16';
 const SHELL = ['./', 'index.html', 'gancha.html', 'SpendTracker.html', 'HabitTracker.html', 'profile.js', 'dashboard.js', 'license.html', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const CROSS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com'];
@@ -13,7 +13,7 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
-    .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('calgencha-') && k !== VERSION).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
 });
 

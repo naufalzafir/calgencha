@@ -187,6 +187,14 @@ input[type="checkbox"] { width: 16px; height: 16px; min-height: 0; padding: 0; a
 .subtle { color: var(--muted); font-size: 12.5px; }
 .sbox { width: 190px; }
 .mini { font-size: 12px; min-height: 28px; padding: 3px 8px; }
+.cellbox { display: flex; flex-direction: column; gap: 4px; min-width: 0; border-radius: 6px; }
+.cthumb { position: relative; height: 64px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface-2); }
+.cthumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cthumb button { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; line-height: 1; cursor: pointer; }
+.cpic { display: flex; gap: 10px; }
+.linkbtn.mini { min-height: 0; padding: 2px 0; font-size: 12px; }
+.racts, .ccontrols { display: flex; align-items: flex-start; }
+.pastetarget { outline: 2px solid var(--accent); outline-offset: 2px; }
 .drop-note { color: var(--muted); font-size: 12px; }
 .datebar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; }
 .datebar .field { width: 160px; }
@@ -482,7 +490,7 @@ const newSection = type => {
   switch (type) {
     case 'text': return { ...base, heading: 'New section', body: '' };
     case 'bullets': return { ...base, heading: 'New list', items: '' };
-    case 'table': return { ...base, heading: 'New table', cols: ['Column 1', 'Column 2', 'Column 3'], rows: [['', '', '']], center: false };
+    case 'table': return { ...base, heading: 'New table', cols: ['Column 1', 'Column 2', 'Column 3'], rows: [['', '', '']], center: false, num: false, numLabel: 'No.', picFit: 'frame', picBorder: true, picH: 4 };
     case 'photos': return { ...base, heading: 'Photos', newPage: true, intro: 'Please refer to the attachment on the following page', groups: [{ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: [] }] };
     case 'beforeafter': return { ...base, heading: 'Completed project photos', newPage: true, groups: [{ sub: '', title: '', fit: 'frame', pborder: true, pairs: [{ before: null, after: null }] }] };
     case 'findings': return { ...base, heading: 'Report summary', newPage: true, rows: [{ loc: '', photo: null, cap: '', finding: '', action: '' }] };
@@ -633,9 +641,10 @@ function countPhotos(s) {
   if (s.type === 'photos') return s.groups.reduce((n, g) => n + g.photos.filter(hasSrc).length, 0);
   if (s.type === 'beforeafter') return s.groups.reduce((n, g) => n + g.pairs.reduce((m, p) => m + (hasSrc(p.before) ? 1 : 0) + (hasSrc(p.after) ? 1 : 0), 0), 0);
   if (s.type === 'findings') return s.rows.filter(r => hasSrc(r.photo)).length;
+  if (s.type === 'table') return s.rows.reduce((n, r) => n + r.filter(c => cellImg(c)).length, 0);
   return 0;
 }
-function updateCounts() { $('#secCount').textContent = S.sections.length; const n = photoSlots(); $('#photoCount').textContent = n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : ''; }
+function updateCounts() { markTarget(); $('#secCount').textContent = S.sections.length; const n = photoSlots(); $('#photoCount').textContent = n ? n + ' photo' + (n > 1 ? 's' : '') + ' added' : ''; }
 
 function renderSections() {
   const box = $('#sections'); box.innerHTML = '';
@@ -670,23 +679,87 @@ function sectionCard(s, i) {
 }
 
 /* ---- table ---- */
+function cellBox(s, r, k, rerender) {
+  const c = r[k], img = cellImg(c);
+  const ta = h('textarea', { rows: 1, 'aria-label': 'Cell text', value: cellTxt(c), oninput: e => { setCellText(r, k, e.target.value); touch(); grow(e.target); } });
+  ta.value = cellTxt(c);
+  const setImg = async fs => { const [ph] = await filesToPhotos(fs); if (!ph) return; r[k] = { t: cellTxt(r[k]), img: ph }; touch(); rerender(); };
+  const box = h('div', { class: 'cellbox' });
+  if (img) box.append(h('div', { class: 'cthumb' }, h('img', { src: img.src, alt: 'Picture in cell' }), h('button', { type: 'button', title: 'Remove picture', 'aria-label': 'Remove picture', onclick: () => { r[k] = cellTxt(r[k]); touch(); rerender(); } }, '×')));
+  box.append(ta, h('div', { class: 'cpic' },
+    h('button', { type: 'button', class: 'linkbtn mini', onclick: () => pickPhotos(false, setImg) }, img ? 'Replace picture' : '+ Picture'),
+    h('button', { type: 'button', class: 'linkbtn mini', onclick: () => pasteFromClipboard(setImg) }, 'Paste')));
+  armPaste(box, keyOf(r) + '-' + k, setImg);
+  return box;
+}
 function tableEditor(s, rerender) {
-  const n = s.cols.length;
-  const grid = h('div', { class: 'tgrid', style: `grid-template-columns: repeat(${n}, minmax(130px, 1fr)) 30px` });
-  s.cols.forEach((c, ci) => grid.append(h('textarea', { class: 'th', rows: 1, 'aria-label': 'Column ' + (ci + 1) + ' heading', value: c, oninput: e => { s.cols[ci] = e.target.value; touch(); } })));
+  const n = s.cols.length, hasImg = s.rows.some(r => r.some(c => cellImg(c)));
+  const grid = h('div', { class: 'tgrid', style: `grid-template-columns: repeat(${n}, minmax(150px, 1fr)) 100px` });
+  const moveCol = (k, d) => { const j = k + d; if (j < 0 || j >= n) return; [s.cols[k], s.cols[j]] = [s.cols[j], s.cols[k]]; s.rows.forEach(r => { [r[k], r[j]] = [r[j], r[k]]; }); touch(); rerender(); };
+  const delCol = k => { const p = snapshot(); s.cols.splice(k, 1); s.rows.forEach(r => r.splice(k, 1)); touch(); rerender(); undoable('Column removed', p, restore); };
+  s.cols.forEach((c, k) => grid.append(h('div', { class: 'ccontrols' },
+    iconBtn('←', 'Move column left', () => moveCol(k, -1), k === 0), iconBtn('→', 'Move column right', () => moveCol(k, 1), k === n - 1),
+    iconBtn('×', 'Remove column', () => delCol(k), n <= 1))));
+  grid.append(h('span'));
+  s.cols.forEach((c, k) => grid.append(h('textarea', { class: 'th', rows: 1, 'aria-label': 'Column ' + (k + 1) + ' heading', value: c, oninput: e => { s.cols[k] = e.target.value; touch(); } })));
   grid.append(h('span'));
   s.rows.forEach((r, ri) => {
-    r.forEach((c, ci) => grid.append(h('textarea', { rows: 1, 'aria-label': 'Row ' + (ri + 1) + ' column ' + (ci + 1), value: c, oninput: e => { r[ci] = e.target.value; touch(); grow(e.target); } })));
-    grid.append(iconBtn('×', 'Remove row', () => { s.rows.splice(ri, 1); touch(); rerender(); }));
+    r.forEach((c, k) => grid.append(cellBox(s, r, k, rerender)));
+    grid.append(h('div', { class: 'racts' },
+      iconBtn('↑', 'Move row up', () => { if (move(s.rows, ri, -1)) { touch(); rerender(); } }, ri === 0),
+      iconBtn('↓', 'Move row down', () => { if (move(s.rows, ri, 1)) { touch(); rerender(); } }, ri === s.rows.length - 1),
+      iconBtn('×', 'Remove row', () => { const p = snapshot(); s.rows.splice(ri, 1); touch(); rerender(); undoable('Row removed', p, restore); })));
   });
+  const sizes = [[2.5, 'Small (2.5 cm tall)'], [4, 'Medium (4 cm tall)'], [6, 'Large (6 cm tall)'], [8, 'Extra large (8 cm tall)']];
+  const fits = [['natural', 'Keep proportions'], ['frame', 'Fit to frame (same size)'], ['fill', 'Fill frame (crops edges)']];
   return h('div', { class: 'stack', style: 'gap:8px' },
     h('div', { class: 'tscroll' }, grid),
     h('div', { class: 'row2' },
       h('button', { type: 'button', class: 'btn', onclick: () => { s.rows.push(s.cols.map(() => '')); touch(); rerender(); } }, '+ Row'),
       h('button', { type: 'button', class: 'btn', onclick: () => { if (s.cols.length >= 8) return toast('Eight columns is the most that fit.', { error: true }); s.cols.push('Column ' + (s.cols.length + 1)); s.rows.forEach(r => r.push('')); touch(); rerender(); } }, '+ Column'),
-      h('button', { type: 'button', class: 'btn', disabled: s.cols.length <= 1, onclick: () => { s.cols.pop(); s.rows.forEach(r => r.pop()); touch(); rerender(); } }, '− Last column'),
-      h('label', { class: 'msdone' }, h('input', { type: 'checkbox', checked: s.center, onchange: e => { s.center = e.target.checked; touch(); } }), 'Centre the cell text')));
+      h('label', { class: 'msdone' }, h('input', { type: 'checkbox', checked: s.center, onchange: e => { s.center = e.target.checked; touch(); } }), 'Centre the cell text'),
+      h('label', { class: 'msdone' }, h('input', { type: 'checkbox', checked: !!s.num, onchange: e => { s.num = e.target.checked; touch(); rerender(); } }), 'Number the rows automatically'),
+      s.num ? h('div', { class: 'field', style: 'width:110px' }, h('label', { class: 'lbl', for: 'nl' + keyOf(s) }, 'Number heading'), h('input', { id: 'nl' + keyOf(s), maxlength: 12, value: s.numLabel ?? 'No.', oninput: e => { s.numLabel = e.target.value; touch(); } })) : null),
+    hasImg ? h('div', { class: 'row2' },
+      field('Picture size', h('select', { onchange: e => { s.picH = +e.target.value; touch(); } }, sizes.map(([v, t]) => h('option', { value: v, selected: (+s.picH || 4) === v }, t))), 'grow'),
+      field('Picture fit', h('select', { onchange: e => { s.picFit = e.target.value; touch(); } }, fits.map(([v, t]) => h('option', { value: v, selected: (s.picFit || 'natural') === v }, t))), 'grow'),
+      h('label', { class: 'msdone', style: 'padding-bottom:8px' }, h('input', { type: 'checkbox', checked: !!s.picBorder, onchange: e => { s.picBorder = e.target.checked; touch(); } }), 'Picture border')) : null);
 }
+
+/* ---- pasting pictures from the clipboard ---- */
+const ptIds = new WeakMap(); let ptN = 0, pasteT = null;
+const keyOf = o => { if (!ptIds.has(o)) ptIds.set(o, ++ptN); return ptIds.get(o); };
+function markTarget() {
+  document.querySelectorAll('.pastetarget').forEach(e => e.classList.remove('pastetarget'));
+  if (pasteT) { const e = document.querySelector('[data-pt="' + pasteT.key + '"]'); if (e) e.classList.add('pastetarget'); }
+}
+function armPaste(el, key, fn) { el.dataset.pt = key; const set = () => { pasteT = { key, fn }; markTarget(); }; el.addEventListener('pointerdown', set); el.addEventListener('focusin', set); }
+document.addEventListener('paste', async e => {
+  const items = [...(e.clipboardData ? e.clipboardData.items : [])].filter(i => i.kind === 'file' && /^image\//.test(i.type));
+  if (!items.length) return;                       // ordinary text paste: leave it alone
+  e.preventDefault();
+  const files = items.map(i => i.getAsFile()).filter(Boolean);
+  if (!pasteT) { toast('Click a photo area first, then paste.', { error: true }); return; }
+  await pasteT.fn(files); toast(files.length > 1 ? files.length + ' pictures pasted.' : 'Picture pasted.');
+});
+async function pasteFromClipboard(fn) {
+  try {
+    const its = await navigator.clipboard.read(), files = [];
+    for (const it of its) { const t = it.types.find(x => /^image\//.test(x)); if (t) { const b = await it.getType(t); files.push(new File([b], 'pasted.' + t.split('/')[1], { type: t })); } }
+    if (!files.length) { toast('No picture on the clipboard. Copy a picture first.', { error: true }); return; }
+    await fn(files); toast('Picture pasted.');
+  } catch (err) { toast('Could not read the clipboard. Click the photo area and press Ctrl+V instead.', { error: true }); }
+}
+
+/* ---- table cells: text, or text plus a picture ---- */
+const cellTxt = c => typeof c === 'string' ? c : (c && c.t) || '';
+const cellImg = c => (c && typeof c === 'object' && hasSrc(c.img)) ? c.img : null;
+function setCellText(r, i, v) { if (r[i] && typeof r[i] === 'object') r[i].t = v; else r[i] = v; }
+function tblWidths(n, num, W) {
+  if (!num) { const cw = Math.floor(W / n), ws = Array(n).fill(cw); ws[n - 1] += W - cw * n; return ws; }
+  const m = n - 1, cw = Math.floor((W - 600) / m), ws = [600, ...Array(m).fill(cw)]; ws[n - 1] += W - 600 - cw * m; return ws;
+}
+const picGroup = s => ({ fit: s.picFit || 'natural', pborder: !!s.picBorder, fh: +s.picH || 4, nat: +s.picH || 4 });
 
 /* ---- photo card ---- */
 function photoCard(p, o) {
@@ -736,10 +809,12 @@ function photosEditor(s, rerender) {
       h('div', { class: 'row2' },
         h('button', { type: 'button', class: 'btn', onclick: () => pickPhotos(true, addMany) }, '+ Add photos'),
         h('button', { type: 'button', class: 'btn', onclick: () => { g.photos.push({ src: '', w: 0, h: 0, caption: '' }); touch(); rerender(); } }, '+ Empty slot'),
-        h('span', { class: 'drop-note' }, 'You can also drop photos here')));
+        h('button', { type: 'button', class: 'btn', onclick: () => pasteFromClipboard(addMany) }, '+ Paste picture'),
+        h('span', { class: 'drop-note' }, 'You can also drop photos here, or click here and press Ctrl+V')));
     box.addEventListener('dragover', e => { e.preventDefault(); box.classList.add('drag'); });
     box.addEventListener('dragleave', () => box.classList.remove('drag'));
     box.addEventListener('drop', e => { e.preventDefault(); box.classList.remove('drag'); addMany([...e.dataTransfer.files]); });
+    armPaste(box, keyOf(g), addMany);
     wrap.append(box);
   });
   wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.groups.push({ sub: '', title: '', cols: 2, frame: false, fit: 'frame', pborder: true, photos: [] }); touch(); rerender(); } }, '+ Add photo group')));
@@ -755,6 +830,11 @@ function baEditor(s, rerender) {
       if (hasSrc(p)) return photoCard(p, { onDel: () => { pair[key] = null; touch(); rerender(); } });
       return emptySlot(label, () => pickPhotos(false, async fs => { const [ph] = await filesToPhotos(fs); if (ph) { pair[key] = ph; touch(); rerender(); } }));
     };
+    const pasteBA = async fs => {
+      const ph = await filesToPhotos(fs); if (!ph.length) return;
+      ph.forEach(x => { let done = false; for (const pr of g.pairs) { if (!hasSrc(pr.before)) { pr.before = x; done = true; break; } if (!hasSrc(pr.after)) { pr.after = x; done = true; break; } } if (!done) g.pairs.push({ before: x, after: null }); });
+      touch(); rerender();
+    };
     const pairs = g.pairs.map((pr, pi) => h('div', { class: 'pair' },
       h('div', {}, h('div', { class: 'tag' }, 'BEFORE'), slot(pr, 'before', 'bc', 'Before')),
       h('div', {}, h('div', { class: 'tag' }, 'AFTER'), slot(pr, 'after', 'ac', 'After')),
@@ -766,7 +846,9 @@ function baEditor(s, rerender) {
         ...fitControls(g),
         iconBtn('×', 'Remove group', () => { const p = snapshot(); s.groups.splice(gi, 1); touch(); rerender(); undoable('Group removed', p, restore); })),
       h('div', { class: 'stack', style: 'gap:8px' }, pairs),
-      h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { g.pairs.push({ before: null, after: null }); touch(); rerender(); } }, '+ Add pair'))));
+      h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { g.pairs.push({ before: null, after: null }); touch(); rerender(); } }, '+ Add pair'),
+        h('button', { type: 'button', class: 'btn', style: 'margin-left:8px', onclick: () => pasteFromClipboard(pasteBA) }, '+ Paste picture'))));
+    armPaste(wrap.lastElementChild, keyOf(g), pasteBA);
   });
   wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.groups.push({ sub: '', title: '', fit: 'frame', pborder: true, pairs: [{ before: null, after: null }] }); touch(); rerender(); } }, '+ Add group')));
   return wrap;
@@ -779,9 +861,10 @@ function findingsEditor(s, rerender) {
     const ph = hasSrc(r.photo)
       ? photoCard(r.photo, { onDel: () => { r.photo = null; touch(); rerender(); } })
       : emptySlot('Photo', () => pickPhotos(false, async fs => { const [p] = await filesToPhotos(fs); if (p) { r.photo = p; touch(); rerender(); } }));
+    const setPh = async fs => { const [p] = await filesToPhotos(fs); if (p) { r.photo = p; touch(); rerender(); } };
     const cap = bindInput(r, 'cap', { placeholder: 'Caption under photo', maxlength: 160, 'aria-label': 'Photo caption' });
     wrap.append(h('div', { class: 'fcard' },
-      h('div', { class: 'fl', style: 'flex:0 0 150px' }, h('span', { class: 'lbl' }, 'No. ' + (ri + 1)), ph, cap),
+      h('div', { class: 'fl', style: 'flex:0 0 150px' }, h('span', { class: 'lbl' }, 'No. ' + (ri + 1)), ph, cap, h('button', { type: 'button', class: 'linkbtn mini', onclick: () => pasteFromClipboard(setPh) }, 'Paste picture')),
       h('div', { class: 'fl' }, field('Location / component', bindInput(r, 'loc', { rows: 3, maxlength: 300, placeholder: 'Post B – Line 2\nRight barrier gate (relay)' }, 'textarea'))),
       h('div', { class: 'fl wide' },
         field('Problem finding / condition', bindInput(r, 'finding', { rows: 2, maxlength: 400, placeholder: 'What was found' }, 'textarea')),
@@ -792,6 +875,7 @@ function findingsEditor(s, rerender) {
         iconBtn('×', 'Remove row', () => { const p = snapshot(); s.rows.splice(ri, 1); touch(); rerender(); undoable('Row removed', p, restore); }))));
   });
   wrap.append(h('div', {}, h('button', { type: 'button', class: 'btn', onclick: () => { s.rows.push({ loc: '', photo: null, cap: '', finding: '', action: '' }); touch(); rerender(); } }, '+ Add row')));
+  wrap.querySelectorAll('.fcard').forEach((el, ri) => { const r = s.rows[ri]; armPaste(el, keyOf(r), async fs => { const [p] = await filesToPhotos(fs); if (p) { r.photo = p; touch(); rerender(); } }); });
   return wrap;
 }
 
@@ -864,7 +948,7 @@ function signTable(S) {
 }
 
 /* ---- photo frames: every photo in a group gets the same fixed frame ---- */
-function frameCm(cols, cwTw) { return [cwTw / 567 - 0.5, cols === 1 ? 11 : cols === 2 ? 6.2 : 4.2]; }
+function frameCm(cols, cwTw, fh) { return [cwTw / 567 - 0.5, fh || (cols === 1 ? 11 : cols === 2 ? 6.2 : 4.2)]; }
 function cropOf(w, hh, boxAspect) {
   const a = w / hh; let l = 0, t = 0;
   if (a > boxAspect) l = (1 - boxAspect / a) / 2; else t = (1 - a / boxAspect) / 2;
@@ -983,19 +1067,23 @@ function buildDocx(S) {
   });
 
   function tableXml(s) {
-    const n = s.cols.length, cw = Math.floor(W / n), ws = s.cols.map(() => cw); ws[n - 1] += W - cw * n;
+    const nm = !!s.num, n = s.cols.length + (nm ? 1 : 0), ws = tblWidths(n, nm, W), off = nm ? 1 : 0, picG = picGroup(s);
     const f = { font: TNR, sz: 20 }, jc = s.center ? 'center' : 'left';
-    const cell = (t, i, o = {}) => tc(ws[i], (cleanTxt(t).split('\n').length ? cleanTxt(t).split('\n') : ['']).map(l => para(runs(l, { ...f, ...o }), { jc: o.b ? 'center' : jc, before: 40, after: 40 })), o.b ? { shade: 'D9E2F3' } : {});
-    return [tbl(ws, [tr(s.cols.map((c, i) => cell(c, i, { b: 1 })), { hdr: 1 }), ...s.rows.map(r => tr(r.map((c, i) => cell(c, i))))])];
+    const txt = (t, o = {}) => cleanTxt(t).split('\n').map(l => para(runs(l, { ...f, ...o }), { jc: o.b ? 'center' : jc, before: 40, after: 40 }));
+    const hcell = (t, i) => tc(ws[i], txt(t, { b: 1 }), { shade: 'D9E2F3' });
+    const bcell = (c, i) => { const im = cellImg(c), t = cellTxt(c), ps = []; if (im && media_(im.src)) ps.push(...photoCell(im, ws[i], 0, picG)); if (t.trim() || !ps.length) ps.push(...txt(t)); return tc(ws[i], ps); };
+    const numc = ri => tc(ws[0], [para(runs(String(ri + 1), f), { jc: 'center', before: 40, after: 40 })]);
+    return [tbl(ws, [tr([...(nm ? [hcell(s.numLabel ?? 'No.', 0)] : []), ...s.cols.map((c, k) => hcell(c, k + off))], { hdr: 1 }),
+      ...s.rows.map((r, ri) => tr([...(nm ? [numc(ri)] : []), ...r.map((c, k) => bcell(c, k + off))]))])];
   }
   function photoCell(p, cw, cols, g) {
     const out = [], mode = (g && g.fit) || 'natural';
     if (hasSrc(p) && media_(p.src)) {
       if (mode === 'natural') {
-        const [cx, cy] = fit(p.w, p.h, cw / 567 - 0.5, cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6);
+        const [cx, cy] = fit(p.w, p.h, cw / 567 - 0.5, (g && g.nat) || (cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6));
         out.push(para(pic(p.src, cx, cy), { jc: 'center', keepNext: 1, before: 80, after: 40 }));
       } else {
-        const [fw, fh] = frameCm(cols, cw), Wt = Math.round(fw * 567), Ht = Math.round(fh * 567), iw = fw - 0.12, ih = fh - 0.12;
+        const [fw, fh] = frameCm(cols, cw, g.fh), Wt = Math.round(fw * 567), Ht = Math.round(fh * 567), iw = fw - 0.12, ih = fh - 0.12;
         let cx, cy, crop = null;
         if (mode === 'fill') { cx = Math.round(iw * 360000); cy = Math.round(ih * 360000); crop = cropOf(p.w, p.h, iw / ih); } else [cx, cy] = fit(p.w, p.h, iw, ih);
         out.push(para('', { line: 100, rule: 'exact', keepNext: 1 }));
@@ -1147,7 +1235,7 @@ function IMG(p, mwCm, mhCm, o = {}) {
   im.src = p.src; im.style.cssText = `display:block;margin:0 auto;width:${cmPx(cw)}px;height:${cmPx(ch)}px`; d.append(im); return d;
 }
 function FRAME(p, cols, cwTw, g, o = {}) {
-  const [fw, fh] = frameCm(cols, cwTw), W = cmPx(fw), H = cmPx(fh), bd = g.pborder ? 1 : 0, IW = W - 2 * bd, IH = H - 2 * bd, iw = cmPx(fw - 0.12), ih = cmPx(fh - 0.12);
+  const [fw, fh] = frameCm(cols, cwTw, g.fh), W = cmPx(fw), H = cmPx(fh), bd = g.pborder ? 1 : 0, IW = W - 2 * bd, IH = H - 2 * bd, iw = cmPx(fw - 0.12), ih = cmPx(fh - 0.12);
   const d = document.createElement('div'), box = document.createElement('div'), ib = document.createElement('div'), im = new Image();
   d.className = 'dp'; d.style.margin = `${twp(o.before || 0)}px 0 ${twp(o.after || 0)}px 0`;
   box.style.cssText = `position:relative;box-sizing:border-box;width:${W}px;height:${H}px;margin:0 auto;border:${bd}px solid #000`;
@@ -1240,7 +1328,7 @@ function renderDoc(S) {
   let num = 0, force = !info.length;
   const photoCell = (p, cw, cols, g) => {
     const out = [];
-    if (hasSrc(p)) out.push(g.fit === 'frame' || g.fit === 'fill' ? FRAME(p, cols, cw, g, { before: 80, after: 40 }) : IMG(p, cw / 567 - 0.5, cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6, { jc: 'center', before: 80, after: 40 }));
+    if (hasSrc(p)) out.push(g.fit === 'frame' || g.fit === 'fill' ? FRAME(p, cols, cw, g, { before: 80, after: 40 }) : IMG(p, cw / 567 - 0.5, (g && g.nat) || (cols === 1 ? 17 : cols === 2 ? 6.2 : 4.6), { jc: 'center', before: 80, after: 40 }));
     if (p && p.caption && p.caption.trim()) out.push(P(p.caption.trim(), { sz: 20, jc: 'center', before: 20, after: 80 }));
     return out;
   };
@@ -1253,9 +1341,13 @@ function renderDoc(S) {
     if (s.type === 'text') { const ps = cleanTxt(s.body).split(/\n\s*\n/).filter(x => x.trim()); if (!ps.length) F.block(P('', {})); ps.forEach(p => F.block(P(p.trim(), { ...T, after: 140, line: 276, jc: 'both' }))); }
     else if (s.type === 'bullets') { const ls = cleanTxt(s.items).split('\n').filter(x => x.trim()); if (!ls.length) F.block(P('', {})); ls.forEach(l => F.block(P('•  ' + l.trim(), { ...T, ind: [567, 283], after: 80 }))); }
     else if (s.type === 'table') {
-      const n = s.cols.length, cw = Math.floor(W2 / n), ws = s.cols.map(() => cw); ws[n - 1] += W2 - cw * n;
-      const cell = (t, i, hd) => TD(ws[i], cleanTxt(t).split('\n').map(l => P(l, { sz: 20, b: hd, jc: hd || s.center ? 'center' : 'left', before: 40, after: 40 })), hd ? { shade: 'D9E2F3' } : {});
-      F.table({ make: () => TBL(ws), repeat: [TR(s.cols.map((c, i) => cell(c, i, 1)))], units: s.rows.map(r => [TR(r.map((c, i) => cell(c, i, 0)))]) });
+      const nm = !!s.num, n = s.cols.length + (nm ? 1 : 0), ws = tblWidths(n, nm, W2), off = nm ? 1 : 0, picG = picGroup(s);
+      const txtP = t => cleanTxt(t).split('\n').map(l => P(l, { sz: 20, jc: s.center ? 'center' : 'left', before: 40, after: 40 }));
+      const hcell = (t, i) => TD(ws[i], cleanTxt(t).split('\n').map(l => P(l, { sz: 20, b: 1, jc: 'center', before: 40, after: 40 })), { shade: 'D9E2F3' });
+      const bcell = (c, i) => { const im = cellImg(c), t = cellTxt(c), kids = []; if (im) kids.push(...photoCell(im, ws[i], 0, picG)); if (t.trim() || !kids.length) kids.push(...txtP(t)); return TD(ws[i], kids); };
+      const numc = ri => TD(ws[0], [P(String(ri + 1), { sz: 20, jc: 'center', before: 40, after: 40 })]);
+      F.table({ make: () => TBL(ws), repeat: [TR([...(nm ? [hcell(s.numLabel ?? 'No.', 0)] : []), ...s.cols.map((c, k) => hcell(c, k + off))])],
+        units: s.rows.map((r, ri) => [TR([...(nm ? [numc(ri)] : []), ...r.map((c, k) => bcell(c, k + off))])]) });
       F.block(P('', { after: 120 }));
     } else if (s.type === 'photos' || s.type === 'beforeafter') {
       let k = 0;

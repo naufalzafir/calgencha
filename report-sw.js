@@ -1,6 +1,6 @@
 /* Report Builder service worker: caches the app so it opens offline.
    Bump VERSION whenever report.html changes so installed copies update. */
-const VERSION = 'report-v5';
+const VERSION = 'report-v6';
 const CORE = ['./report.html', './report.webmanifest', './icons/report-icon.svg', './icons/report-192.png', './icons/report-512.png', './icons/report-maskable-512.png', './icons/report-apple-180.png'];
 
 self.addEventListener('install', e => {
